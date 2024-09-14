@@ -127,7 +127,8 @@ body {
   justify-content: space-between; /* Split the cart and search sections */
   align-items: flex-start;
   width: 100%;
-  padding: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   margin-top: 90px; /* Add space between the navbar and the section */
   box-sizing: border-box;
 }
@@ -156,7 +157,9 @@ body {
   width: 50%; /* Take 60% of the screen width */
   background-color: #f9f9f9;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 400px;
 }
 
 #cart h2 {
@@ -176,21 +179,11 @@ h1, h2 {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  z-index: 0;
+  position: relative;
+  overflow: visible; /* Ensures child elements can overflow */
 }
 
-.slider-group {
-  margin-bottom: 20px;
-}
-
-.slider-group label {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-}
-
-.slider-group input[type="range"] {
-  width: 100%;
-}
 
 .checkbox-group {
   margin-bottom: 20px;
@@ -205,20 +198,108 @@ h1, h2 {
   margin-bottom: 10px;
 }
 
+/* Sliders */
+
+
+.box{
+  width: 550px;
+  height: 70px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  
+}
+.box .inner-box{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.inner-box .line{
+  position: absolute;
+  left: 0;
+  width: 0%;
+  height: 4px;
+  background-color: #030303;
+  border-radius: 5px;
+} 
+.inner-box .input-range{
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  background-color: #DDDDDD;
+}
+.inner-box .input-range::-webkit-slider-thumb{
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background-color: #030303;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+
+} 
+
+.number{
+  width: 50px;
+  text-align: right;
+  justify-self: center;
+  font-size: 21px;
+  font-weight: bold;
+  margin-top: 1em;
+  color: #030303;
+}
+.slider-label{
+  padding-top: 15px;
+  font-weight: bold;
+  font-size: 20px;
+  padding-right: 10px;
+}
+
 /* Buttons */
 .btn-primary {
-  background-color: #ff6347;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  width: 165px;
+  height: 50px;
   cursor: pointer;
-  font-size: 16px;
-}#ff6347
-
-.btn-primary:hover {
-  background-color: #ff4500;
+  color: #fff;
+  font-size: 17px;
+  border-radius: 1rem;
+  border: none;
+  position: relative;
+  background: #100720;
+  transition: 0.1s;
 }
+
+.btn-primary::after {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgb(250, 115, 62) 17.8%, rgb(22, 21, 99) 100.2% );
+  filter: blur(15px);
+  z-index: -1;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.btn-primary:active {
+  transform: scale(0.9) rotate(3deg);
+  background: radial-gradient( circle farthest-corner at 10% 20%, rgb(250, 115, 62) 17.8%, rgb(22, 21, 99) 100.2% );
+  transition: 0.1s;
+}
+
+
 
 .btn-secondary {
   background-color: #cccccc;
@@ -233,6 +314,58 @@ h1, h2 {
 .btn-secondary:hover {
   background-color: #b3b3b3;
 }
+
+/* Serch cources */
+
+.group {
+  display: flex;
+  line-height: 28px;
+  align-items: center;
+  position: relative;
+  width: 350px;
+  padding-right: 20px;
+}
+ 
+ .input {
+  width: 100%;
+  height: 50px;
+  line-height: 28px;
+  padding: 0 1rem;
+  padding-left: 2.5rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  background-color: #fffffff6;
+  color: #0d0c22;
+  transition: .3s ease;
+ }
+ 
+ .input::placeholder {
+  color: #030303;
+  font-weight: bold;
+  font-size: small;
+ }
+ 
+ .input:focus, input:hover {
+  outline: none;
+  border-color: rgb(223, 124, 58);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+ }
+ 
+ .icon {
+  position: absolute;
+  left: 1rem;
+  fill: #9e9ea7;
+  width: 1rem;
+  height: 1rem;
+ }
+ 
+ 
+ 
+ 
+ 
+ 
 
 /* Generated Schedules Section */
 .generated-schedules {
