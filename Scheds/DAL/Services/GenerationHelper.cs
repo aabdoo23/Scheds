@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
-using Scheds.Model;
+using Scheds.Models;
 using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 
@@ -277,13 +277,27 @@ namespace Scheds.DAL.Services
                 }
             }
         }
-        public static List<List<ReturnedCardItem>> GenerateAllTimetables(List<List<CardItem>> allCardItemsByCourse, GenerateRequest request)
+        public static List<ReturnedCardItem[,]> GenerateAllTimetables(List<List<CardItem>> allCardItemsByCourse, GenerateRequest request)
         {
             List<List<ReturnedCardItem>> result = new List<List<ReturnedCardItem>>();
 
             GenerateTimetablesHelper(allCardItemsByCourse, 0, new List<CardItem>(), result, request);
-
-            return result;
+            List<ReturnedCardItem[,]> schedules = new List<ReturnedCardItem[,]>();
+            foreach(var schedule in result)
+            {
+                ReturnedCardItem[,] scheduleArray = new ReturnedCardItem[6,24];
+                foreach(var item in schedule)
+                {
+                    int dayIndex = Array.IndexOf(new string[] {"Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" }, item.day);
+                    
+                    for (int i = item.startTime.Hours; i < item.endTime.Hours; i++)
+                    {
+                        scheduleArray[dayIndex,i] = item;
+                    }
+                }
+                schedules.Add(scheduleArray);
+            }
+            return schedules;
         }
 
         public static bool isCompatible(List<CardItem> currSchedule, CardItem item)

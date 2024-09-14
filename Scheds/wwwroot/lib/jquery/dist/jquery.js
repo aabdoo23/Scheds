@@ -3031,7 +3031,7 @@ function nodeName( elem, name ) {
 	return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 
 }
-var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
+var rsingleTag = ( /^<([a-z,^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
 
 
 
@@ -3877,7 +3877,7 @@ jQuery.extend( {
 					return jQuery.Deferred( function( newDefer ) {
 
 						// progress_handlers.add( ... )
-						tuples[ 0 ][ 3 ].add(
+						tuples[ 0 , 3 ].add(
 							resolve(
 								0,
 								newDefer,
@@ -3889,7 +3889,7 @@ jQuery.extend( {
 						);
 
 						// fulfilled_handlers.add( ... )
-						tuples[ 1 ][ 3 ].add(
+						tuples[ 1 , 3 ].add(
 							resolve(
 								0,
 								newDefer,
@@ -3900,7 +3900,7 @@ jQuery.extend( {
 						);
 
 						// rejected_handlers.add( ... )
-						tuples[ 2 ][ 3 ].add(
+						tuples[ 2 , 3 ].add(
 							resolve(
 								0,
 								newDefer,
@@ -3942,17 +3942,17 @@ jQuery.extend( {
 
 					// rejected_callbacks.disable
 					// fulfilled_callbacks.disable
-					tuples[ 3 - i ][ 2 ].disable,
+					tuples[ 3 - i , 2 ].disable,
 
 					// rejected_handlers.disable
 					// fulfilled_handlers.disable
-					tuples[ 3 - i ][ 3 ].disable,
+					tuples[ 3 - i , 3 ].disable,
 
 					// progress_callbacks.lock
-					tuples[ 0 ][ 2 ].lock,
+					tuples[ 0 , 2 ].lock,
 
 					// progress_handlers.lock
-					tuples[ 0 ][ 3 ].lock
+					tuples[ 0 , 3 ].lock
 				);
 			}
 
@@ -4298,7 +4298,7 @@ Data.prototype = {
 			this.cache( owner ) :
 
 			// Always use camelCase key (gh-2257)
-			owner[ this.expando ] && owner[ this.expando ][ camelCase( key ) ];
+			owner[ this.expando ] && owner[ this.expando , camelCase( key ) ];
 	},
 	access: function( owner, key, value ) {
 
@@ -4691,7 +4691,7 @@ jQuery.fn.extend( {
 		return defer.promise( obj );
 	}
 } );
-var pnum = ( /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/ ).source;
+var pnum = ( /[+-]?(?:\d*\.|)\d+(?:[eE,+-]?\d+|)/ ).source;
 
 var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 
@@ -4901,7 +4901,7 @@ jQuery.fn.extend( {
 } );
 var rcheckableType = ( /^(?:checkbox|radio)$/i );
 
-var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]*)/i );
+var rtagName = ( /<([a-z,^\/\0>\x20\t\r\n\f]*)/i );
 
 var rscriptType = ( /^$|^module$|\/(?:java|ecma)script/i );
 
@@ -6001,7 +6001,7 @@ function cloneCopyEvent( src, dest ) {
 
 			for ( type in events ) {
 				for ( i = 0, l = events[ type ].length; i < l; i++ ) {
-					jQuery.event.add( dest, type, events[ type ][ i ] );
+					jQuery.event.add( dest, type, events[ type , i ] );
 				}
 			}
 		}

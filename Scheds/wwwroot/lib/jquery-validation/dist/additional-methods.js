@@ -170,7 +170,7 @@ $.validator.addMethod( "bankorgiroaccountNL", function( value, element ) {
  * - Last 3 characters - branch code, optional (shall not start with 'X' except in case of 'XXX' for primary office) (letters and digits)
  */
 $.validator.addMethod( "bic", function( value, element ) {
-    return this.optional( element ) || /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( value.toUpperCase() );
+    return this.optional( element ) || /^([A-Z]{6}[A-Z2-9,A-NP-Z1-9])(X{3}|[A-WY-Z0-9,A-Z0-9]{2})?$/.test( value.toUpperCase() );
 }, "Please specify a valid BIC code." );
 
 /*
@@ -179,7 +179,7 @@ $.validator.addMethod( "bic", function( value, element ) {
  *
  * Spanish CIF structure:
  *
- * [ T ][ P ][ P ][ N ][ N ][ N ][ N ][ N ][ C ]
+ * [ T , P , P , N , N , N , N , N , C ]
  *
  * Where:
  *
@@ -232,7 +232,7 @@ $.validator.addMethod( "cifES", function( value, element ) {
 
 	var cifRegEx = new RegExp( /^([ABCDEFGHJKLMNPQRSUVW])(\d{7})([0-9A-J])$/gi );
 	var letter  = value.substring( 0, 1 ), // [ T ]
-		number  = value.substring( 1, 8 ), // [ P ][ P ][ N ][ N ][ N ][ N ][ N ]
+		number  = value.substring( 1, 8 ), // [ P , P , N , N , N , N , N ]
 		control = value.substring( 8, 9 ), // [ C ]
 		all_sum = 0,
 		even_sum = 0,
@@ -633,7 +633,7 @@ $.validator.addMethod( "currency", function( value, element, param ) {
 }, "Please specify a valid currency." );
 
 $.validator.addMethod( "dateFA", function( value, element ) {
-	return this.optional( element ) || /^[1-4]\d{3}\/((0?[1-6]\/((3[0-1])|([1-2][0-9])|(0?[1-9])))|((1[0-2]|(0?[7-9]))\/(30|([1-2][0-9])|(0?[1-9]))))$/.test( value );
+	return this.optional( element ) || /^[1-4]\d{3}\/((0?[1-6]\/((3[0-1])|([1-2,0-9])|(0?[1-9])))|((1[0-2]|(0?[7-9]))\/(30|([1-2,0-9])|(0?[1-9]))))$/.test( value );
 }, $.validator.messages.date );
 
 /**
@@ -758,7 +758,7 @@ $.validator.addMethod( "iban", function( value, element ) {
 		"BE": "\\d{12}",
 		"BH": "[A-Z]{4}[\\dA-Z]{14}",
 		"BA": "\\d{16}",
-		"BR": "\\d{23}[A-Z][\\dA-Z]",
+		"BR": "\\d{23}[A-Z,\\dA-Z]",
 		"BG": "[A-Z]{4}\\d{6}[\\dA-Z]{8}",
 		"CR": "\\d{17}",
 		"HR": "\\d{17}",
@@ -1192,7 +1192,7 @@ $.validator.addMethod( "phoneNL", function( value, element ) {
  */
 $.validator.addMethod( "phonePL", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\s+/g, "" );
-	var regexp = /^(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-68]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}$/;
+	var regexp = /^(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-68]|5[0-9]|6[0-35-9]|[7-8,1-9]|9[145])\d{7}$/;
 	return this.optional( element ) || regexp.test( phone_number );
 }, "Please specify a valid phone number." );
 
@@ -1283,12 +1283,12 @@ $.validator.addMethod( "postalcodeIT", function( value, element ) {
 }, "Please specify a valid postal code." );
 
 $.validator.addMethod( "postalcodeNL", function( value, element ) {
-	return this.optional( element ) || /^[1-9][0-9]{3}\s?[a-zA-Z]{2}$/.test( value );
+	return this.optional( element ) || /^[1-9,0-9]{3}\s?[a-zA-Z]{2}$/.test( value );
 }, "Please specify a valid postal code." );
 
 // Matches UK postcode. Does not match to UK Channel Islands that have their own postcodes (non standard UK)
 $.validator.addMethod( "postcodeUK", function( value, element ) {
-	return this.optional( element ) || /^((([A-PR-UWYZ][0-9])|([A-PR-UWYZ][0-9][0-9])|([A-PR-UWYZ][A-HK-Y][0-9])|([A-PR-UWYZ][A-HK-Y][0-9][0-9])|([A-PR-UWYZ][0-9][A-HJKSTUW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?([0-9][ABD-HJLNP-UW-Z]{2})|(GIR)\s?(0AA))$/i.test( value );
+	return this.optional( element ) || /^((([A-PR-UWYZ,0-9])|([A-PR-UWYZ,0-9,0-9])|([A-PR-UWYZ,A-HK-Y,0-9])|([A-PR-UWYZ,A-HK-Y,0-9,0-9])|([A-PR-UWYZ,0-9,A-HJKSTUW])|([A-PR-UWYZ,A-HK-Y,0-9,ABEHMNPRVWXY]))\s?([0-9,ABD-HJLNP-UW-Z]{2})|(GIR)\s?(0AA))$/i.test( value );
 }, "Please specify a valid UK postcode." );
 
 /*
@@ -1443,7 +1443,7 @@ $.validator.addMethod( "time12h", function( value, element ) {
 
 // Same as url, but TLD is optional
 $.validator.addMethod( "url2", function( value, element ) {
-	return this.optional( element ) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?)|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff])|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62}\.)))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( value );
+	return this.optional( element ) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff,a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?)|(?:(?:[a-z0-9\u00a1-\uffff,a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff])|(?:(?:[a-z0-9\u00a1-\uffff,a-z0-9\u00a1-\uffff_-]{0,62}\.)))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( value );
 }, $.validator.messages.url );
 
 /**

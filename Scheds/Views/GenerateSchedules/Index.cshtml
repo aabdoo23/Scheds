@@ -1,15 +1,17 @@
+@using Scheds.Models
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Schedules - Scheds</title>
     <link rel="stylesheet" href="~/css/styles.css">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar">
@@ -92,11 +94,46 @@
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
             <div class="schedule-container">
-                <!-- Schedules will be inserted here -->
+                @{
+                    // Initialize the 2D array with 7 days (Saturday to Friday)
+                    ReturnedCardItem[,] scheduleArray = new ReturnedCardItem[7, 24];
+                    scheduleArray[2, 12] = new ReturnedCardItem
+            {
+                cardId = 1,
+                courseName = "Artificial Intelligence",
+                courseCode = "AIS415",
+                instructorName = "Dr. John Doe",
+                section = "1A",
+                subType = "Lecture",
+                credits = 3,
+                seatsLeft = 10,
+                day = "Monday",
+                startTime = TimeSpan.Parse("10:30"),
+                endTime = TimeSpan.Parse("12:30"),
+                room = "F45"
+            };
+                }
+
+                @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray)
+
                 <button id="prev-schedule" class="btn-secondary">← Previous</button>
                 <button id="next-schedule" class="btn-secondary">Next →</button>
             </div>
         </section>
+        @* @await Component.InvokeAsync("CardItemViewComponent",new ReturnedCardItem{
+        cardId=1,
+        courseName="Artificial IntelligenceArtificial Intelligence",
+        courseCode="AIS415",
+        instructorName="Dr. John Doe",
+        section="1A",
+        subType="Lecture",
+        credits=3,
+        seatsLeft=0,
+        day="Monday",
+        startTime=TimeSpan.Parse("10:30"),
+        endTime=TimeSpan.Parse("12:30"),
+        room="F45"
+        }) *@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -131,4 +168,5 @@
 
     <script src="~/js/generate-schedules.js"></script>
 </body>
+
 </html>

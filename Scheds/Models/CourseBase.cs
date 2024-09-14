@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Scheds.Model
+namespace Scheds.Models
 {
     public class CourseBase
     {

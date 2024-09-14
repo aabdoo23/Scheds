@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Scheds.DAL.Repositories;
-using Scheds.Model;
+using Scheds.Models;
 using System.Text.Json.Nodes;
 
 namespace Scheds.DAL.Services

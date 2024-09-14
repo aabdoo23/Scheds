@@ -1,4 +1,4 @@
-﻿namespace Scheds.Model
+﻿namespace Scheds.Models
 {
     public class CourseSchedule
     {

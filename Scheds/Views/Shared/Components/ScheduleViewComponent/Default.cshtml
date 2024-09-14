@@ -1,0 +1,72 @@
+@using Scheds.Models
+@model ReturnedCardItem[,]
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Saturday</th>
+            <th>Sunday</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var timeSlots = new[] {
+        "8:30 AM - 10:29 AM", "10:30 AM - 12:29 PM",
+        "12:30 PM - 2:29 PM", "2:30 PM - 4:29 PM",
+        "4:30 PM - 6:29 PM", "6:30 PM - 8:29 PM"
+        };
+            var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
+            for (int i = 0; i < timeSlots.Length; i++)
+            {
+                <tr>
+                    <td class="timeslot">@timeSlots[i]</td>
+                    @for (int j = 0; j < 6; j++)
+                    {
+                        <td>
+                            @if (Model[j, hoursMapping[i]] != null)
+                            {
+                                @await Component.InvokeAsync("CardItemViewComponent", Model[j, hoursMapping[i]]);
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+
+
+        }
+    </tbody>
+</table>
+<style>
+    table {
+        width: 100%;
+        height: 500;
+        border-collapse: collapse;
+
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+        min-height: 100px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .timeslot {
+        font-weight: 600;
+        font-size: 0.8em;
+
+
+    }
