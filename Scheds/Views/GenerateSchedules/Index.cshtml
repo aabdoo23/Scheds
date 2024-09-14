@@ -1,0 +1,134 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Schedules - Scheds</title>
+    <link rel="stylesheet" href="~/css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#"><img src="~/images/logo.png" alt="Scheds Logo" class="logo-img"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/GenerateSchedules">Generate Schedules</a></li>
+            <li><a href="/FindStudyRooms">Find Study Rooms</a></li>
+        </ul>
+    </nav>
+
+    <!-- Generate Schedules Page -->
+    <div class="container">
+        <!-- Search and Cart Section -->
+        <section class="search-cart">
+            <div class="search-section">
+                <h1>Search for Courses</h1>
+                <div class="search-bar">
+                    <input type="text" id="course-search" placeholder="Search for courses...">
+                    <button id="add-to-cart" class="btn-primary">Add to Cart</button>
+                </div>
+            </div>
+            <div id="cart">
+                <h2>Your Cart</h2>
+                <ul id="cart-items"></ul>
+            </div>
+        </section>
+
+
+        <!-- Customization Section -->
+        <section class="customization">
+            <h2>Customize Your Schedule</h2>
+            <div class="slider-group">
+                <label for="min-slots">Minimum Slots per Day: <span id="min-slots-value">1</span></label>
+                <input type="range" id="min-slots" min="1" max="4" value="1">
+            </div>
+            <div class="slider-group">
+                <label for="gap-period">Maximum Gap Period (hours): <span id="gap-period-value">1</span></label>
+                <input type="range" id="gap-period" min="1" max="6" value="1">
+            </div>
+            <div class="slider-group">
+                <label for="max-schedules">Maximum Number of Schedules: <span id="max-schedules-value">1</span></label>
+                <input type="range" id="max-schedules" min="1" max="500" value="1">
+            </div>
+            <div class="slider-group">
+                <label for="days-on-campus">Maximum Days on Campus: <span id="days-on-campus-value">1</span></label>
+                <input type="range" id="days-on-campus" min="1" max="6" value="1">
+            </div>
+            <div class="checkbox-group">
+                <h3>Select Days on Campus:</h3>
+                <label><input type="checkbox" name="days" value="all"> All Week</label>
+                <label><input type="checkbox" name="days" value="sunday"> Sunday</label>
+                <label><input type="checkbox" name="days" value="monday"> Monday</label>
+                <label><input type="checkbox" name="days" value="tuesday"> Tuesday</label>
+                <label><input type="checkbox" name="days" value="wednesday"> Wednesday</label>
+                <label><input type="checkbox" name="days" value="thursday"> Thursday</label>
+                <label><input type="checkbox" name="days" value="friday"> Friday</label>
+                <label><input type="checkbox" name="days" value="saturday"> Saturday</label>
+            </div>
+            <div class="checkbox-group">
+                <h3>Select First Slot Time:</h3>
+                <label><input type="checkbox" name="time" value="830"> 8:30 AM</label>
+                <label><input type="checkbox" name="time" value="1030"> 10:30 AM</label>
+                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
+                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
+            </div>
+            <div class="checkbox-group">
+                <h3>Select Last Slot Time:</h3>
+                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
+                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
+                <label><input type="checkbox" name="time" value="1630"> 4:30 PM</label>
+                <label><input type="checkbox" name="time" value="1830"> 6:30 PM</label>
+            </div>
+            <button id="generate-schedule" class="btn-primary">Generate Schedule</button>
+        </section>
+
+        <!-- Generated Schedules Section -->
+        <section class="generated-schedules">
+            <h2>Generated Schedules</h2>
+            <div class="schedule-container">
+                <!-- Schedules will be inserted here -->
+                <button id="prev-schedule" class="btn-secondary">← Previous</button>
+                <button id="next-schedule" class="btn-secondary">Next →</button>
+            </div>
+        </section>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/coursebase/getAllCourses')
+                .then(response => response.json())
+                .then(courses => {
+                    const searchInput = document.getElementById('course-search');
+                    searchInput.addEventListener('input', () => {
+                        const query = searchInput.value.toLowerCase();
+                        const filteredCourses = courses.filter(course =>
+                            course.courseName.toLowerCase().includes(query) ||
+                            course.courseCode.toLowerCase().includes(query)
+                        );
+                        updateSearchResults(filteredCourses);
+                    });
+                })
+                .catch(error => console.error('Error fetching courses:', error));
+        });
+
+        function updateSearchResults(courses) {
+            const searchInput = document.getElementById('course-search');
+            const resultsContainer = document.getElementById('cart-items');
+            resultsContainer.innerHTML = '';
+
+            courses.forEach(course => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${course.courseName} (${course.courseCode})`;
+                resultsContainer.appendChild(listItem);
+            });
+        }
+    </script>
+
+    <script src="~/js/generate-schedules.js"></script>
+</body>
+</html>

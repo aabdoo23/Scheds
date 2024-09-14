@@ -1,0 +1,65 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Study Rooms - Scheds</title>
+    <link rel="stylesheet" href="~/css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#"><img src="~/images/logo.png" alt="Scheds Logo" class="logo-img"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/GenerateSchedules">Generate Schedules</a></li>
+            <li><a href="/FindStudyRooms">Find Study Rooms</a></li>
+        </ul>
+    </nav>
+
+    <!-- Find Study Rooms Page -->
+    <div class="find-study-rooms-container">
+        <div class="search-section">
+            <h1 class="animated-text">Find Study Rooms</h1>
+            <div class="search-form">
+                <label for="day-select">Select Day:</label>
+                <select id="day-select">
+                    <option value="sunday">Sunday</option>
+                    <option value="monday">Monday</option>
+                    <option value="tuesday">Tuesday</option>
+                    <option value="wednesday">Wednesday</option>
+                    <option value="thursday">Thursday</option>
+                    <option value="friday">Friday</option>
+                    <option value="saturday">Saturday</option>
+                </select>
+
+                <label for="time-select">Select Time:</label>
+                <select id="time-select">
+                    <option value="8:30 AM">8:30 AM</option>
+                    <option value="10:30 AM">10:30 AM</option>
+                    <option value="12:30 PM">12:30 PM</option>
+                    <option value="2:30 PM">2:30 PM</option>
+                    <option value="4:30 PM">4:30 PM</option>
+                    <option value="6:30 PM">6:30 PM</option>
+                    <option value="8:30 PM">8:30 PM</option>
+                </select>
+
+                <button id="search-button" class="btn-primary">Search</button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Available Rooms</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+    
+    <script src="~/js/find-study-rooms.js"></script>
+</body>
+</html>
