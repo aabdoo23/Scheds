@@ -32,7 +32,11 @@
             <div class="search-section">
                 <h1>Search for Courses</h1>
                 <div class="search-bar">
-                    <input type="text" id="course-search" placeholder="Search for courses...">
+                    <div class="group">
+                        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+                        <input placeholder="Search" type="search" class="input">
+                    </div>
+
                     <button id="add-to-cart" class="btn-primary">Add to Cart</button>
                 </div>
             </div>
@@ -46,22 +50,47 @@
         <!-- Customization Section -->
         <section class="customization">
             <h2>Customize Your Schedule</h2>
-            <div class="slider-group">
-                <label for="min-slots">Minimum Slots per Day: <span id="min-slots-value">1</span></label>
-                <input type="range" id="min-slots" min="1" max="4" value="1">
+            <div class="box">
+                <label class="slider-label">Minimum Slots per Day</label>
+                <div class="inner-box">
+                    <div class="line"></div>
+                    <input type="range" class="input-range"  min="0" max="4" value="0" />
+                    
+                </div>
+                <p class="number">0</p>
             </div>
-            <div class="slider-group">
-                <label for="gap-period">Maximum Gap Period (hours): <span id="gap-period-value">1</span></label>
-                <input type="range" id="gap-period" min="1" max="6" value="1">
+            
+            <div class="box">
+                <label class="slider-label">Maximum Gap Period (hours)</label>
+                <div class="inner-box">
+                    <div class="line"></div>
+                    <input type="range" class="input-range"  min="0" max="6" value="0" />
+                    
+                </div>
+                <p class="number">0</p>
             </div>
-            <div class="slider-group">
-                <label for="max-schedules">Maximum Number of Schedules: <span id="max-schedules-value">1</span></label>
-                <input type="range" id="max-schedules" min="1" max="500" value="1">
+            
+            <div class="box">
+                <label class="slider-label">Maximum Number of Schedules</label>
+                <div class="inner-box">
+                    <div class="line"></div>
+                    <input type="range" class="input-range"  min="0" max="500" value="0" />
+                    
+                </div>
+                <p class="number">0</p>
             </div>
-            <div class="slider-group">
-                <label for="days-on-campus">Maximum Days on Campus: <span id="days-on-campus-value">1</span></label>
-                <input type="range" id="days-on-campus" min="1" max="6" value="1">
+            
+            <div class="box">
+                <label class="slider-label">Maximum Days on Campus</label>
+                <div class="inner-box">
+                    <div class="line"></div>
+                    <input type="range" class="input-range"  min="0" max="6" value="0" />
+                    
+                </div>
+                <p class="number">0</p>
             </div>
+            
+            
             <div class="checkbox-group">
                 <h3>Select Days on Campus:</h3>
                 <label><input type="checkbox" name="days" value="all"> All Week</label>
@@ -166,7 +195,21 @@
         }
     </script>
 
-    <script src="~/js/generate-schedules.js"></script>
+    <script >
+        document.querySelectorAll('.box').forEach(box => {
+        const input_range = box.querySelector('.input-range');
+        const number = box.querySelector('.number');
+        const line = box.querySelector('.line');
+        const max_value = input_range.max;
+
+        input_range.addEventListener('input', () => {
+            const value = input_range.value;
+            number.innerHTML = value;
+            line.style.width = (value / max_value) * 100 + '%';
+        });
+    });
+
+    </script>
 </body>
 
 </html>
