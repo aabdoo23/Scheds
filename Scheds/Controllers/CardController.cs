@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Scheds.DAL.Repositories;
 using Scheds.DAL.Services;
-using Scheds.Model;
+using Scheds.Models;
 using System.Text;
 
 namespace Scheds.Controllers

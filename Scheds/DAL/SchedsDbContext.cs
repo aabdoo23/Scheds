@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Scheds.Model;
+using Scheds.Models;
 
 namespace Scheds.DAL
 {

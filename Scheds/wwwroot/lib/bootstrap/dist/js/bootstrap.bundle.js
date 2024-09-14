@@ -482,7 +482,7 @@
     }
 
     element.removeEventListener(typeEvent, fn, Boolean(delegationSelector));
-    delete events[typeEvent][fn.uidEvent];
+    delete events[typeEvent,fn.uidEvent];
   }
 
   function removeNamespacedHandlers(element, events, typeEvent, namespace) {
@@ -3275,7 +3275,7 @@
       var maxOffset = isBasePlacement ? -referenceRect[len] / 2 + additive + arrowLen + arrowPaddingMax + tetherOffsetValue : maxLen + arrowLen + arrowPaddingMax + tetherOffsetValue;
       var arrowOffsetParent = state.elements.arrow && getOffsetParent(state.elements.arrow);
       var clientOffset = arrowOffsetParent ? mainAxis === 'y' ? arrowOffsetParent.clientTop || 0 : arrowOffsetParent.clientLeft || 0 : 0;
-      var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement][mainAxis] : 0;
+      var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement,mainAxis] : 0;
       var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue - clientOffset;
       var tetherMax = popperOffsets[mainAxis] + maxOffset - offsetModifierValue;
 
