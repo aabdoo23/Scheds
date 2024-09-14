@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Scheds.DAL.Repositories;
+using Scheds.Models;
 
 namespace Scheds.Controllers
 {
@@ -17,8 +18,8 @@ namespace Scheds.Controllers
         [HttpGet("getAllCourses")]
         public async Task<IActionResult> GetAllCourses()
         {
-            Console.WriteLine("here");
             var courses = await courseBaseRepository.GetAllCourseBasesAsync();
+            foreach(CourseBase course in courses) Console.WriteLine(course.CourseCode);
             return Ok(courses);
         }
     }
