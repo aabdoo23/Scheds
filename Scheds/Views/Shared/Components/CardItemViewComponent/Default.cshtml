@@ -1,0 +1,191 @@
+﻿@using Scheds.Models
+@model ReturnedCardItem
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+</head>
+<div class="cardm">
+  <div class="card">
+    @if (Model.courseName.Length > 27)
+    {
+        <div class="main">@Model.courseCode:@Model.courseName.Substring(0, 27)...</div>
+    }
+    else
+    {
+        <div class="main">@Model.courseCode: @Model.courseName</div>
+    }
+    <div class="mainsub">@Model.subType - @Model.section</div>
+
+  </div>
+
+  <div class="card2">
+    <div class="upper">
+      <div class="instructor">
+        <div class="instructortext">@Model.instructorName</div>
+
+      </div>
+
+      <div class="credits">
+        <div class="creditstext">Credits: @Model.credits CH</div>
+
+      </div>
+    </div>
+
+    <div class="lower">
+      <div class="schedule">
+        <i class="fa-regular fa-clock"></i>        
+        <div class="scheduletext">@Model.day, @Model.startTime.ToString(@"hh\:mm") - @Model.endTime.ToString(@"hh\:mm")</div>
+      </div>
+      <div class="room">
+        <div class="roomtext">Room: @Model.room</div>
+      </div>
+
+      <div class="card3">
+        <p class="seatstext">
+        Seats Left: @Model.seatsLeft
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cardm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1em;
+    @* margin-bottom: 20em; *@
+
+  }
+
+  .card {
+    position: absolute;
+    width: 150px;
+    height: 80px;
+    border-radius: 20px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    background: whitesmoke;
+    color: black;
+    z-index: 2;
+    transition: .4s ease-in-out;
+  }
+
+  .main {
+    font-size: 1em;
+    font-weight: 700;
+    margin: 0.5em;
+
+  }
+
+  .mainsub {
+    font-size: 0.8em;
+    margin: 0.5em;
+    font-weight: 600;
+
+  }
+
+  .card2 {
+    position:absolute;
+    display: flex;
+    flex-direction: row;
+    width: 150px;
+    height: 80px;
+    border-radius: 20px;
+    background: white;
+    z-index: 1;
+    transition: .4s ease-in-out;
+  }
+
+  .card:hover {
+    background-color: #FFE87C;
+    cursor: pointer;
+  }
+
+  .card:hover + .card2 {
+    height: 180px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+  .card:hover+.card2 .lower {
+    top: 10.2em;
+  }
+
+  .upper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    color: black;
+    left: 1.0em;
+    top: 0.5em;
+    gap: .5em;
+  }
+
+  .instructortext {
+    
+    font-size: 0.8em;
+    font-weight: 700;
+
+  }
+
+  .creditstext {
+    font-size: 0.7em;
+    font-weight: 500;
+  }
+
+  .lower {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    @* text-align: center; *@
+    color: black;
+    left: 1em;
+    top: 1em;
+    gap: 0.5em;
+    margin-top: 0.7em;
+    font-size: 0.7em;
+    transition: .4s ease-in-out;
+  }
+
+  .schedule {
+    margin-top: 1em;
+    font-weight: 600;
+    font-size: 1em;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    
+  }
+
+  .room {
+    font-size: 1.3em;
+    font-weight: 600;
+  }
+
+  .card3 {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 30px;
+    top: 4.3em;
+    left: -0.8em;
+    font-size: 1.24em;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background: rgb(0, 80, 0);
+    transition: .4s ease-in-out;
+    @if (Model.seatsLeft == 0) {
+        <text>background: darkred;</text>
+    }
+  }
+  .seatstext {
+    font-size: 1em;
+    color: white;
+    font-weight: 600;
+  }
+</style>

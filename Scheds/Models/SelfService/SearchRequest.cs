@@ -1,4 +1,4 @@
-﻿namespace Scheds.Model.SelfService
+﻿namespace Scheds.Models.SelfService
 {
     public class SearchRequest
     {

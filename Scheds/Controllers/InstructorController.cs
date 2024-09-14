@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Scheds.DAL.Repositories;
-using Scheds.Model;
+using Scheds.Models;
 
 namespace Scheds.Controllers
 {

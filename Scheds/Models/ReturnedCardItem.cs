@@ -1,4 +1,4 @@
-﻿namespace Scheds.Model
+﻿namespace Scheds.Models
 {
     public class ReturnedCardItem
     {
@@ -42,5 +42,24 @@
             }
         }
 
+        public ReturnedCardItem()
+        {
+            
+        }
+        public ReturnedCardItem(int cardId, string courseCode, string courseName, string instructorName, string section, decimal credits, string day, TimeSpan startTime, TimeSpan endTime, string room, string subType, int seatsLeft)
+        {
+            this.cardId = cardId;
+            this.courseCode = courseCode;
+            this.courseName = courseName;
+            this.instructorName = instructorName;
+            this.section = section;
+            this.credits = credits;
+            this.day = day;
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.room = room;
+            this.subType = subType;
+            this.seatsLeft = seatsLeft;
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Scheds.DAL.Repositories;
 using Scheds.DAL.Services;
-using Scheds.Model;
+using Scheds.Models;
 
 namespace Scheds.Controllers
 {
@@ -17,7 +17,7 @@ namespace Scheds.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<List<List<ReturnedCardItem>>>> Generate(GenerateRequest request)
+        public async Task<ActionResult<List<ReturnedCardItem[,]>>> Generate(GenerateRequest request)
         {
             List<List<CardItem>> allCardItemsByCourse = new List<List<CardItem>>();
 
@@ -133,7 +133,7 @@ namespace Scheds.Controllers
                 }
             }
 
-            List<List<ReturnedCardItem>> generatedTest = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
+            var generatedTest = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
 
             // Return the result
             return Ok(generatedTest);

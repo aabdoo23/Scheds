@@ -1,5 +1,5 @@
-﻿using Scheds.Model;
-using Scheds.Model.SelfService;
+﻿using Scheds.Models;
+using Scheds.Models.SelfService;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
