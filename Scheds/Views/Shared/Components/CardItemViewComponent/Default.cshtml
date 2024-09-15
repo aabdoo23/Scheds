@@ -8,7 +8,7 @@
   <div class="card">
     @if (Model.courseName.Length > 27)
     {
-        <div class="main">@Model.courseCode:@Model.courseName.Substring(0, 27)...</div>
+        <div class="main">@Model.courseCode:@Model.courseName.Substring(0, 20)...</div>
     }
     else
     {
@@ -76,6 +76,7 @@
     font-size: 1em;
     font-weight: 700;
     margin: 0.5em;
+    margin-right: 1em;
 
   }
 
