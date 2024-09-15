@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Schedules - Scheds</title>
     <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="icon" type="image/png" href="~/images/abdo.png">
 </head>
 
 <body>
@@ -91,10 +92,10 @@
                             <label class="slider-label">Maximum Number of Schedules</label>
                             <div class="inner-box">
                                 <div class="line"></div>
-                                <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="0"
-                                    max="500" value="200" />
+                                <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
+                                    max="30" value="20" />
                             </div>
-                            <p class="number">200</p>
+                            <p class="number">20</p>
                         </div>
                     </div>
 
@@ -104,14 +105,14 @@
                 </form>
                 <div class="right-section">
                     <!-- Checkboxes Section -->
-                    <div class="customization-method">
+                    @*< div class="customization-method">
                         <h3>Pick your day customization method</h3>
                         <label><input type="radio" name="scheduleMethod" value="maxDays" checked>Pick max number of
                             days</label>
                         <label><input type="radio" name="scheduleMethod" value="selectDays">Select Specific Days</label>
-                    </div>
+                    </div> *@
 
-                    <!-- Sliders Section -->
+                    @* <!-- Sliders Section -->
                     <div class="sliders" id="slider-section">
                         <div class="box">
                             <label class="slider-label">Maximum Days on Campus</label>
@@ -121,14 +122,12 @@
                             </div>
                             <p class="number">4</p>
                         </div>
-                    </div>
+                    </div> *@
 
-                    <!-- Checkboxes Section (Initially Hidden) -->
-                    <div class="checkboxes" id="checkbox-section" style="display: none;">
+                    <div class="checkboxes" id="checkbox-section">
                         <div class="checkbox-group">
                             <h3>Select Days on Campus</h3>
-                            <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
-                                Week</label>
+                            <label><input type="checkbox" name="selectedDays" value="all" id="all-days" checked> All Week</label>
                             <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
                             <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
                             <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
@@ -169,8 +168,24 @@
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
-            <div id="schedule-container" class="schedule-container">
+            <div id=schedule-container class="schedule-container">
             </div>
+            @* <div id="schedule-container" style="margin: 20px; padding-left: 100px; height: 200px; background-color: yellow;" class="schedule-container">
+                @await Component.InvokeAsync("CardItemViewComponent", new ReturnedCardItem{
+                courseCode = "CSEN 401",
+                courseName = "Software EngineeringE EngineeringEngineering",
+                subType = "Lecture",
+                section = "1",
+                instructorName = "Dr.Ahmed Kandil kan",
+                credits = 3,
+                day = "Wednesday",
+                startTime = new TimeSpan(11, 30, 0),
+                endTime = new TimeSpan(14, 30, 0),
+                room = "C7.202",
+                seatsLeft = 20
+
+                })
+            </div> *@
         </section>
     </div>
 
@@ -184,16 +199,6 @@
             const allDaysCheckbox = document.getElementById('all-days');
             const dayCheckboxes = document.querySelectorAll('input[name="selectedDays"]:not([value="all"])');
 
-            // Toggle between slider and checkboxes based on the selected method
-            function toggleCustomizationMethod() {
-                if (maxDaysRadio.checked) {
-                    sliderSection.style.display = 'block';
-                    checkboxSection.style.display = 'none';
-                } else if (selectDaysRadio.checked) {
-                    sliderSection.style.display = 'none';
-                    checkboxSection.style.display = 'block';
-                }
-            }
 
             // Handle "All Week" checkbox behavior
             function toggleAllDaysCheckbox() {
@@ -343,7 +348,7 @@
             // Capture data outside the form (selected days, start time, and end time)
             const selectedDays = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
-            const isMaxNumberOfDaysChecked = document.querySelector('input[name="scheduleMethod"]:checked')?.value==="maxDays";
+            const isMaxNumberOfDaysChecked = false;
 
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
             const numberOfDays = form.numberOfDays?.value || 0; // Only if max days is selected
@@ -517,6 +522,7 @@
         background-color: #ff6347;
         /* Match the scrollbar thumb with search result color */
         border-radius: 10px;
+        
     }
 
     #cart-items {
@@ -536,5 +542,9 @@
         padding: 20px;
         border-radius: 10px;
         /* Same border radius */
+    }
+    .right-section{
+        display: flex;
+        gap: 20px;
     }
 </style>

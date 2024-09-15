@@ -17,23 +17,7 @@
 </div>
 
 <script>
-    var scrollContainer = document.querySelector('.scroll-container');
-    var totalSchedules = @Model.Count;
-    var scheduleWidth = document.querySelector('.schedule').offsetWidth;
-    var currScheduleText = document.getElementById('currSchedule');
-
-    // Update the current schedule text based on scroll position
-    function updateScheduleText() {
-        var scrollLeft = scrollContainer.scrollLeft;
-        var currentScheduleIndex = Math.round(scrollLeft / scheduleWidth) + 1;
-        currScheduleText.innerText = `Schedule ${currentScheduleIndex} of ${totalSchedules}`;
-    }
-
-    // Listen for scroll events to update the schedule text
-    scrollContainer.addEventListener('scroll', updateScheduleText);
-
-    // Initial text update
-    updateScheduleText();
+    
 </script>
 
 <style>
