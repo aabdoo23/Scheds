@@ -15,13 +15,21 @@ document.getElementById('search-button').addEventListener('click', function () {
             if (data.length === 0) {
                 resultsDiv.innerHTML = '<p>No available rooms found for the selected day and time.</p>';
             } else {
-                const list = document.createElement('ul');
                 data.forEach(room => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = room;
-                    list.appendChild(listItem);
+                    // Create the room card div
+                    const roomCard = document.createElement('div');
+                    roomCard.classList.add('room-card');
+                    
+                    // Create an h3 element for the room number
+                    const roomTitle = document.createElement('h3');
+                    roomTitle.textContent = `Room: ${room}`;
+                    
+                    // Append the room title to the room card
+                    roomCard.appendChild(roomTitle);
+                    
+                    // Append the room card to the results div
+                    resultsDiv.appendChild(roomCard);
                 });
-                resultsDiv.appendChild(list);
             }
         })
         .catch(error => {
