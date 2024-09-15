@@ -148,11 +148,7 @@
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
-            <div class="schedule-container">
-
-                <button id="prev-schedule" class="btn-secondary">← Previous</button>
-                <div id="schedule-section"></div>
-                <button id="next-schedule" class="btn-secondary">Next →</button>
+            <div id="schedule-container" class="schedule-container">
             </div>
         </section>
     </div>
@@ -304,7 +300,7 @@
                 .then(response => response.text()) // Expect HTML response
                 .then(html => {
                     // Inject the returned HTML into the page
-                    document.getElementById('schedule-section').innerHTML = html;
+                    document.getElementById('schedule-container').innerHTML = html;
                 })
                 .catch(error => {
                     console.error('There was a problem with the fetch operation:', error);
