@@ -17,9 +17,9 @@
         @{
             // Define the time slots and corresponding hours
             var timeSlots = new[] {
-        "8:30 AM 10:29 AM", "10:30 AM 12:29 PM",
-        "12:30 PM 2:29 PM", "2:30 PM 4:29 PM",
-        "4:30 PM 6:29 PM", "6:30 PM 8:29 PM"
+        "8:30 AM - 10:29 AM", "10:30 AM - 12:29 PM",
+        "12:30 PM - 2:29 PM", "2:30 PM - 4:29 PM",
+        "4:30 PM - 6:29 PM", "6:30 PM - 8:29 PM"
         };
 
             var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
@@ -66,7 +66,7 @@
 <style>
     /* Table styles */
     table {
-
+        padding-bottom: 10px;
         margin-left: 45px;
         margin-top: 20px;
         width: 180vh;
@@ -81,8 +81,8 @@
 
     th, td {
         padding: 12px;
-        text-align: center; /* Centers text horizontally */
-        vertical-align: middle; /* Centers text vertically */
+        @* text-align: center; /* Centers text horizontally */ *@
+        @* vertical-align: middle; /* Centers text vertically */ *@
         border: 1px solid #ddd; /* Sets border for all cells */
         font-size: 1em; /* Text size */
         
@@ -91,7 +91,7 @@
     }
 
     th {
-        background-color: #2a2244; /* Header background color */
+        background-color: rgb(0, 34, 52); /* Header background color */
         color: white; /* Header text color */
         font-weight: bold;
     }
@@ -99,12 +99,12 @@
         height:70px;
     }
     .timeslot {
-        background-color: #463161f6; /* Slot background color */
+        background-color: rgb(0, 62, 94); /* Slot background color */
         color: white;
         font-weight: 600;
         font-size: 1em;
         text-align: center;
-        max-width:30px;
+        max-width:100px;
 
     }
 

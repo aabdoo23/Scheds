@@ -31,7 +31,6 @@ namespace Scheds.DAL.Services
             }
             return false;
         }
-        //h:mm a diff
         public static int GetTimeDiffInMins(TimeSpan t1, TimeSpan t2)
         {
             return (int)(t2 - t1).TotalMinutes;
@@ -54,7 +53,7 @@ namespace Scheds.DAL.Services
                 for (int i = 0; i < items.Count - 1; i++)
                 {
                     int gap = GetTimeDiffInMins(items[i].getEndTime(), items[i + 1].getStartTime());
-                    if (gap > request.largestAllowedGap)
+                    if (gap > request.largestAllowedGap*60)
                     {
                         return false;
                     }
@@ -80,7 +79,7 @@ namespace Scheds.DAL.Services
                 var validItems = day.Value.Where(item => item != null).ToList();
                 if (validItems.Count > 0)
                 {
-                    daysWithCards.Add(day.Key.ToLower());
+                    daysWithCards.Add(day.Key.ToUpper());
                 }
             }
 
@@ -95,8 +94,8 @@ namespace Scheds.DAL.Services
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
-                days.Add(day.Key.ToLower());
-                System.Console.WriteLine(day.Key.ToLower() + " "+day.Value.Count);
+                days.Add(day.Key.ToUpper());
+                System.Console.WriteLine(day.Key.ToUpper() + " "+day.Value.Count);
             }
             foreach (var day in request.selectedDays)
             {
