@@ -62,7 +62,7 @@ namespace Scheds.Controllers
         private void SaveCartItemsToCookies(List<CourseBase> cart)
         {
             var cartJson = JsonConvert.SerializeObject(cart);
-            CookieOptions options = new CookieOptions
+            CookieOptions options = new()
             {
                 Expires = DateTime.Now.AddDays(1) // Set cookie to expire in one day
             };

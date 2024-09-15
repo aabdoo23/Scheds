@@ -99,6 +99,11 @@ namespace Scheds.Controllers
             //return responseContent;
             cards = ParsingService.ParseCourseResponse(responseContent);
             //TODO: update the db
+            foreach (var card in cards)
+            {
+                await repository.UpdateCardItemAsync(card);
+            }
+
             return cards;
 
         }

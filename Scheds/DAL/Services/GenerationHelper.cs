@@ -59,6 +59,7 @@ namespace Scheds.DAL.Services
 
         private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
+            if (request.numberOfDays == 0) return true;
             if (request.selectedDays.Count>0|| request.selectedDays.Contains("all")) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
@@ -70,6 +71,7 @@ namespace Scheds.DAL.Services
         private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
             // return true;
+            if(request.numberOfDays==0) return true;
             if (request.selectedDays.Count==0 || request.selectedDays.Contains("all")) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
