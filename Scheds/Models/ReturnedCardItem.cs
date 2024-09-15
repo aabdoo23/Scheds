@@ -61,5 +61,9 @@
             this.subType = subType;
             this.seatsLeft = seatsLeft;
         }
+        public override string ToString()
+        {
+            return $"cardId: {cardId}, courseCode: {courseCode}, courseName: {courseName}, instructorName: {instructorName}, section: {section}, credits: {credits}, day: {day}, startTime: {startTime}, endTime: {endTime}, room: {room}, subType: {subType}, seatsLeft: {seatsLeft}";
+        }
     }
 }
