@@ -9,6 +9,7 @@
         public int largestAllowedGap { get; set; }
         public int numberOfDays { get; set; }
         public int maxNumberOfGeneratedSchedules { get; set; }
+        public bool isMaxNumberOfDaysChecked { get; set; }
         public List<CourseBase> selectedItems { get; set; }
         public List<CustomCourseBase> customSelectedItems { get; set; }
     }
