@@ -17,8 +17,9 @@ namespace Scheds.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<List<ReturnedCardItem[,]>>> Generate(GenerateRequest request)
+        public async Task<IActionResult> Generate(GenerateRequest request)
         {
+            System.Console.WriteLine(request.ToString());
             List<List<CardItem>> allCardItemsByCourse = new List<List<CardItem>>();
 
             // Handle custom selected items
@@ -134,9 +135,8 @@ namespace Scheds.Controllers
             }
 
             var generatedTest = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
-
-            // Return the result
-            return Ok(generatedTest);
+            return ViewComponent("ScheduleViewComponent", generatedTest[0]);
+            
         }
 
     }

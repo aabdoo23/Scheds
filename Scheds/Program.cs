@@ -13,7 +13,13 @@ namespace Scheds
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddControllers();
-
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromDays(1);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             builder.Services.AddDbContext<SchedsDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
             builder.Services.AddScoped<CardItemRepository>();
@@ -34,6 +40,7 @@ namespace Scheds
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
 

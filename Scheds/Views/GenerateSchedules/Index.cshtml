@@ -1,4 +1,5 @@
 @using Scheds.Models
+@model Scheds.Models.GenerateAndResultViewModel
 @{
     Layout = null;
 }
@@ -33,11 +34,22 @@
                 <h1>Search for Courses</h1>
                 <div class="search-bar">
                     <div class="group">
-                        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
-                        <input placeholder="Search" type="search" class="input">
+                        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                            <g>
+                                <path
+                                    d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                                </path>
+                            </g>
+                        </svg>
+                        @* <input placeholder="Search" type="search" class="input"> *@
+                        <input id="course-search" placeholder="Search" type="search" class="input">
+
                     </div>
 
-                    <button id="add-to-cart" class="btn-primary">Add to Cart</button>
+                    @* <button id="add-to-cart" class="btn-primary">Add to Cart</button> *@
+                </div>
+                <div id="search-results" class="search-results">
+
                 </div>
             </div>
             <div id="cart">
@@ -47,7 +59,7 @@
         </section>
 
 
-        <!-- Customization Section -->
+
         <section class="customization">
     <h2>Customize Your Schedule</h2>
     <div class="customization-layout">
@@ -88,7 +100,7 @@
                 </div>
                 <p class="number">0</p>
             </div>
-        </div>
+      </div>
 
         <!-- Checkboxes Section -->
         <div class="checkboxes">
@@ -132,46 +144,18 @@
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
             <div class="schedule-container">
-                @{
-                    // Initialize the 2D array with 7 days (Saturday to Friday)
-                    ReturnedCardItem[,] scheduleArray = new ReturnedCardItem[7, 24];
-                    scheduleArray[2, 12] = new ReturnedCardItem
-            {
-                cardId = 1,
-                courseName = "Artificial Intelligence",
-                courseCode = "AIS415",
-                instructorName = "Dr. John Doe",
-                section = "1A",
-                subType = "Lecture",
-                credits = 3,
-                seatsLeft = 10,
-                day = "Monday",
-                startTime = TimeSpan.Parse("10:30"),
-                endTime = TimeSpan.Parse("12:30"),
-                room = "F45"
-            };
-                }
 
-                @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray)
-
+                <button id="prev-schedule" class="btn-secondary">← Previous</button>
+                <div id="schedule-section"></div>
+                <button id="next-schedule" class="btn-secondary">Next →</button>
             </div>
         </section>
-        @* @await Component.InvokeAsync("CardItemViewComponent",new ReturnedCardItem{
-        cardId=1,
-        courseName="Artificial IntelligenceArtificial Intelligence",
-        courseCode="AIS415",
-        instructorName="Dr. John Doe",
-        section="1A",
-        subType="Lecture",
-        credits=3,
-        seatsLeft=0,
-        day="Monday",
-        startTime=TimeSpan.Parse("10:30"),
-        endTime=TimeSpan.Parse("12:30"),
-        room="F45"
-        }) *@
     </div>
+    
+    
     <script>
+        let cart = [];
+
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/api/coursebase/getAllCourses')
                 .then(response => response.json())
@@ -187,36 +171,281 @@
                     });
                 })
                 .catch(error => console.error('Error fetching courses:', error));
+
+            // Fetch the cart items from the backend
+            fetch('/api/cart/getCartItems')
+                .then(response => response.json())
+                .then(cartItems => {
+                    console.log(cartItems);
+                    cart = cartItems; // Store full course objects in the cart array
+                    cart.forEach(course => updateCartUI(course));
+                })
+                .catch(error => console.error('Error fetching cart items:', error));
+
+
         });
 
         function updateSearchResults(courses) {
-            const searchInput = document.getElementById('course-search');
-            const resultsContainer = document.getElementById('cart-items');
-            resultsContainer.innerHTML = '';
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = ''; // Clear previous results
 
             courses.forEach(course => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${course.courseName} (${course.courseCode})`;
-                resultsContainer.appendChild(listItem);
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('search-result-item');
+
+                resultItem.innerHTML = `
+                <p><strong>${course.courseCode}: ${course.courseName}</strong></p>
+            `;
+
+                resultItem.addEventListener('click', () => {
+                    addToCart(course);
+                });
+
+                resultsContainer.appendChild(resultItem);
             });
         }
+
+        function addToCart(course) {
+            if (!cart.some(c => c.courseCode === course.courseCode)) {
+                cart.push(course); // Add full course object to cart
+
+                // Call backend to store in C# List
+                fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(course)
+                });
+
+                // Update the cart UI
+                updateCartUI(course);
+            }
+        }
+
+        function updateCartUI(course) {
+            const cartItemsContainer = document.getElementById('cart-items');
+
+            const cartItem = document.createElement('li');
+            cartItem.classList.add('cart-item');
+            cartItem.innerHTML = `<p><strong>${course.courseCode}: ${course.courseName}</strong></p>`;
+
+            // Remove from cart on click
+            cartItem.addEventListener('click', () => removeFromCart(course, cartItem));
+
+            cartItemsContainer.appendChild(cartItem);
+        }
+
+        function removeFromCart(course, cartItem) {
+            const index = cart.findIndex(c => c.courseCode === course.courseCode); // Match by courseCode
+            if (index > -1) {
+                cart.splice(index, 1); // Remove from cart array
+
+                // Call backend to remove from C# List
+                fetch('/api/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(course)
+                });
+
+                // Remove the cart item from UI
+                cartItem.remove();
+            }
+        }
+
+        document.getElementById('generate-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Capture form data
+            const form = event.target;
+            const selectedDays = Array.from(form.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
+            const daysStart = form.querySelector('input[name="daysStart"]:checked')?.value || '';
+            const daysEnd = form.querySelector('input[name="daysEnd"]:checked')?.value || '';
+            const minimumNumberOfItemsPerDay = form.minimumNumberOfItemsPerDay.value;
+            const largestAllowedGap = form.largestAllowedGap.value;
+            const maxNumberOfGeneratedSchedules = form.maxNumberOfGeneratedSchedules.value;
+            const numberOfDays = form.numberOfDays.value;
+
+            // Assuming selectedItems and customSelectedItems will be managed elsewhere
+            const selectedItems = cart;
+            const customSelectedItems = [];
+
+            // Construct the GenerateRequest object
+            const generateRequest = {
+                selectedDays,
+                daysStart,
+                daysEnd,
+                minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
+                largestAllowedGap: parseInt(largestAllowedGap),
+                maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
+                numberOfDays: parseInt(numberOfDays),
+                selectedItems,
+                customSelectedItems
+            };
+
+            // URL for the fetch call
+            const url = '/api/generate';
+
+            // Make the AJAX POST request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(generateRequest)
+            })
+            .then(response => response.text()) // Expect HTML response
+            .then(html => {
+                // Inject the returned HTML into the page
+                document.getElementById('schedule-section').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        });
+
+
+
+
     </script>
 
-    <script >
-        document.querySelectorAll('.box').forEach(box => {
-        const input_range = box.querySelector('.input-range');
-        const number = box.querySelector('.number');
-        const line = box.querySelector('.line');
-        const max_value = input_range.max;
 
-        input_range.addEventListener('input', () => {
-            const value = input_range.value;
-            number.innerHTML = value;
-            line.style.width = (value / max_value) * 100 + '%';
+    <script>
+        document.querySelectorAll('.box').forEach(box => {
+            const input_range = box.querySelector('.input-range');
+            const number = box.querySelector('.number');
+            const line = box.querySelector('.line');
+            const max_value = input_range.max;
+
+            input_range.addEventListener('input', () => {
+                const value = input_range.value;
+                number.innerHTML = value;
+                line.style.width = (value / max_value) * 100 + '%';
+            });
         });
-    });
 
     </script>
 </body>
 
 </html>
+
+<style>
+    .search-section {
+        background-color: #f9f9f9;
+        height: 400px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        width: 60%;
+        margin-right: 20px;
+        padding: 20px;
+    }
+
+    .search-bar {
+        margin-bottom: 15px;
+    }
+
+    .search-results {
+        background-color: #f9f9f9;
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .search-result-item {
+        background-color: #ff6347;
+        /* Blue background for individual result div */
+        color: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+        cursor: pointer;
+        /* Full width */
+        box-sizing: border-box;
+        font-size: 1.1rem;
+    }
+
+    .search-result-item p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .search-results::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .search-results::-webkit-scrollbar-thumb {
+        background-color: #ff6347;
+        /* Custom scrollbar color */
+        border-radius: 10px;
+    }
+
+    /* Cart Section with the same style as search results */
+    #cart {
+        background-color: #f9f9f9;
+        /* Match the background with search-section */
+        max-height: 400px;
+        /* Limit height similar to search results */
+        overflow-y: auto;
+        padding: 20px;
+
+        border-radius: 10px;
+        /* Same border radius */
+    }
+
+    /* Cart item with the same look and feel as search result items */
+    .cart-item {
+        background-color: #ff6347;
+        /* Match the search result item color */
+        color: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+        /* Full width like search result items */
+        cursor: pointer;
+        box-sizing: border-box;
+        font-size: 1.1rem;
+    }
+
+    .cart-item p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    /* Custom scrollbar for the cart section */
+    #cart::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #cart::-webkit-scrollbar-thumb {
+        background-color: #ff6347;
+        /* Match the scrollbar thumb with search result color */
+        border-radius: 10px;
+    }
+    #cart-items {
+        padding: 0;
+    }
+
+    /* Hover effect for cart items */
+    .cart-item:hover {
+        background-color: #ff8367;
+    }
+
+
+    #all-schedules {
+        background-color: #f9f9f9;
+        /* Match the background with search-section */
+        overflow-y: auto;
+        padding: 20px;
+        border-radius: 10px;
+        /* Same border radius */
+    }
+
+
+
+</style>
