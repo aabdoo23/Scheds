@@ -26,7 +26,7 @@
     </nav>
 
     <!-- Generate Schedules Page -->
-    <div class="container">
+    <div class="Container">
         <!-- Search and Cart Section -->
         <section class="search-cart">
             <div class="search-section">
@@ -49,48 +49,50 @@
 
         <!-- Customization Section -->
         <section class="customization">
-            <h2>Customize Your Schedule</h2>
+    <h2>Customize Your Schedule</h2>
+    <div class="customization-layout">
+        <!-- Sliders Section -->
+        <div class="sliders">
             <div class="box">
                 <label class="slider-label">Minimum Slots per Day</label>
                 <div class="inner-box">
                     <div class="line"></div>
-                    <input type="range" class="input-range"  min="0" max="4" value="0" />
-                    
+                    <input type="range" class="input-range" min="0" max="4" value="0" />
                 </div>
                 <p class="number">0</p>
             </div>
-            
+
             <div class="box">
                 <label class="slider-label">Maximum Gap Period (hours)</label>
                 <div class="inner-box">
                     <div class="line"></div>
-                    <input type="range" class="input-range"  min="0" max="6" value="0" />
-                    
+                    <input type="range" class="input-range" min="0" max="6" value="0" />
                 </div>
                 <p class="number">0</p>
             </div>
-            
+
             <div class="box">
                 <label class="slider-label">Maximum Number of Schedules</label>
                 <div class="inner-box">
                     <div class="line"></div>
-                    <input type="range" class="input-range"  min="0" max="500" value="0" />
-                    
+                    <input type="range" class="input-range" min="0" max="500" value="0" />
                 </div>
                 <p class="number">0</p>
             </div>
-            
+
             <div class="box">
                 <label class="slider-label">Maximum Days on Campus</label>
                 <div class="inner-box">
                     <div class="line"></div>
-                    <input type="range" class="input-range"  min="0" max="6" value="0" />
-                    
+                    <input type="range" class="input-range" min="0" max="6" value="0" />
                 </div>
                 <p class="number">0</p>
             </div>
-            
-            
+        </div>
+
+        <!-- Checkboxes Section -->
+        <div class="checkboxes">
+            <!-- First Checkbox Group -->
             <div class="checkbox-group">
                 <h3>Select Days on Campus:</h3>
                 <label><input type="checkbox" name="days" value="all"> All Week</label>
@@ -102,6 +104,8 @@
                 <label><input type="checkbox" name="days" value="friday"> Friday</label>
                 <label><input type="checkbox" name="days" value="saturday"> Saturday</label>
             </div>
+
+            <!-- Second Checkbox Group -->
             <div class="checkbox-group">
                 <h3>Select First Slot Time:</h3>
                 <label><input type="checkbox" name="time" value="830"> 8:30 AM</label>
@@ -109,6 +113,8 @@
                 <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
                 <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
             </div>
+
+            <!-- Third Checkbox Group -->
             <div class="checkbox-group">
                 <h3>Select Last Slot Time:</h3>
                 <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
@@ -116,8 +122,11 @@
                 <label><input type="checkbox" name="time" value="1630"> 4:30 PM</label>
                 <label><input type="checkbox" name="time" value="1830"> 6:30 PM</label>
             </div>
-            <button id="generate-schedule" class="btn-primary">Generate Schedule</button>
-        </section>
+        </div>
+    </div>
+
+    <button id="generate-schedule" class="btn-primary">Generate Schedule</button>
+</section>
 
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
@@ -145,8 +154,6 @@
 
                 @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray)
 
-                <button id="prev-schedule" class="btn-secondary">← Previous</button>
-                <button id="next-schedule" class="btn-secondary">Next →</button>
             </div>
         </section>
         @* @await Component.InvokeAsync("CardItemViewComponent",new ReturnedCardItem{
