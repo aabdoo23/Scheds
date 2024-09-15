@@ -23,41 +23,42 @@
                 "4:30 PM - 6:29 PM", "6:30 PM - 8:29 PM"
             };
             var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
-            @if (Model == null || Model.Count == 0)
+
+            if (Model == null || Model.Count == 0)
             {
                 <tr>
                     <td colspan="7">No data available</td>
                 </tr>
             }
-            else{
-
-                
-            // Loop through each time slot
-            for (int i = 0; i < timeSlots.Length; i++)
+            else
             {
-                <tr>
-                    <!-- Time slot column -->
-                    <td class="timeslot">@timeSlots[i]</td>
-                    
-                    <!-- Loop through the 6 days of the week (Saturday to Thursday) -->
-                    @for (int j = 0; j < 6; j++)
-                    {
-                        <td>
-                            @if (Model.Count > j && Model[j] != null && Model[j].Any(item => item != null && item.startTime.Hours == hoursMapping[i]))
-                            {
-                                var cardItem = Model[j].FirstOrDefault(item => item.startTime.Hours == hoursMapping[i]);
-                                if (cardItem != null)
+                // Loop through each time slot
+                for (int i = 0; i < timeSlots.Length; i++)
+                {
+                    <tr>
+                        <!-- Time slot column -->
+                        <td class="timeslot">@timeSlots[i]</td>
+                        
+                        <!-- Loop through the 6 days of the week (Saturday to Thursday) -->
+                        @for (int j = 0; j < 6; j++)
+                        {
+                            <td>
+                                @if (Model.Count > j && Model[j] != null)
                                 {
-                                    @await Component.InvokeAsync("CardItemViewComponent", cardItem)
-                                }
-                            }
-                        </td>
-                    }
-                </tr>
-            }
+                                    var cardItem = Model[j]
+                                        .FirstOrDefault(item => item?.startTime != null && item.startTime.Hours == hoursMapping[i]);
 
+                                    if (cardItem != null)
+                                    {
+                                        @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+                                    }
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            }
         }
-    }
     </tbody>
 </table>
 

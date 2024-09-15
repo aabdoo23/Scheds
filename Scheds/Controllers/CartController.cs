@@ -10,31 +10,17 @@ namespace Scheds.Controllers
     [Route("api/cart")]
     public class CartController : ControllerBase
     {
-        private const string SessionKeyCart = "CartItems";
+        private const string CookieKeyCart = "CartItems";
 
         // Add to cart (POST)
         [HttpPost("add")]
         public IActionResult AddToCart([FromBody] CourseBase course)
         {
-            var cart = GetCartItemsFromSession();
+            var cart = GetCartItemsFromCookies();
             if (!cart.Exists(c => c.CourseCode == course.CourseCode))
             {
                 cart.Add(course);
-                SaveCartItemsToSession(cart);
-            }
-            return Ok();
-        }
-
-        // Remove from cart (POST)
-        [HttpPost("remove")]
-        public IActionResult RemoveFromCart([FromBody] CourseBase course)
-        {
-            var cart = GetCartItemsFromSession();
-            var itemToRemove = cart.Find(c => c.CourseCode == course.CourseCode);
-            if (itemToRemove != null)
-            {
-                cart.Remove(itemToRemove);
-                SaveCartItemsToSession(cart);
+                SaveCartItemsToCookies(cart);
             }
             return Ok();
         }
@@ -43,26 +29,34 @@ namespace Scheds.Controllers
         [HttpGet("getCartItems")]
         public IActionResult GetCartItems()
         {
-            var cart = GetCartItemsFromSession();
+            var cart = GetCartItemsFromCookies();
             return Ok(cart);
         }
 
-        // Helper method to get the cart from the session
-        private List<CourseBase> GetCartItemsFromSession()
+        // Helper method to get the cart from cookies
+        private List<CourseBase> GetCartItemsFromCookies()
         {
-            var cartJson = HttpContext.Session.GetString(SessionKeyCart);
+            var cartJson = Request.Cookies[CookieKeyCart];
             if (string.IsNullOrEmpty(cartJson))
             {
+                System.Console.WriteLine("Cart is empty");
                 return new List<CourseBase>();
             }
             return JsonConvert.DeserializeObject<List<CourseBase>>(cartJson);
         }
 
-        // Helper method to save the cart to the session
-        private void SaveCartItemsToSession(List<CourseBase> cart)
+        // Helper method to save the cart to cookies
+        private void SaveCartItemsToCookies(List<CourseBase> cart)
         {
             var cartJson = JsonConvert.SerializeObject(cart);
-            HttpContext.Session.SetString(SessionKeyCart, cartJson);
+            CookieOptions options = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(1) // Set cookie to expire in one day
+            };
+            Response.Cookies.Append(CookieKeyCart, cartJson, options);
         }
+
+
+
     }
 }
