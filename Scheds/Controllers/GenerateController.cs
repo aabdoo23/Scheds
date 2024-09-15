@@ -17,8 +17,9 @@ namespace Scheds.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<List<ReturnedCardItem[,]>>> Generate(GenerateRequest request)
+        public async Task<ActionResult<List<List<List<ReturnedCardItem>>>>> Generate(GenerateRequest request)
         {
+            System.Console.WriteLine(request.ToString());
             List<List<CardItem>> allCardItemsByCourse = new List<List<CardItem>>();
 
             // Handle custom selected items

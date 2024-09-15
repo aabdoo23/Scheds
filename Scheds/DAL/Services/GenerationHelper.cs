@@ -59,7 +59,7 @@ namespace Scheds.DAL.Services
 
         private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            if (request.specificDays) return true;
+            //if (request.specificDays) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
@@ -69,7 +69,8 @@ namespace Scheds.DAL.Services
         }
         private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            if (!request.specificDays) return true;
+            return true;
+            //if (!request.specificDays) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
@@ -165,8 +166,9 @@ namespace Scheds.DAL.Services
                     bool dsc = PassesDayStartConstraint(request, itemsPerDay);
                     bool sdc = PassesSpecificDaysConstraint(request, itemsPerDay);
                     bool dec = PassesDayEndConstraint(request, itemsPerDay);
+                    Console.WriteLine(nodc + " " + nopdc + " " + tg + " " + dsc + " " + sdc + " " + dec);
 
-                    if (nodc&&nopdc&&tg&&dsc&&sdc&&dec)
+                    if (nodc && nopdc && tg && dsc && sdc && dec)
                     {
                         var returnedTimetable = currentTimetable
                             .Select(i => new ReturnedCardItem(i))
@@ -277,24 +279,52 @@ namespace Scheds.DAL.Services
                 }
             }
         }
-        public static List<ReturnedCardItem[,]> GenerateAllTimetables(List<List<CardItem>> allCardItemsByCourse, GenerateRequest request)
+        public static List<List<List<ReturnedCardItem>>> GenerateAllTimetables(List<List<CardItem>> allCardItemsByCourse, GenerateRequest request)
         {
             List<List<ReturnedCardItem>> result = new List<List<ReturnedCardItem>>();
 
             GenerateTimetablesHelper(allCardItemsByCourse, 0, new List<CardItem>(), result, request);
-            List<ReturnedCardItem[,]> schedules = new List<ReturnedCardItem[,]>();
-            foreach(var schedule in result)
+
+            // Define the number of days and the number of hours in a day
+            int numberOfDays = 6; // Saturday to Thursday
+            int hoursInDay = 24;
+
+            List<List<List<ReturnedCardItem>>> schedules = new List<List<List<ReturnedCardItem>>>();
+            foreach (var schedule in result)
             {
-                ReturnedCardItem[,] scheduleArray = new ReturnedCardItem[6,24];
-                foreach(var item in schedule)
+                // Initialize the scheduleArray with a size for each day and each hour
+                List<List<ReturnedCardItem>> scheduleArray = new List<List<ReturnedCardItem>>();
+                for (int day = 0; day < numberOfDays; day++)
                 {
-                    int dayIndex = Array.IndexOf(new string[] {"Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" }, item.day);
-                    
+                    // Initialize each day's list with an empty list for each hour
+                    List<ReturnedCardItem> daySchedule = new List<ReturnedCardItem>();
+                    for (int hour = 0; hour < hoursInDay; hour++)
+                    {
+                        daySchedule.Add(null); // or a default value if needed
+                    }
+                    scheduleArray.Add(daySchedule);
+                }
+
+                foreach (var item in schedule)
+                {
+                    int dayIndex = Array.IndexOf(new string[] { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" }, item.day);
+                    if (dayIndex < 0 || dayIndex >= numberOfDays)
+                    {
+                        throw new ArgumentException("Invalid day value.");
+                    }
+
                     for (int i = item.startTime.Hours; i < item.endTime.Hours; i++)
                     {
-                        scheduleArray[dayIndex,i] = item;
+                        if (i >= hoursInDay)
+                        {
+                            throw new ArgumentException("Start time or end time is out of range.");
+                        }
+                        scheduleArray[dayIndex][i] = item;
+                        System.Console.WriteLine(item.ToString());
                     }
+                    System.Console.WriteLine();
                 }
+
                 schedules.Add(scheduleArray);
             }
             return schedules;
