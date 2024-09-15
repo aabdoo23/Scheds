@@ -1,5 +1,5 @@
 @using Scheds.Models
-@model ReturnedCardItem[,]
+@model List<List<ReturnedCardItem>>
 
 <table border="1">
     <thead>
@@ -11,30 +11,54 @@
             <th>Tuesday</th>
             <th>Wednesday</th>
             <th>Thursday</th>
+            @* <th>Friday</th> If you want to include Friday *@
         </tr>
     </thead>
     <tbody>
         @{
+            // Define the time slots and corresponding hours
             var timeSlots = new[] {
         "8:30 AM 10:29 AM", "10:30 AM 12:29 PM",
         "12:30 PM 2:29 PM", "2:30 PM 4:29 PM",
         "4:30 PM 6:29 PM", "6:30 PM 8:29 PM"
         };
+
             var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
-            for (int i = 0; i < timeSlots.Length; i++)
+
+            if (Model == null || Model.Count == 0)
             {
                 <tr>
-                    <td class="timeslot">@timeSlots[i]</td>
-                    @for (int j = 0; j < 6; j++)
-                    {
-                        <td>
-                            @if (Model[j, hoursMapping[i]] != null)
-                            {
-                                @await Component.InvokeAsync("CardItemViewComponent", Model[j, hoursMapping[i]]);
-                            }
-                        </td>
-                    }
+                    <td colspan="7">No data available</td>
                 </tr>
+            }
+
+            else
+            {
+                // Loop through each time slot
+                for (int i = 0; i < timeSlots.Length; i++)
+                {
+                    <tr>
+                        <!-- Time slot column -->
+                        <td class="timeslot">@timeSlots[i]</td>
+                        
+                        <!-- Loop through the 6 days of the week (Saturday to Thursday) -->
+                        @for (int j = 0; j < 6; j++)
+                        {
+                            <td>
+                                @if (Model.Count > j && Model[j] != null)
+                                {
+                                    var cardItem = Model[j]
+                                        .FirstOrDefault(item => item?.startTime != null && item.startTime.Hours == hoursMapping[i]);
+
+                                    if (cardItem != null)
+                                    {
+                                        @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+                                    }
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
             }
         }
     </tbody>
@@ -43,6 +67,7 @@
 <style>
     /* Table styles */
     table {
+
         margin-left: 45px;
         margin-top: 20px;
         width: 180vh;
@@ -63,6 +88,7 @@
         font-size: 1em; /* Text size */
         
         
+
     }
 
     th {
@@ -80,6 +106,7 @@
         font-size: 1em;
         text-align: center;
         max-width:30px;
+
     }
 
     /* Optional: Highlight even rows (striped table effect) */
@@ -96,5 +123,6 @@
     /* Removes border around individual cells */
     td, th {
         border: none; /* No internal borders */
+
     }
 </style>
