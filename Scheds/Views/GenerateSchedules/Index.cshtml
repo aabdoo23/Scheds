@@ -61,84 +61,89 @@
 
 
         <section class="customization">
-    <h2>Customize Your Schedule</h2>
-    <div class="customization-layout">
-        <!-- Sliders Section -->
-        <div class="sliders">
-            <div class="box">
-                <label class="slider-label">Minimum Slots per Day</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="4" value="0" />
-                </div>
-                <p class="number">0</p>
-            </div>
+            <h2>Customize Your Schedule</h2>
+            <div class="customization-layout">
+                <form id="generate-form">
 
-            <div class="box">
-                <label class="slider-label">Maximum Gap Period (hours)</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="6" value="0" />
-                </div>
-                <p class="number">0</p>
-            </div>
+                    <!-- Sliders Section -->
+                    <div class="sliders">
+                        <div class="box">
+                            <label class="slider-label">Minimum Slots per Day</label>
+                            <div class="inner-box">
+                                <div class="line"></div>
+                                <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0"
+                                    max="4" value="0" />
+                            </div>
+                            <p class="number">0</p>
+                        </div>
 
-            <div class="box">
-                <label class="slider-label">Maximum Number of Schedules</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="500" value="0" />
-                </div>
-                <p class="number">0</p>
-            </div>
+                        <div class="box">
+                            <label class="slider-label">Maximum Gap Period (hours)</label>
+                            <div class="inner-box">
+                                <div class="line"></div>
+                                <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
+                                    value="0" />
+                            </div>
+                            <p class="number">0</p>
+                        </div>
 
-            <div class="box">
-                <label class="slider-label">Maximum Days on Campus</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="6" value="0" />
-                </div>
-                <p class="number">0</p>
-            </div>
-      </div>
+                        <div class="box">
+                            <label class="slider-label">Maximum Number of Schedules</label>
+                            <div class="inner-box">
+                                <div class="line"></div>
+                                <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="0"
+                                    max="500" value="0" />
+                            </div>
+                            <p class="number">0</p>
+                        </div>
 
-        <!-- Checkboxes Section -->
-        <div class="checkboxes">
-            <!-- First Checkbox Group -->
-            <div class="checkbox-group">
-                <h3>Select Days on Campus:</h3>
-                <label><input type="checkbox" name="days" value="all"> All Week</label>
-                <label><input type="checkbox" name="days" value="sunday"> Sunday</label>
-                <label><input type="checkbox" name="days" value="monday"> Monday</label>
-                <label><input type="checkbox" name="days" value="tuesday"> Tuesday</label>
-                <label><input type="checkbox" name="days" value="wednesday"> Wednesday</label>
-                <label><input type="checkbox" name="days" value="thursday"> Thursday</label>
-                <label><input type="checkbox" name="days" value="friday"> Friday</label>
-                <label><input type="checkbox" name="days" value="saturday"> Saturday</label>
-            </div>
+                        <div class="box">
+                            <label class="slider-label">Maximum Days on Campus</label>
+                            <div class="inner-box">
+                                <div class="line"></div>
+                                <input type="range" name="numberOfDays" class="input-range" min="0" max="6" value="0" />
+                            </div>
+                            <p class="number">0</p>
+                        </div>
+                    </div>
 
-            <!-- Second Checkbox Group -->
-            <div class="checkbox-group">
-                <h3>Select First Slot Time:</h3>
-                <label><input type="checkbox" name="time" value="830"> 8:30 AM</label>
-                <label><input type="checkbox" name="time" value="1030"> 10:30 AM</label>
-                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
-                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
-            </div>
+                    <!-- Checkboxes Section -->
+                    <div class="checkboxes">
+                        <!-- First Checkbox Group -->
+                        <div class="checkbox-group">
+                            <h3>Select Days on Campus:</h3>
+                            <label><input type="checkbox" name="selectedDays" value="all"> All Week</label>
+                            <label><input type="checkbox" name="selectedDays" value="sunday"> Sunday</label>
+                            <label><input type="checkbox" name="selectedDays" value="monday"> Monday</label>
+                            <label><input type="checkbox" name="selectedDays" value="tuesday"> Tuesday</label>
+                            <label><input type="checkbox" name="selectedDays" value="wednesday"> Wednesday</label>
+                            <label><input type="checkbox" name="selectedDays" value="thursday"> Thursday</label>
+                            <label><input type="checkbox" name="selectedDays" value="friday"> Friday</label>
+                            <label><input type="checkbox" name="selectedDays" value="saturday"> Saturday</label>
+                        </div>
 
-            <!-- Third Checkbox Group -->
-            <div class="checkbox-group">
-                <h3>Select Last Slot Time:</h3>
-                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
-                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
-                <label><input type="checkbox" name="time" value="1630"> 4:30 PM</label>
-                <label><input type="checkbox" name="time" value="1830"> 6:30 PM</label>
-            </div>
-        </div>
-    </div>
+                        <!-- Second Checkbox Group -->
+                        <div class="checkbox-group">
+                            <h3>Select First Slot Time:</h3>
+                            <label><input type="radio" name="daysStart" value="830"> 8:30 AM</label>
+                            <label><input type="radio" name="daysStart" value="1030"> 10:30 AM</label>
+                            <label><input type="radio" name="daysStart" value="1230"> 12:30 PM</label>
+                            <label><input type="radio" name="daysStart" value="1430"> 2:30 PM</label>
+                        </div>
 
-    <button id="generate-schedule" class="btn-primary">Generate Schedule</button>
-</section>
+                        <!-- Third Checkbox Group -->
+                        <div class="checkbox-group">
+                            <h3>Select Last Slot Time:</h3>
+                            <label><input type="checkbox" name="daysEnd" value="1230"> 12:30 PM</label>
+                            <label><input type="checkbox" name="daysEnd" value="1430"> 2:30 PM</label>
+                            <label><input type="checkbox" name="daysEnd" value="1630"> 4:30 PM</label>
+                            <label><input type="checkbox" name="daysEnd" value="1830"> 6:30 PM</label>
+                        </div>
+                    </div>
+
+            <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
+            </form>
+        </section>
 
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
@@ -151,8 +156,8 @@
             </div>
         </section>
     </div>
-    
-    
+
+
     <script>
         let cart = [];
 
@@ -255,7 +260,7 @@
             }
         }
 
-        document.getElementById('generate-form').addEventListener('submit', function(event) {
+        document.getElementById('generate-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent form submission
 
             // Capture form data
@@ -271,7 +276,7 @@
             // Assuming selectedItems and customSelectedItems will be managed elsewhere
             const selectedItems = cart;
             const customSelectedItems = [];
-
+            console.log(selectedItems);
             // Construct the GenerateRequest object
             const generateRequest = {
                 selectedDays,
@@ -296,14 +301,14 @@
                 },
                 body: JSON.stringify(generateRequest)
             })
-            .then(response => response.text()) // Expect HTML response
-            .then(html => {
-                // Inject the returned HTML into the page
-                document.getElementById('schedule-section').innerHTML = html;
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+                .then(response => response.text()) // Expect HTML response
+                .then(html => {
+                    // Inject the returned HTML into the page
+                    document.getElementById('schedule-section').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
         });
 
 
@@ -427,6 +432,7 @@
         /* Match the scrollbar thumb with search result color */
         border-radius: 10px;
     }
+
     #cart-items {
         padding: 0;
     }
@@ -445,7 +451,4 @@
         border-radius: 10px;
         /* Same border radius */
     }
-
-
-
 </style>
