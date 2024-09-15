@@ -1,3 +1,71 @@
 @using Scheds.Models
 @model List<List<List<ReturnedCardItem>>>
 
+<div class="all-container">
+    <div class="scroll-container">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="schedule">
+                @await Component.InvokeAsync("ScheduleViewComponent", Model[i])
+            </div>
+        }
+    </div>
+
+    <div class="bottom-bar">
+        <p id="currSchedule" class="current-schedule">Schedule 1 of @Model.Count</p>
+    </div>
+</div>
+
+<script>
+    var scrollContainer = document.querySelector('.scroll-container');
+    var totalSchedules = @Model.Count;
+    var scheduleWidth = document.querySelector('.schedule').offsetWidth;
+    var currScheduleText = document.getElementById('currSchedule');
+
+    // Update the current schedule text based on scroll position
+    function updateScheduleText() {
+        var scrollLeft = scrollContainer.scrollLeft;
+        var currentScheduleIndex = Math.round(scrollLeft / scheduleWidth) + 1;
+        currScheduleText.innerText = `Schedule ${currentScheduleIndex} of ${totalSchedules}`;
+    }
+
+    // Listen for scroll events to update the schedule text
+    scrollContainer.addEventListener('scroll', updateScheduleText);
+
+    // Initial text update
+    updateScheduleText();
+</script>
+
+<style>
+    .all-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .scroll-container {
+        display: flex;
+        overflow-x: auto;
+        width: 100%;
+        scroll-behavior: smooth;
+    }
+
+    .schedule {
+        flex: 0 0 auto; /* Prevent shrinking, keep natural width */
+        width: 100%;
+        margin-right: 20px; /* Space between schedules */
+    }
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .current-schedule {
+        font-size: 20px;
+    }
+</style>

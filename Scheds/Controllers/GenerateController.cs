@@ -134,8 +134,8 @@ namespace Scheds.Controllers
                 }
             }
 
-            var generatedTest = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
-            return ViewComponent("ScheduleViewComponent", generatedTest[0]);
+            var generatedSchedules = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
+            return ViewComponent("AllSchedulesViewComponent", generatedSchedules);
             
         }
 
