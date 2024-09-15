@@ -63,115 +63,103 @@
         <section class="customization">
             <h2>Customize Your Schedule</h2>
 
-            <form id="generate-form" asp-action="Generate" method="post">
-                <!-- Minimum Slots per Day -->
-                <div class="box">
-                    <label class="slider-label">Minimum Slots per Day</label>
-                    <div class="inner-box">
-                        <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0" max="4"
-                            value="@Model?.FormRequest?.minimumNumberOfItemsPerDay ?? 0" />
-                    </div>
-                </div>
+            <form id="generate-form">
+    <!-- Minimum Slots per Day -->
+    <div class="box">
+        <label class="slider-label">Minimum Slots per Day</label>
+        <div class="inner-box">
+            <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0" max="4" value="0" />
+        </div>
+    </div>
 
-                <!-- Maximum Gap Period (hours) -->
-                <div class="box">
-                    <label class="slider-label">Maximum Gap Period (hours)</label>
-                    <div class="inner-box">
-                        <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
-                            value="@Model?.FormRequest?.largestAllowedGap ?? 0" />
-                    </div>
-                </div>
+    <!-- Maximum Gap Period (hours) -->
+    <div class="box">
+        <label class="slider-label">Maximum Gap Period (hours)</label>
+        <div class="inner-box">
+            <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6" value="0" />
+        </div>
+    </div>
 
-                <!-- Maximum Number of Schedules -->
-                <div class="box">
-                    <label class="slider-label">Maximum Number of Schedules</label>
-                    <div class="inner-box">
-                        <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="0" max="500"
-                            value="@Model?.FormRequest?.maxNumberOfGeneratedSchedules ?? 0" />
-                    </div>
-                </div>
+    <!-- Maximum Number of Schedules -->
+    <div class="box">
+        <label class="slider-label">Maximum Number of Schedules</label>
+        <div class="inner-box">
+            <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="0" max="500" value="0" />
+        </div>
+    </div>
 
-                <!-- Maximum Days on Campus -->
-                <div class="box">
-                    <label class="slider-label">Maximum Days on Campus</label>
-                    <div class="inner-box">
-                        <input type="range" name="numberOfDays" class="input-range" min="0" max="6"
-                            value="@Model?.FormRequest?.numberOfDays ?? 0" />
-                    </div>
-                </div>
+    <!-- Maximum Days on Campus -->
+    <div class="box">
+        <label class="slider-label">Maximum Days on Campus</label>
+        <div class="inner-box">
+            <input type="range" name="numberOfDays" class="input-range" min="0" max="6" value="0" />
+        </div>
+    </div>
 
-                <!-- Select Days on Campus -->
-                <div class="checkbox-group">
-                    <h3>Select Days on Campus:</h3>
-                    <label>
-                        <input type="checkbox" name="selectedDays" value="all"
-                        @(Model?.FormRequest?.selectedDays?.Contains("all") == true ? "checked" : "")> All Week
-                    </label>
-                    <label>
-                        <input type="checkbox" name="selectedDays" value="saturday"
-                        @(Model?.FormRequest?.selectedDays?.Contains("saturday") == true ? "checked" : "")> Saturday
-                    </label>
-                    <!-- Add other checkboxes similarly -->
-                </div>
+    <!-- Select Days on Campus -->
+    <div class="checkbox-group">
+        <h3>Select Days on Campus:</h3>
+        <label>
+            <input type="checkbox" name="selectedDays" value="all"> All Week
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="saturday"> Saturday
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="sunday"> Sunday
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="monday"> Monday
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="tuesday"> Tuesday
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="wednesday"> Wednesday
+        </label>
+        <label>
+            <input type="checkbox" name="selectedDays" value="thursday"> Thursday
+        </label>
+    </div>
 
-                <!-- Select First Slot Time -->
-                <div class="checkbox-group">
-                    <h3>Select First Slot Time:</h3>
-                    <input type="radio" name="daysStart" value="830" @(Model?.FormRequest?.daysStart == "830" ?
-                        "checked" : "") /> 8:30 AM
-                    <!-- Add other radios similarly -->
-                </div>
+    <!-- Select First Slot Time -->
+    <div class="checkbox-group">
+        <h3>Select First Slot Time:</h3>
+        <input type="radio" name="daysStart" value="830" /> 8:30 AM
+        <input type="radio" name="daysStart" value="1030" /> 10:30 AM
+        <input type="radio" name="daysStart" value="1230" /> 12:30 PM
+        <input type="radio" name="daysStart" value="1430" /> 2:30 PM
+    </div>
 
-                <!-- Select Last Slot Time -->
-                <div class="checkbox-group">
-                    <h3>Select Last Slot Time:</h3>
-                    <input type="radio" name="daysEnd" value="1230" @(Model?.FormRequest?.daysEnd == "1230" ? "checked"
-                        : "") /> 12:30 PM
-                    <!-- Add other radios similarly -->
-                </div>
+    <!-- Select Last Slot Time -->
+    <div class="checkbox-group">
+        <h3>Select Last Slot Time:</h3>
+        <input type="radio" name="daysEnd" value="1229" /> 12:30 PM
+        <input type="radio" name="daysEnd" value="1429" /> 2:30 PM
+        <input type="radio" name="daysEnd" value="1629" /> 4:30 PM
+        <input type="radio" name="daysEnd" value="1829" /> 6:30 PM
+        <input type="radio" name="daysEnd" value="2029" /> 8:30 PM (Default)
 
-                <input type="hidden" id="selectedItems" name="selectedItems" />
-                <input type="hidden" id="customSelectedItems" name="customSelectedItems" />
-                <!-- Submit Button -->
-                <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
-            </form>
+
+        
+    </div>
+
+
+    <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
+</form>
         </section>
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
             <div class="schedule-container">
-                @{
-                    // Initialize the 2D array with 7 days (Saturday to Friday)
-                    ReturnedCardItem[,] scheduleArray = new ReturnedCardItem[7, 24];
-                    scheduleArray[2, 12] = new ReturnedCardItem
-            {
-                cardId = 1,
-                courseName = "Artificial Intelligence",
-                courseCode = "AIS415",
-                instructorName = "Dr. John Doe",
-                section = "1A",
-                subType = "Lecture",
-                credits = 3,
-                seatsLeft = 10,
-                day = "Monday",
-                startTime = TimeSpan.Parse("10:30"),
-                endTime = TimeSpan.Parse("12:30"),
-                room = "F45"
-            };
-                }
-                @if (Model?.ScheduleResult != null && Model.ScheduleResult.Any())
-                {
-                    @await Component.InvokeAsync("ScheduleViewComponent", Model.ScheduleResult[0])
-                    ;
-
-                })
-                @* @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray) *@
-
                 <button id="prev-schedule" class="btn-secondary">← Previous</button>
+                <div id="schedule-section"></div>
                 <button id="next-schedule" class="btn-secondary">Next →</button>
             </div>
         </section>
     </div>
+    
+    
     <script>
         let cart = [];
 
@@ -195,6 +183,7 @@
             fetch('/api/cart/getCartItems')
                 .then(response => response.json())
                 .then(cartItems => {
+                    console.log(cartItems);
                     cart = cartItems; // Store full course objects in the cart array
                     cart.forEach(course => updateCartUI(course));
                 })
@@ -202,21 +191,6 @@
 
 
         });
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('generate-form');
-            form.addEventListener('submit', (event) => {
-                fetch('https://localhost:7250/api/cart/getcartitems')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        const selectedItemsInput = document.getElementById('selectedItems');
-                        selectedItemsInput.value = JSON.stringify(data); 
-                    });
-                
-            });
-        });
-
-
 
         function updateSearchResults(courses) {
             const resultsContainer = document.getElementById('search-results');
@@ -287,6 +261,61 @@
                 cartItem.remove();
             }
         }
+
+        document.getElementById('generate-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Capture form data
+            const form = event.target;
+            const selectedDays = Array.from(form.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
+            const daysStart = form.querySelector('input[name="daysStart"]:checked')?.value || '';
+            const daysEnd = form.querySelector('input[name="daysEnd"]:checked')?.value || '';
+            const minimumNumberOfItemsPerDay = form.minimumNumberOfItemsPerDay.value;
+            const largestAllowedGap = form.largestAllowedGap.value;
+            const maxNumberOfGeneratedSchedules = form.maxNumberOfGeneratedSchedules.value;
+            const numberOfDays = form.numberOfDays.value;
+
+            // Assuming selectedItems and customSelectedItems will be managed elsewhere
+            const selectedItems = cart;
+            const customSelectedItems = [];
+
+            // Construct the GenerateRequest object
+            const generateRequest = {
+                selectedDays,
+                daysStart,
+                daysEnd,
+                minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
+                largestAllowedGap: parseInt(largestAllowedGap),
+                maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
+                numberOfDays: parseInt(numberOfDays),
+                selectedItems,
+                customSelectedItems
+            };
+
+            // URL for the fetch call
+            const url = '/api/generate';
+
+            // Make the AJAX POST request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(generateRequest)
+            })
+            .then(response => response.text()) // Expect HTML response
+            .then(html => {
+                // Inject the returned HTML into the page
+                document.getElementById('schedule-section').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        });
+
+
+
+
     </script>
 
 
@@ -316,6 +345,8 @@
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         position: relative;
+        width: 60%;
+        margin-right: 20px;
         padding: 20px;
     }
 
@@ -368,6 +399,7 @@
         /* Limit height similar to search results */
         overflow-y: auto;
         padding: 20px;
+
         border-radius: 10px;
         /* Same border radius */
     }
@@ -402,9 +434,25 @@
         /* Match the scrollbar thumb with search result color */
         border-radius: 10px;
     }
+    #cart-items {
+        padding: 0;
+    }
 
     /* Hover effect for cart items */
     .cart-item:hover {
         background-color: #ff8367;
     }
+
+
+    #all-schedules {
+        background-color: #f9f9f9;
+        /* Match the background with search-section */
+        overflow-y: auto;
+        padding: 20px;
+        border-radius: 10px;
+        /* Same border radius */
+    }
+
+
+
 </style>

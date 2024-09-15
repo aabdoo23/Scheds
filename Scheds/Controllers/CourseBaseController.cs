@@ -19,7 +19,7 @@ namespace Scheds.Controllers
         public async Task<IActionResult> GetAllCourses()
         {
             var courses = await courseBaseRepository.GetAllCourseBasesAsync();
-            foreach(CourseBase course in courses) Console.WriteLine(course.CourseCode);
+            // foreach(CourseBase course in courses) Console.WriteLine(course.CourseCode);
             return Ok(courses);
         }
     }

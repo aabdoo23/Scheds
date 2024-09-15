@@ -124,7 +124,7 @@ body {
 /* Search and Cart Section */
 .search-cart {
   display: flex;
-  justify-content: space-between; /* Split the cart and search sections */
+  /* justify-content: space-between; Split the cart and search sections */
   align-items: flex-start;
   width: 100%;
   padding-top: 20px;
