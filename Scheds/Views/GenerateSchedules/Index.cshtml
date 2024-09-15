@@ -158,7 +158,7 @@
 
     <script>
         let cart = [];
-
+        //dont show any courses if empty
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/api/coursebase/getAllCourses')
                 .then(response => response.json())
@@ -166,6 +166,10 @@
                     const searchInput = document.getElementById('course-search');
                     searchInput.addEventListener('input', () => {
                         const query = searchInput.value.toLowerCase();
+                        if (!query||query.length <= 1) {
+                            updateSearchResults([]); // Clear search results
+                            return;
+                        }
                         const filteredCourses = courses.filter(course =>
                             course.courseName.toLowerCase().includes(query) ||
                             course.courseCode.toLowerCase().includes(query)
