@@ -116,8 +116,359 @@ body {
   z-index: 2; /* Make sure the text is above the overlay */
   
 }
+/* lolypops */
+.custom-container {
+  position: relative;
+  width: 350px;
+  height: 180px;
+  transition: 200ms;
+}
+
+.custom-container:active {
+  width: 350px;
+  height: 180px;
+}
+
+#custom-card {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  transition: 700ms;
+  background: #191919;
+}
+
+.custom-subtitle {
+  transform: translateY(160px);
+  color: rgb(134, 110, 221);
+  text-align: center;
+  width: 100%;
+}
+
+.custom-title {
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out-out;
+  transition-delay: 100ms;
+  position: absolute;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
+  text-align: center;
+  color: black;
+}
+
+.custom-tracker:hover ~ #custom-card .custom-title {
+  opacity: 1;
+}
+
+#custom-prompt {
+  padding-top: 40PX;
+  bottom: 8px;
+  left: 12px;
+  z-index: 20;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 300ms ease-in-out-out;
+  max-width: 1000px;
+  color: rgb(255, 255, 255);
+}
+
+.custom-tracker {
+  position: absolute;
+  z-index: 200;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-tracker:hover {
+  cursor: pointer;
+}
+
+.custom-tracker:hover ~ #custom-card #custom-prompt {
+  opacity: 0;
+}
+
+.custom-tracker:hover ~ #custom-card {
+  transition: 300ms;
+  filter: brightness(1.1);
+}
+
+.custom-container:hover #custom-card::before {
+  transition: 200ms;
+  content: "";
+  opacity: 80%;
+}
+
+.custom-canvas {
+  perspective: 800px;
+  inset: 0;
+  z-index: 200;
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-template-areas:
+    "area-1 area-2 area-3 area-4 area-5"
+    "area-6 area-7 area-8 area-9 area-10"
+    "area-11 area-12 area-13 area-14 area-15"
+    "area-16 area-17 area-18 area-19 area-20"
+    "area-21 area-22 area-23 area-24 area-25";
+}
+
+#custom-card::before {
+  content: "";
+  background: #f78c13;
+  opacity: 0%;
+  width: 105%;
+  height: 105%;
+  border-radius: 20px;
+  position: absolute;
+  z-index: -1;
+  transition: 200ms;
+}
+.area-1 {
+  grid-area: area-1;
+}
+
+.area-2 {
+  grid-area: area-2;
+}
+
+.area-3 {
+  grid-area: area-3;
+}
+
+.area-4 {
+  grid-area: area-4;
+}
+
+.area-5 {
+  grid-area: area-5;
+}
+
+.area-6 {
+  grid-area: area-6;
+}
+
+.area-7 {
+  grid-area: area-7;
+}
+
+.area-8 {
+  grid-area: area-8;
+}
+
+.area-9 {
+  grid-area: area-9;
+}
+
+.area-10 {
+  grid-area: area-10;
+}
+
+.area-11 {
+  grid-area: area-11;
+}
+
+.area-12 {
+  grid-area: area-12;
+}
+
+.area-13 {
+  grid-area: area-13;
+}
+
+.area-14 {
+  grid-area: area-14;
+}
+
+.area-15 {
+  grid-area: area-15;
+}
+
+.area-16 {
+  grid-area: area-16;
+}
+
+.area-17 {
+  grid-area: area-17;
+}
+
+.area-18 {
+  grid-area: area-18;
+}
+
+.area-19 {
+  grid-area: area-19;
+}
+
+.area-20 {
+  grid-area: area-20;
+}
+
+.area-21 {
+  grid-area: area-21;
+}
+
+.area-22 {
+  grid-area: area-22;
+}
+
+.area-23 {
+  grid-area: area-23;
+}
+
+.area-24 {
+  grid-area: area-24;
+}
+
+.area-25 {
+  grid-area: area-25;
+}
+
+.area-1:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(20deg) rotateY(-10deg) rotateZ(0deg);
+}
+
+.area-2:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(20deg) rotateY(-5deg) rotateZ(0deg);
+}
+
+.area-3:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(20deg) rotateY(0deg) rotateZ(0deg);
+}
+
+.area-4:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(20deg) rotateY(5deg) rotateZ(0deg);
+}
+
+.area-5:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(20deg) rotateY(10deg) rotateZ(0deg);
+}
+
+.area-6:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(10deg) rotateY(-10deg) rotateZ(0deg);
+}
+
+.area-7:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(10deg) rotateY(-5deg) rotateZ(0deg);
+}
+
+.area-8:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(10deg) rotateY(0deg) rotateZ(0deg);
+}
+
+.area-9:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(10deg) rotateY(5deg) rotateZ(0deg);
+}
+
+.area-10:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(10deg) rotateY(10deg) rotateZ(0deg);
+}
+
+.area-11:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(0deg) rotateY(-10deg) rotateZ(0deg);
+}
+
+.area-12:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(0deg) rotateY(-5deg) rotateZ(0deg);
+}
+
+.area-13:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+}
+
+.area-14:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(0deg) rotateY(5deg) rotateZ(0deg);
+}
+
+.area-15:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(0deg) rotateY(10deg) rotateZ(0deg);
+}
+
+.area-16:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-10deg) rotateY(-10deg) rotateZ(0deg);
+}
+
+.area-17:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-10deg) rotateY(-5deg) rotateZ(0deg);
+}
+
+.area-18:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-10deg) rotateY(0deg) rotateZ(0deg);
+}
+
+.area-19:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-10deg) rotateY(5deg) rotateZ(0deg);
+}
+
+.area-20:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-10deg) rotateY(10deg) rotateZ(0deg);
+}
+
+.area-21:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-20deg) rotateY(-10deg) rotateZ(0deg);
+}
+
+.area-22:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-20deg) rotateY(-5deg) rotateZ(0deg);
+}
+
+.area-23:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-20deg) rotateY(0deg) rotateZ(0deg);
+}
+
+.area-24:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-20deg) rotateY(5deg) rotateZ(0deg);
+}
+
+.area-25:hover ~ #custom-card {
+  transition: 125ms ease-in-out;
+  transform: rotateX(-20deg) rotateY(10deg) rotateZ(0deg);
+}
+
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+
 /* General Styles */
-.container {
+.Container {
   padding: 20px;
 }
 
@@ -183,7 +534,16 @@ h1, h2 {
   position: relative;
   overflow: visible; /* Ensures child elements can overflow */
 }
+.customization-layout {
+  display: flex;
+  justify-content: space-between;
+}
 
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 
 .checkbox-group {
   margin-bottom: 20px;
@@ -199,6 +559,10 @@ h1, h2 {
 }
 
 /* Sliders */
+.sliders {
+  flex: 1;
+  margin-right: 20px;
+}
 
 
 .box{
@@ -315,7 +679,7 @@ h1, h2 {
   background-color: #b3b3b3;
 }
 
-/* Serch cources */
+/* Search cources */
 
 .group {
   display: flex;
@@ -371,7 +735,7 @@ h1, h2 {
 .generated-schedules {
   padding: 20px;
   background-color: #ffffff;
-  height: 100vh;
+  height: 120vh;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -471,17 +835,21 @@ h1, h2 {
 }
 
 /* Features Section */
-.features {
+.features-sec{
   display: flex;
-  justify-content: space-around;
-  padding: 50px;
-  background-color: white;
+  justify-content: space-around; /* Spacing between each div */
+  align-items: center; /* Align items vertically in the center */
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  padding: 20px;
+  background-color: #fcfcfc;
 }
 
-.feature {
+.feature{
   text-align: center;
-  max-width: 300px;
+  justify-content: center;
+  max-width: 350px;
   transition: transform 0.3s ease;
+  background-color: #fcfcfc;
 }
 
 .feature img {

@@ -18,10 +18,11 @@
         @{
             // Define the time slots and corresponding hours
             var timeSlots = new[] {
-                "8:30 AM - 10:29 AM", "10:30 AM - 12:29 PM",
-                "12:30 PM - 2:29 PM", "2:30 PM - 4:29 PM",
-                "4:30 PM - 6:29 PM", "6:30 PM - 8:29 PM"
-            };
+        "8:30 AM 10:29 AM", "10:30 AM 12:29 PM",
+        "12:30 PM 2:29 PM", "2:30 PM 4:29 PM",
+        "4:30 PM 6:29 PM", "6:30 PM 8:29 PM"
+        };
+
             var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
 
             if (Model == null || Model.Count == 0)
@@ -30,6 +31,7 @@
                     <td colspan="7">No data available</td>
                 </tr>
             }
+
             else
             {
                 // Loop through each time slot
@@ -63,27 +65,64 @@
 </table>
 
 <style>
+    /* Table styles */
     table {
-        width: 100%;
-        height: auto;
-        border-collapse: collapse;
-    }
 
-    th {
-        background-color: #f2f2f2;
+        margin-left: 45px;
+        margin-top: 20px;
+        width: 180vh;
+        height: 500px;
+        border-collapse: separate; /* Allows for border-radius */
+        border-spacing: 0; /* Removes gaps between cells */
+        border-radius: 10px; /* Applies rounded corners */
+        overflow: hidden; /* Hides overflow on corners */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Adds shadow for aesthetic */
+        
     }
 
     th, td {
-        padding: 8px;
-        text-align: left;
+        padding: 12px;
+        text-align: center; /* Centers text horizontally */
+        vertical-align: middle; /* Centers text vertically */
+        border: 1px solid #ddd; /* Sets border for all cells */
+        font-size: 1em; /* Text size */
+        
+        
+
     }
 
+    th {
+        background-color: #2a2244; /* Header background color */
+        color: white; /* Header text color */
+        font-weight: bold;
+    }
+    td{
+        height:70px;
+    }
+    .timeslot {
+        background-color: #463161f6; /* Slot background color */
+        color: white;
+        font-weight: 600;
+        font-size: 1em;
+        text-align: center;
+        max-width:30px;
+
+    }
+
+    /* Optional: Highlight even rows (striped table effect) */
     tr:nth-child(even) {
         background-color: #f2f2f2;
     }
 
-    .timeslot {
-        font-weight: 600;
-        font-size: 0.8em;
+    /* Applies rounded corners to outer borders */
+    table {
+        border: 2px solid #463161f6; /* Outer border color */
+        border-radius: 10px; /* Rounded borders for the table */
+    }
+
+    /* Removes border around individual cells */
+    td, th {
+        border: none; /* No internal borders */
+
     }
 </style>
