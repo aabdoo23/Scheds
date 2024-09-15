@@ -24,6 +24,19 @@ namespace Scheds.Controllers
             }
             return Ok();
         }
+        // Remove from cart (POST)
+        [HttpPost("remove")]
+        public IActionResult RemoveFromCart([FromBody] CourseBase course)
+        {
+            var cart = GetCartItemsFromCookies();
+            var itemToRemove = cart.Find(c => c.CourseCode == course.CourseCode);
+            if (itemToRemove != null)
+            {
+                cart.Remove(itemToRemove);
+                SaveCartItemsToCookies(cart);
+            }
+            return Ok();
+        }
 
         // Retrieve cart items (GET)
         [HttpGet("getCartItems")]
