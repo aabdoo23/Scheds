@@ -529,10 +529,13 @@ body {
   z-index: 0;
   position: relative;
   overflow: visible; /* Ensures child elements can overflow */
+
+
 }
 .customization-layout {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  gap: -20px;
 }
 
 .checkboxes {
@@ -634,7 +637,8 @@ body {
   cursor: pointer;
   color: #fff;
   font-size: 17px;
-  border-radius: 1rem;
+  font-weight: 600;
+  border-radius: 15px;
   border: none;
   position: relative;
   background: #100720;
