@@ -1,4 +1,5 @@
 @using Scheds.Models
+@model Scheds.Models.GenerateAndResultViewModel
 @{
     Layout = null;
 }
@@ -58,78 +59,83 @@
         </section>
 
 
-        <!-- Customization Section -->
+
         <section class="customization">
             <h2>Customize Your Schedule</h2>
-            <div class="box">
-                <label class="slider-label">Minimum Slots per Day</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="4" value="0" />
 
+            <form id="generate-form" asp-action="Generate" method="post">
+                <!-- Minimum Slots per Day -->
+                <div class="box">
+                    <label class="slider-label">Minimum Slots per Day</label>
+                    <div class="inner-box">
+                        <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0" max="4"
+                            value="@Model?.FormRequest?.minimumNumberOfItemsPerDay ?? 0" />
+                    </div>
                 </div>
-                <p class="number">0</p>
-            </div>
 
-            <div class="box">
-                <label class="slider-label">Maximum Gap Period (hours)</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="6" value="0" />
-
+                <!-- Maximum Gap Period (hours) -->
+                <div class="box">
+                    <label class="slider-label">Maximum Gap Period (hours)</label>
+                    <div class="inner-box">
+                        <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
+                            value="@Model?.FormRequest?.largestAllowedGap ?? 0" />
+                    </div>
                 </div>
-                <p class="number">0</p>
-            </div>
 
-            <div class="box">
-                <label class="slider-label">Maximum Number of Schedules</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="500" value="0" />
-
+                <!-- Maximum Number of Schedules -->
+                <div class="box">
+                    <label class="slider-label">Maximum Number of Schedules</label>
+                    <div class="inner-box">
+                        <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="0" max="500"
+                            value="@Model?.FormRequest?.maxNumberOfGeneratedSchedules ?? 0" />
+                    </div>
                 </div>
-                <p class="number">0</p>
-            </div>
 
-            <div class="box">
-                <label class="slider-label">Maximum Days on Campus</label>
-                <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" class="input-range" min="0" max="6" value="0" />
-
+                <!-- Maximum Days on Campus -->
+                <div class="box">
+                    <label class="slider-label">Maximum Days on Campus</label>
+                    <div class="inner-box">
+                        <input type="range" name="numberOfDays" class="input-range" min="0" max="6"
+                            value="@Model?.FormRequest?.numberOfDays ?? 0" />
+                    </div>
                 </div>
-                <p class="number">0</p>
-            </div>
 
+                <!-- Select Days on Campus -->
+                <div class="checkbox-group">
+                    <h3>Select Days on Campus:</h3>
+                    <label>
+                        <input type="checkbox" name="selectedDays" value="all"
+                        @(Model?.FormRequest?.selectedDays?.Contains("all") == true ? "checked" : "")> All Week
+                    </label>
+                    <label>
+                        <input type="checkbox" name="selectedDays" value="saturday"
+                        @(Model?.FormRequest?.selectedDays?.Contains("saturday") == true ? "checked" : "")> Saturday
+                    </label>
+                    <!-- Add other checkboxes similarly -->
+                </div>
 
-            <div class="checkbox-group">
-                <h3>Select Days on Campus:</h3>
-                <label><input type="checkbox" name="days" value="all"> All Week</label>
-                <label><input type="checkbox" name="days" value="sunday"> Sunday</label>
-                <label><input type="checkbox" name="days" value="monday"> Monday</label>
-                <label><input type="checkbox" name="days" value="tuesday"> Tuesday</label>
-                <label><input type="checkbox" name="days" value="wednesday"> Wednesday</label>
-                <label><input type="checkbox" name="days" value="thursday"> Thursday</label>
-                <label><input type="checkbox" name="days" value="friday"> Friday</label>
-                <label><input type="checkbox" name="days" value="saturday"> Saturday</label>
-            </div>
-            <div class="checkbox-group">
-                <h3>Select First Slot Time:</h3>
-                <label><input type="checkbox" name="time" value="830"> 8:30 AM</label>
-                <label><input type="checkbox" name="time" value="1030"> 10:30 AM</label>
-                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
-                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
-            </div>
-            <div class="checkbox-group">
-                <h3>Select Last Slot Time:</h3>
-                <label><input type="checkbox" name="time" value="1230"> 12:30 PM</label>
-                <label><input type="checkbox" name="time" value="1430"> 2:30 PM</label>
-                <label><input type="checkbox" name="time" value="1630"> 4:30 PM</label>
-                <label><input type="checkbox" name="time" value="1830"> 6:30 PM</label>
-            </div>
-            <button id="generate-schedule" class="btn-primary">Generate Schedule</button>
+                <!-- Select First Slot Time -->
+                <div class="checkbox-group">
+                    <h3>Select First Slot Time:</h3>
+                    <input type="radio" name="daysStart" value="830" @(Model?.FormRequest?.daysStart == "830" ?
+                        "checked" : "") /> 8:30 AM
+                    <!-- Add other radios similarly -->
+                </div>
+
+                <!-- Select Last Slot Time -->
+                <div class="checkbox-group">
+                    <h3>Select Last Slot Time:</h3>
+                    <input type="radio" name="daysEnd" value="1230" @(Model?.FormRequest?.daysEnd == "1230" ? "checked"
+                        : "") /> 12:30 PM
+                    <!-- Add other radios similarly -->
+                </div>
+
+                <input type="hidden" id="selectedItems" name="selectedItems" />
+                <input type="hidden" id="customSelectedItems" name="customSelectedItems" />
+                <!-- Submit Button -->
+                <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
+            </form>
         </section>
-
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
             <h2>Generated Schedules</h2>
@@ -153,8 +159,13 @@
                 room = "F45"
             };
                 }
+                @if (Model?.ScheduleResult != null && Model.ScheduleResult.Any())
+                {
+                    @await Component.InvokeAsync("ScheduleViewComponent", Model.ScheduleResult[0])
+                    ;
 
-                @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray)
+                })
+                @* @await Component.InvokeAsync("ScheduleViewComponent", scheduleArray) *@
 
                 <button id="prev-schedule" class="btn-secondary">← Previous</button>
                 <button id="next-schedule" class="btn-secondary">Next →</button>
@@ -164,103 +175,120 @@
     <script>
         let cart = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/coursebase/getAllCourses')
-        .then(response => response.json())
-        .then(courses => {
-            const searchInput = document.getElementById('course-search');
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                const filteredCourses = courses.filter(course =>
-                    course.courseName.toLowerCase().includes(query) ||
-                    course.courseCode.toLowerCase().includes(query)
-                );
-                updateSearchResults(filteredCourses);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/coursebase/getAllCourses')
+                .then(response => response.json())
+                .then(courses => {
+                    const searchInput = document.getElementById('course-search');
+                    searchInput.addEventListener('input', () => {
+                        const query = searchInput.value.toLowerCase();
+                        const filteredCourses = courses.filter(course =>
+                            course.courseName.toLowerCase().includes(query) ||
+                            course.courseCode.toLowerCase().includes(query)
+                        );
+                        updateSearchResults(filteredCourses);
+                    });
+                })
+                .catch(error => console.error('Error fetching courses:', error));
+
+            // Fetch the cart items from the backend
+            fetch('/api/cart/getCartItems')
+                .then(response => response.json())
+                .then(cartItems => {
+                    cart = cartItems; // Store full course objects in the cart array
+                    cart.forEach(course => updateCartUI(course));
+                })
+                .catch(error => console.error('Error fetching cart items:', error));
+
+
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('generate-form');
+            form.addEventListener('submit', (event) => {
+                fetch('https://localhost:7250/api/cart/getcartitems')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        const selectedItemsInput = document.getElementById('selectedItems');
+                        selectedItemsInput.value = JSON.stringify(data); 
+                    });
+                
             });
-        })
-        .catch(error => console.error('Error fetching courses:', error));
-
-    // Fetch the cart items from the backend
-    fetch('/api/cart/getCartItems')
-        .then(response => response.json())
-        .then(cartItems => {
-            cart = cartItems; // Store full course objects in the cart array
-            cart.forEach(course => updateCartUI(course));
-        })
-        .catch(error => console.error('Error fetching cart items:', error));
-});
-
-function updateSearchResults(courses) {
-    const resultsContainer = document.getElementById('search-results');
-    resultsContainer.innerHTML = ''; // Clear previous results
-
-    courses.forEach(course => {
-        const resultItem = document.createElement('div');
-        resultItem.classList.add('search-result-item');
-
-        resultItem.innerHTML = `
-            <p><strong>${course.courseCode}: ${course.courseName}</strong></p>
-        `;
-
-        resultItem.addEventListener('click', () => {
-            addToCart(course);
         });
 
-        resultsContainer.appendChild(resultItem);
-    });
-}
 
-function addToCart(course) {
-    if (!cart.some(c => c.courseCode === course.courseCode)) {
-        cart.push(course); // Add full course object to cart
 
-        // Call backend to store in C# List
-        fetch('/api/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(course)
-        });
+        function updateSearchResults(courses) {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = ''; // Clear previous results
 
-        // Update the cart UI
-        updateCartUI(course);
-    }
-}
+            courses.forEach(course => {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('search-result-item');
 
-function updateCartUI(course) {
-    const cartItemsContainer = document.getElementById('cart-items');
+                resultItem.innerHTML = `
+                <p><strong>${course.courseCode}: ${course.courseName}</strong></p>
+            `;
 
-    const cartItem = document.createElement('li');
-    cartItem.classList.add('cart-item');
-    cartItem.innerHTML = `<p><strong>${course.courseCode}: ${course.courseName}</strong></p>`;
+                resultItem.addEventListener('click', () => {
+                    addToCart(course);
+                });
 
-    // Remove from cart on click
-    cartItem.addEventListener('click', () => removeFromCart(course, cartItem));
+                resultsContainer.appendChild(resultItem);
+            });
+        }
 
-    cartItemsContainer.appendChild(cartItem);
-}
+        function addToCart(course) {
+            if (!cart.some(c => c.courseCode === course.courseCode)) {
+                cart.push(course); // Add full course object to cart
 
-function removeFromCart(course, cartItem) {
-    const index = cart.findIndex(c => c.courseCode === course.courseCode); // Match by courseCode
-    if (index > -1) {
-        cart.splice(index, 1); // Remove from cart array
+                // Call backend to store in C# List
+                fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(course)
+                });
 
-        // Call backend to remove from C# List
-        fetch('/api/cart/remove', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(course)
-        });
+                // Update the cart UI
+                updateCartUI(course);
+            }
+        }
 
-        // Remove the cart item from UI
-        cartItem.remove();
-    }
-}
+        function updateCartUI(course) {
+            const cartItemsContainer = document.getElementById('cart-items');
 
+            const cartItem = document.createElement('li');
+            cartItem.classList.add('cart-item');
+            cartItem.innerHTML = `<p><strong>${course.courseCode}: ${course.courseName}</strong></p>`;
+
+            // Remove from cart on click
+            cartItem.addEventListener('click', () => removeFromCart(course, cartItem));
+
+            cartItemsContainer.appendChild(cartItem);
+        }
+
+        function removeFromCart(course, cartItem) {
+            const index = cart.findIndex(c => c.courseCode === course.courseCode); // Match by courseCode
+            if (index > -1) {
+                cart.splice(index, 1); // Remove from cart array
+
+                // Call backend to remove from C# List
+                fetch('/api/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(course)
+                });
+
+                // Remove the cart item from UI
+                cartItem.remove();
+            }
+        }
     </script>
+
 
     <script>
         document.querySelectorAll('.box').forEach(box => {
@@ -331,52 +359,52 @@ function removeFromCart(course, cartItem) {
         /* Custom scrollbar color */
         border-radius: 10px;
     }
-/* Cart Section with the same style as search results */
-#cart {
-    background-color: #f9f9f9;
-    /* Match the background with search-section */
-    max-height: 400px;
-    /* Limit height similar to search results */
-    overflow-y: auto;
-    padding: 20px;
-    border-radius: 10px;
-    /* Same border radius */
-}
 
-/* Cart item with the same look and feel as search result items */
-.cart-item {
-    background-color: #ff6347;
-    /* Match the search result item color */
-    color: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    width: 100%;
-    /* Full width like search result items */
-    cursor: pointer;
-    box-sizing: border-box;
-    font-size: 1.1rem;
-}
+    /* Cart Section with the same style as search results */
+    #cart {
+        background-color: #f9f9f9;
+        /* Match the background with search-section */
+        max-height: 400px;
+        /* Limit height similar to search results */
+        overflow-y: auto;
+        padding: 20px;
+        border-radius: 10px;
+        /* Same border radius */
+    }
 
-.cart-item p {
-    margin: 0;
-    font-size: 1rem;
-}
+    /* Cart item with the same look and feel as search result items */
+    .cart-item {
+        background-color: #ff6347;
+        /* Match the search result item color */
+        color: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+        /* Full width like search result items */
+        cursor: pointer;
+        box-sizing: border-box;
+        font-size: 1.1rem;
+    }
 
-/* Custom scrollbar for the cart section */
-#cart::-webkit-scrollbar {
-    width: 8px;
-}
+    .cart-item p {
+        margin: 0;
+        font-size: 1rem;
+    }
 
-#cart::-webkit-scrollbar-thumb {
-    background-color: #ff6347;
-    /* Match the scrollbar thumb with search result color */
-    border-radius: 10px;
-}
+    /* Custom scrollbar for the cart section */
+    #cart::-webkit-scrollbar {
+        width: 8px;
+    }
 
-/* Hover effect for cart items */
-.cart-item:hover {
-    background-color: #ff8367;    
-}
+    #cart::-webkit-scrollbar-thumb {
+        background-color: #ff6347;
+        /* Match the scrollbar thumb with search result color */
+        border-radius: 10px;
+    }
 
+    /* Hover effect for cart items */
+    .cart-item:hover {
+        background-color: #ff8367;
+    }
 </style>

@@ -1,19 +1,22 @@
-document.getElementById('search-button').addEventListener('click', function() {
+document.getElementById('search-button').addEventListener('click', function () {
     const day = document.getElementById('day-select').value;
     const time = document.getElementById('time-select').value;
 
-    // Example AJAX request (assuming you're using a backend to fetch available rooms)
-    fetch(`/api/find-rooms?day=${day}&time=${time}`)
+    // Construct the URL with query parameters, ensuring special characters are encoded
+    const url = `/api/room?dayOfWeek=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}`;
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
 
-            if (data.rooms.length === 0) {
+            if (data.length === 0) {
                 resultsDiv.innerHTML = '<p>No available rooms found for the selected day and time.</p>';
             } else {
                 const list = document.createElement('ul');
-                data.rooms.forEach(room => {
+                data.forEach(room => {
                     const listItem = document.createElement('li');
                     listItem.textContent = room;
                     list.appendChild(listItem);
