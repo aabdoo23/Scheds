@@ -32,23 +32,29 @@ namespace Scheds.DAL.Services
             return false;
         }
         //h:mm a diff
-        public static int GetAbsTimeDiffInMins(TimeSpan t1, TimeSpan t2)
+        public static int GetTimeDiffInMins(TimeSpan t1, TimeSpan t2)
         {
-            return (int)Math.Abs((t1 - t2).TotalMinutes);
+            return (int)(t2 - t1).TotalMinutes;
         }
+
         private static bool PassesTimeGapConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
             if (request.largestAllowedGap == 0)
             {
                 return true;
             }
+
             foreach (var day in ItemsPerDay)
             {
                 List<CardItem> items = day.Value;
-                items.Sort((a, b) => GetAbsTimeDiffInMins(a.getStartTime(), b.getStartTime()));
+
+                // Sort based on StartTime directly, not by the difference
+                items.Sort((a, b) => a.getStartTime().CompareTo(b.getStartTime()));
+
                 for (int i = 0; i < items.Count - 1; i++)
                 {
-                    if (GetAbsTimeDiffInMins(items[i].getEndTime(), items[i + 1].getStartTime()) > request.largestAllowedGap)
+                    int gap = GetTimeDiffInMins(items[i].getEndTime(), items[i + 1].getStartTime());
+                    if (gap > request.largestAllowedGap)
                     {
                         return false;
                     }
@@ -57,27 +63,40 @@ namespace Scheds.DAL.Services
             return true;
         }
 
+
         private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            if (request.numberOfDays == 0) return true;
-            if (request.selectedDays.Count>0|| request.selectedDays.Contains("all")) return true;
-            HashSet<string> days = new HashSet<string>();
+            // If max number of days constraint is not checked, always return true
+            if (!request.isMaxNumberOfDaysChecked) return true;
+
+            // If "all" is selected or specific days are selected, return true
+            if (request.selectedDays.Count > 0 && request.selectedDays.Contains("all")) return true;
+
+            HashSet<string> daysWithCards = new HashSet<string>();
+
+            // Iterate over the dictionary to count days that have at least one valid card
             foreach (var day in ItemsPerDay)
             {
-                days.Add(day.Key);
+                var validItems = day.Value.Where(item => item != null).ToList();
+                if (validItems.Count > 0)
+                {
+                    daysWithCards.Add(day.Key.ToLower());
+                }
             }
-            return days.Count <= request.numberOfDays;
+
+            // Return true if the number of days with cards is less than or equal to numberOfDays
+            return daysWithCards.Count <= request.numberOfDays;
         }
+
         private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            // return true;
-            if(request.numberOfDays==0) return true;
+            if(request.isMaxNumberOfDaysChecked) return true;
             if (request.selectedDays.Count==0 || request.selectedDays.Contains("all")) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
-                days.Add(day.Key);
-                System.Console.WriteLine(day.Key+" "+day.Value.Count);
+                days.Add(day.Key.ToLower());
+                System.Console.WriteLine(day.Key.ToLower() + " "+day.Value.Count);
             }
             foreach (var day in request.selectedDays)
             {
@@ -92,52 +111,73 @@ namespace Scheds.DAL.Services
         //TODO: Test
         private static bool PassesDayStartConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            if (request.daysStart == null || request.daysStart == "") return true;
-            foreach (var day in ItemsPerDay)
-            {
-                foreach (var item in day.Value)
-                {
-                    if (item == null) continue;
-                    var dayStart = TimeSpan.Parse(request.daysStart);
-                    if (GetAbsTimeDiffInMins(item.getStartTime(), dayStart) < 0)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+            // If no specific start time is given in the request, always return true
+            if (string.IsNullOrEmpty(request.daysStart)) return true;
 
-        private static bool PassesDayEndConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
-        {
-            if (request.daysEnd == null || request.daysEnd == "") return true;
+            // Parse the provided start time from the request
+            var dayStart = TimeSpan.Parse(request.daysStart);
+
             foreach (var day in ItemsPerDay)
             {
-                foreach (var item in day.Value)
-                {
-                    if (item == null) continue;
-                    var dayEnd = TimeSpan.Parse(request.daysEnd);
-                    //check if dayEnd is before item end time
-                    if (GetAbsTimeDiffInMins(item.getEndTime(), dayEnd) < 0)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
-        {
-            if (request.minimumNumberOfItemsPerDay == 0) return true;
-            foreach (var day in ItemsPerDay)
-            {
-                if (day.Value.Count < request.minimumNumberOfItemsPerDay)
+                // Sort the items by start time to ensure we check the earliest item
+                var items = day.Value.Where(item => item != null).OrderBy(item => item.getStartTime()).ToList();
+                if (items.Count == 0) continue; // If no items exist for this day, skip it
+
+                // Check if the earliest item's start time is earlier than the allowed start time
+                if (items.First().getStartTime() < dayStart)
                 {
                     return false;
                 }
             }
+
             return true;
         }
+
+
+        private static bool PassesDayEndConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        {
+            // If no specific end time is given in the request, always return true
+            if (string.IsNullOrEmpty(request.daysEnd)) return true;
+
+            // Parse the provided end time from the request
+            var dayEnd = TimeSpan.Parse(request.daysEnd);
+
+            foreach (var day in ItemsPerDay)
+            {
+                // Sort the items by end time to ensure we check the latest item
+                var items = day.Value.Where(item => item != null).OrderByDescending(item => item.getEndTime()).ToList();
+                if (items.Count == 0) continue; // If no items exist for this day, skip it
+
+                // Check if the latest item's end time is later than the allowed end time
+                if (items.First().getEndTime() > dayEnd)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        {
+            // If no minimum is specified, always return true
+            if (request.minimumNumberOfItemsPerDay == 0) return true;
+
+            foreach (var day in ItemsPerDay)
+            {
+                // Filter out null or empty lists
+                var items = day.Value.Where(item => item != null).ToList();
+
+                // If there are any items on that day, check the count against the minimum
+                if (items.Count > 0 && items.Count < request.minimumNumberOfItemsPerDay)
+                {
+                    return false;  // Not enough items for this day
+                }
+            }
+
+            return true;
+        }
+
 
         public static void GenerateTimetablesHelper(List<List<CardItem>> courses, int currentIndex,
      List<CardItem> currentTimetable, List<List<ReturnedCardItem>> timetables, GenerateRequest request)
@@ -157,7 +197,7 @@ namespace Scheds.DAL.Services
                     {
                         if (item.Schedule.Count == 0) continue;
 
-                        var dayOfWeek = item.Schedule[0].DayOfWeek; // Assuming Schedule is a List<List<string>> as in your Java code
+                        var dayOfWeek = item.Schedule[0].DayOfWeek; 
                         if (!itemsPerDay.ContainsKey(dayOfWeek))
                         {
                             itemsPerDay[dayOfWeek] = new List<CardItem>();

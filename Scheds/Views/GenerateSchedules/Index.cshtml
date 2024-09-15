@@ -129,12 +129,12 @@
                             <h3>Select Days on Campus</h3>
                             <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
                                 Week</label>
-                            <label><input type="checkbox" name="selectedDays" value="saturday"> Saturday</label>
-                            <label><input type="checkbox" name="selectedDays" value="sunday"> Sunday</label>
-                            <label><input type="checkbox" name="selectedDays" value="monday"> Monday</label>
-                            <label><input type="checkbox" name="selectedDays" value="tuesday"> Tuesday</label>
-                            <label><input type="checkbox" name="selectedDays" value="wednesday"> Wednesday</label>
-                            <label><input type="checkbox" name="selectedDays" value="thursday"> Thursday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
+                            <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
                         </div>
                     </div>
                     <div class="checkboxes">
@@ -154,7 +154,9 @@
                             <label><input type="radio" name="daysEnd" value="12:30"> 12:30 PM</label>
                             <label><input type="radio" name="daysEnd" value="14:30"> 2:30 PM</label>
                             <label><input type="radio" name="daysEnd" value="16:30"> 4:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="18:30" checked> 6:30 PM</label>
+                            <label><input type="radio" name="daysEnd" value="18:30"> 6:30 PM</label>
+                            <label><input type="radio" name="daysEnd" value="20:30" checked> 8:30 PM</label>
+
                         </div>
                     </div>
                 </div>
@@ -341,6 +343,8 @@
             // Capture data outside the form (selected days, start time, and end time)
             const selectedDays = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
+            const isMaxNumberOfDaysChecked = document.querySelector('input[name="scheduleMethod"]:checked')?.value==="maxDays";
+
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
             const numberOfDays = form.numberOfDays?.value || 0; // Only if max days is selected
 
@@ -351,8 +355,9 @@
                 daysEnd,
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
-                maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
                 numberOfDays: parseInt(numberOfDays) || 0,
+                maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
+                isMaxNumberOfDaysChecked,
                 selectedItems: cart,
                 customSelectedItems:[]
             };
