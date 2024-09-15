@@ -59,7 +59,7 @@ namespace Scheds.DAL.Services
 
         private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            //if (request.specificDays) return true;
+            if (request.selectedDays.Count>0|| request.selectedDays.Contains("all")) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
@@ -69,17 +69,19 @@ namespace Scheds.DAL.Services
         }
         private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
         {
-            return true;
-            //if (!request.specificDays) return true;
+            // return true;
+            if (request.selectedDays.Count==0 || request.selectedDays.Contains("all")) return true;
             HashSet<string> days = new HashSet<string>();
             foreach (var day in ItemsPerDay)
             {
                 days.Add(day.Key);
+                System.Console.WriteLine(day.Key+" "+day.Value.Count);
             }
             foreach (var day in request.selectedDays)
             {
                 if (!days.Contains(day))
                 {
+                    System.Console.WriteLine(day);
                     return false;
                 }
             }
@@ -300,7 +302,7 @@ namespace Scheds.DAL.Services
                     List<ReturnedCardItem> daySchedule = new List<ReturnedCardItem>();
                     for (int hour = 0; hour < hoursInDay; hour++)
                     {
-                        daySchedule.Add(null); // or a default value if needed
+                        daySchedule.Add(null); // default 
                     }
                     scheduleArray.Add(daySchedule);
                 }
@@ -310,7 +312,8 @@ namespace Scheds.DAL.Services
                     int dayIndex = Array.IndexOf(new string[] { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" }, item.day);
                     if (dayIndex < 0 || dayIndex >= numberOfDays)
                     {
-                        throw new ArgumentException("Invalid day value.");
+                        // dont place it
+                        continue;
                     }
 
                     for (int i = item.startTime.Hours; i < item.endTime.Hours; i++)
