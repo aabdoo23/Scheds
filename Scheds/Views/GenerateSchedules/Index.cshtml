@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div id="cart">
-                <h2>Your Cart</h2>
+                <h2>Your Courses</h2>
                 <ul id="cart-items"></ul>
             </div>
         </section>
@@ -63,7 +63,7 @@
         <section class="customization">
             <h2>Customize Your Schedule</h2>
             <div class="customization-layout">
-                <form id="generate-form">
+                <form class="generate-form" id="generate-form">
 
                     <!-- Sliders Section -->
                     <div class="sliders">
@@ -107,11 +107,14 @@
                         </div>
                     </div>
 
-                    <!-- Checkboxes Section -->
+                   
+            <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
+            </form>
+             <!-- Checkboxes Section -->
                     <div class="checkboxes">
                         <!-- First Checkbox Group -->
                         <div class="checkbox-group">
-                            <h3>Select Days on Campus:</h3>
+                            <h3>Select Days on Campus</h3>
                             <label><input type="checkbox" name="selectedDays" value="all"> All Week</label>
                             <label><input type="checkbox" name="selectedDays" value="sunday"> Sunday</label>
                             <label><input type="checkbox" name="selectedDays" value="monday"> Monday</label>
@@ -121,10 +124,10 @@
                             <label><input type="checkbox" name="selectedDays" value="friday"> Friday</label>
                             <label><input type="checkbox" name="selectedDays" value="saturday"> Saturday</label>
                         </div>
-
-                        <!-- Second Checkbox Group -->
+                    </div>
+                    <div class="checkboxes">
                         <div class="checkbox-group">
-                            <h3>Select First Slot Time:</h3>
+                            <h3>Select First Slot Time</h3>
                             <label><input type="radio" name="daysStart" value="830"> 8:30 AM</label>
                             <label><input type="radio" name="daysStart" value="1030"> 10:30 AM</label>
                             <label><input type="radio" name="daysStart" value="1230"> 12:30 PM</label>
@@ -133,17 +136,16 @@
 
                         <!-- Third Checkbox Group -->
                         <div class="checkbox-group">
-                            <h3>Select Last Slot Time:</h3>
-                            <label><input type="checkbox" name="daysEnd" value="1230"> 12:30 PM</label>
-                            <label><input type="checkbox" name="daysEnd" value="1430"> 2:30 PM</label>
-                            <label><input type="checkbox" name="daysEnd" value="1630"> 4:30 PM</label>
-                            <label><input type="checkbox" name="daysEnd" value="1830"> 6:30 PM</label>
+                            <h3>Select Last Slot Time</h3>
+                            <label><input type="radio" name="daysEnd" value="1230"> 12:30 PM</label>
+                            <label><input type="radio" name="daysEnd" value="1430"> 2:30 PM</label>
+                            <label><input type="radio" name="daysEnd" value="1630"> 4:30 PM</label>
+                            <label><input type="radio" name="daysEnd" value="1830"> 6:30 PM</label>
                         </div>
                     </div>
 
-            <button id="generate-schedule" class="btn-primary" type="submit">Generate Schedule</button>
-            </form>
         </section>
+
 
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
@@ -343,6 +345,9 @@
         margin-right: 20px;
         padding: 20px;
     }
+    .search-section h1,h2{
+        margin-top:0;
+    }
 
     .search-bar {
         margin-bottom: 15px;
@@ -357,7 +362,7 @@
     }
 
     .search-result-item {
-        background-color: #ff6347;
+        background-color: #ff7300;
         /* Blue background for individual result div */
         color: white;
         padding: 15px;
@@ -374,7 +379,9 @@
         margin: 0;
         font-size: 1rem;
     }
-
+    .search-result-item:hover{
+        background-color:#ff5100;
+    }
     .search-results::-webkit-scrollbar {
         width: 8px;
     }
@@ -400,7 +407,7 @@
 
     /* Cart item with the same look and feel as search result items */
     .cart-item {
-        background-color: #ff6347;
+        background-color: #ff7300;
         /* Match the search result item color */
         color: white;
         padding: 15px;
@@ -435,7 +442,7 @@
 
     /* Hover effect for cart items */
     .cart-item:hover {
-        background-color: #ff8367;
+        background-color: #ff5100;
     }
 
 
