@@ -23,6 +23,7 @@ body {
 .logo-img {
   height: 90px; /* Adjust as needed */
   width: auto;
+  padding-left: 20px;
 }
 .navbar .logo a {
   color: white;
@@ -498,6 +499,7 @@ body {
   padding-left: 30px;
   margin-right: 10px; /* Add space between the search bar and button */
   font-weight: 600;
+  font-size: 20px;
 }
 
 #add-to-cart {
@@ -513,14 +515,8 @@ body {
   height: 400px;
 }
 
-#cart h2 {
-  padding-bottom: 30px; /* Add padding below the h2 */
-}
 
-h1, h2 {
-  margin: 0;
-  padding-bottom: 20px;
-}
+
 
 
 /* Customization Section */
@@ -704,9 +700,9 @@ h1, h2 {
  }
  
  .input::placeholder {
-  color: #030303;
-  font-weight: bold;
-  font-size: small;
+  color: #8d8787;
+  font-weight:100;
+  font-size: 18px;
  }
  
  .input:focus, input:hover {
@@ -724,13 +720,9 @@ h1, h2 {
   height: 1rem;
  }
  
- 
- 
- 
- 
- 
- 
-
+.generate-form{
+  margin-right:60px;
+}
 /* Generated Schedules Section */
 .generated-schedules {
   padding: 20px;
@@ -760,81 +752,7 @@ h1, h2 {
 
 }
 
-.search-section {
-  width: 40%;
-  padding: 20px;
-}
-
-.search-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.search-form label {
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-
-.search-form select,
-.search-form input {
-  padding: 10px;
-  font-size: 16px;
-}
-
-.search-form button {
-  padding: 10px 20px;
-  font-size: 20px;
-  font-display: bold;
-  background-color: #ff6347;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-.search-form button:hover {
-  background-color: #ff472f;
-}
-
-.results-section {
-  width: 55%;
-  padding: 20px;
-  border-left: 2px solid #ddd;
-}
-
-.results-section h2 {
-  margin-bottom: 20px;
-}
-
-#results {
-  /* Styles for results will be added dynamically */
-}
-
-/* Animated Text */
-@keyframes colorChange {
-  0% { color: red; }
-  25% { color: orange; }
-  50% { color: yellow; }
-  75% { color: green; }
-  100% { color: blue; }
-}
-
-.animated-text {
-  animation: colorChange 5s infinite;
-}
-
-
-
-@keyframes bounce {
-  0%, 100% {
-      transform: translateY(0);
-  }
-  50% {
-      transform: translateY(-10px);
-  }
-}
-
-/* Features Section */
+/* /* Features Section */
 .features-sec{
   display: flex;
   justify-content: space-around; /* Spacing between each div */
