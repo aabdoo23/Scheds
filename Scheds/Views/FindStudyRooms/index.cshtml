@@ -7,14 +7,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Study Rooms - Scheds</title>
+    <title>Scheds - Find Study Rooms</title>
     <link rel="icon" type="image/png" href="~/images/abdo.png">
+    <link rel="stylesheet" href="~/css/styles.css">
     
     <style>
+   
     .body {
         font-family: 'Arial', sans-serif;
-        margin: 0;
-        padding: 0;
+        margin:0;
         background: #f0f0f0;
     }
 
@@ -136,7 +137,7 @@
         color: #fff; /* Change text color to white on hover for better contrast */
     }
 
-    .btn-primary {
+    .btnn-primary {
         display
         width: 165px;
         height: 50px;
@@ -151,7 +152,7 @@
         transition: 0.1s;
     }
 
-    .btn-primary::after {
+    .btnn-primary::after {
         content: '';
         width: 100%;
         height: 100%;
@@ -163,7 +164,7 @@
         top: 0;
     }
 
-    .btn-primary:active {
+    .btnn-primary:active {
         transform: scale(0.9) rotate(3deg);
         background: radial-gradient(circle farthest-corner at 10% 20%, rgb(250, 115, 62) 17.8%, rgb(22, 21, 99) 100.2%);
         transition: 0.1s;
@@ -228,7 +229,7 @@
         <div class="search-section">
             <h1 class="animated-text">Find Study Rooms</h1>
             <div class="search-form">
-                <label for="day-select">Select Day:</label>
+                <label for="day-select">Select Day</label>
                 <select class="select" id="day-select">
                     <option value="saturday">Saturday</option>
                     <option value="sunday">Sunday</option>
@@ -238,7 +239,7 @@
                     <option value="thursday">Thursday</option>
                 </select>
 
-                <label for="time-select">Select Time:</label>
+                <label for="time-select">Select Time</label>
                 <select class="select" id="time-select">
                     <option value="8:30">8:30 AM</option>
                     <option value="10:30">10:30 AM</option>
@@ -249,7 +250,7 @@
                     <option value="20:30">8:30 PM</option>
                 </select>
 
-                <button id="search-button" class="btn-primary">Search</button>
+                <button id="search-button" class="btnn-primary">Search</button>
             </div>
         </div>
 
