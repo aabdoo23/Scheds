@@ -36,7 +36,7 @@ namespace Scheds.DAL.Services
             return (int)(t2 - t1).TotalMinutes;
         }
 
-        private static bool PassesTimeGapConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesTimeGapConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
             if (request.largestAllowedGap == 0)
             {
@@ -63,50 +63,37 @@ namespace Scheds.DAL.Services
         }
 
 
-        private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            // If max number of days constraint is not checked, always return true
-
-            // If "all" is selected or specific days are selected, return true
-            if (request.selectedDays.Count > 0 && request.selectedDays.Contains("all")) return true;
-
-            HashSet<string> daysWithCards = new HashSet<string>();
-
-            // Iterate over the dictionary to count days that have at least one valid card
-            foreach (var day in ItemsPerDay)
+            if (!request.isNumberOfDaysSelected) return true;
+            int cnt = 0;
+            for (int i = 0; i < 6; i++)
             {
-                var validItems = day.Value.Where(item => item != null).ToList();
-                if (validItems.Count > 0)
+                //check if itemsperday[i] exists and has content
+                if (ItemsPerDay.ContainsKey(i) && ItemsPerDay[i].Count > 0)
                 {
-                    daysWithCards.Add(day.Key.ToUpper());
+                    //Console.WriteLine(i);
+                    //foreach(var item in ItemsPerDay[i])
+                    //{
+                    //    Console.WriteLine(item.ToString());
+                    //}
+                    cnt++;
                 }
             }
-
-            // Return true if the number of days with cards is less than or equal to numberOfDays
-            return daysWithCards.Count <= request.numberOfDays;
+            return cnt <= request.numberOfDays;
         }
 
-        private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesSpecificDaysConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            if (request.selectedDays.Count==0 || request.selectedDays.Contains("all")) return true;
-            HashSet<string> days = new HashSet<string>();
-            foreach (var day in ItemsPerDay)
+            if (request.isNumberOfDaysSelected) return true;
+            for (int i = 0; i < 6; i++)
             {
-                days.Add(day.Key.ToUpper());
-                System.Console.WriteLine(day.Key + " "+day.Value.Count);
-            }
-            foreach (var day in request.selectedDays)
-            {
-                if (!days.Contains(day))
-                {
-                    System.Console.WriteLine(day);
-                    return false;
-                }
+                if (ItemsPerDay.ContainsKey(i)&&ItemsPerDay[i].Count > 0 && !request.selectedDays[i]) return false;
             }
             return true;
         }
         //TODO: Test
-        private static bool PassesDayStartConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesDayStartConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
             // If no specific start time is given in the request, always return true
             if (string.IsNullOrEmpty(request.daysStart)) return true;
@@ -131,7 +118,7 @@ namespace Scheds.DAL.Services
         }
 
 
-        private static bool PassesDayEndConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesDayEndConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
             // If no specific end time is given in the request, always return true
             if (string.IsNullOrEmpty(request.daysEnd)) return true;
@@ -155,7 +142,7 @@ namespace Scheds.DAL.Services
             return true;
         }
 
-        private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<string, List<CardItem>> ItemsPerDay)
+        private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
             // If no minimum is specified, always return true
             if (request.minimumNumberOfItemsPerDay == 0) return true;
@@ -175,6 +162,24 @@ namespace Scheds.DAL.Services
             return true;
         }
 
+        public static Dictionary<int,List<CardItem>> ConstructItemsPerDay(List<CardItem> currentTimetable)
+        {
+            // Group by day for customization
+            Dictionary<int, List<CardItem>> itemsPerDay = new Dictionary<int, List<CardItem>>();
+            List<string> days = new List<string> { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" };
+            foreach (var item in currentTimetable)
+            {
+                if (item.Schedule.Count == 0) continue;
+                var dayOfWeek = days.IndexOf(item.Schedule[0].DayOfWeek);
+                if (!itemsPerDay.ContainsKey(dayOfWeek))
+                {
+                    itemsPerDay[dayOfWeek] = new List<CardItem>();
+                }
+                itemsPerDay[dayOfWeek].Add(item);
+            }
+            return itemsPerDay;
+
+        }
 
         public static void GenerateTimetablesHelper(List<List<CardItem>> courses, int currentIndex,
      List<CardItem> currentTimetable, List<List<ReturnedCardItem>> timetables, GenerateRequest request)
@@ -188,19 +193,8 @@ namespace Scheds.DAL.Services
                 // Ensure the current timetable is not a duplicate before adding
                 if (!timetables.Any(x => x.SequenceEqual(currentTimetable.Select(i => new ReturnedCardItem(i)))))
                 {
-                    // Group by day for customization
-                    Dictionary<string, List<CardItem>> itemsPerDay = new Dictionary<string, List<CardItem>>();
-                    foreach (var item in currentTimetable)
-                    {
-                        if (item.Schedule.Count == 0) continue;
+                    var itemsPerDay = ConstructItemsPerDay(currentTimetable);
 
-                        var dayOfWeek = item.Schedule[0].DayOfWeek; 
-                        if (!itemsPerDay.ContainsKey(dayOfWeek))
-                        {
-                            itemsPerDay[dayOfWeek] = new List<CardItem>();
-                        }
-                        itemsPerDay[dayOfWeek].Add(item);
-                    }
                     bool nodc = PassesNumberOfDaysConstraint(request, itemsPerDay);
                     bool nopdc = PassesNumberOfItemsPerDayConstraint(request, itemsPerDay);
                     bool tg = PassesTimeGapConstraint(request, itemsPerDay);
