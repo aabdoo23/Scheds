@@ -8,12 +8,13 @@ namespace Scheds.DAL
         public SchedsDbContext(DbContextOptions<SchedsDbContext> options)
             : base(options)
         {
+            
         }
 
-        public DbSet<CardItem> Sections_Spr24 { get; set; }
-        public DbSet<Instructor> All_Instructors_Spr24 { get; set; }
-        public DbSet<CourseBase> CourseBase_Spr24 { get; set; }
-        public DbSet<CourseSchedule> Schedules_Spr24 { get; set; }
+        public DbSet<CardItem> Sections_Fall25 { get; set; }
+        public DbSet<Instructor> All_Instructors_Fall25 { get; set; }
+        public DbSet<CourseBase> CourseBase_Fall25 { get; set; }
+        public DbSet<CourseSchedule> Schedules_Fall25 { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

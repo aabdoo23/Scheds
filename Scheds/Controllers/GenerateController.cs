@@ -10,9 +10,11 @@ namespace Scheds.Controllers
     public class GenerateController : Controller
     {
         private readonly CardItemRepository CardItemRepository;
-        public GenerateController(CardItemRepository cardItemRepository)
+        private readonly NuDealer NuDealer;
+        public GenerateController(CardItemRepository cardItemRepository, NuDealer nuDealer)
         {
             this.CardItemRepository = cardItemRepository;
+            this.NuDealer = nuDealer;
         }
 
 
@@ -29,11 +31,10 @@ namespace Scheds.Controllers
                 {
                     List<CardItem> cardItems = await CardItemRepository.GetCardItemsByCourseCodeAsync(customCourse.courseCode);
 
-                    // Fetch live data if last update was more than 24 hours ago
-                    //if (DateTime.Now - cardItems[0].LastUpdate > TimeSpan.FromDays(1))
-                    //{
-                    //    cardItems = NuDealer.FetchCards(customCourse.courseCode);
-                    //}
+                    if (request.useLiveData)
+                    {
+                       cardItems = await NuDealer.FetchCards(customCourse.courseCode);
+                    }
 
                     List<CardItem> customizedCards = new List<CardItem>();
 
@@ -125,10 +126,10 @@ namespace Scheds.Controllers
                 {
                     List<CardItem> cardItems = await CardItemRepository.GetCardItemsByCourseCodeAsync(course.CourseCode);
 
-                    //if (DateTime.Now - cardItems[0].LastUpdate > TimeSpan.FromDays(1))
-                    //{
-                    //    cardItems = NuDealer.FetchCards(course.CourseCode);
-                    //}
+                    if (request.useLiveData)
+                    {
+                       cardItems = await NuDealer.FetchCards(course.CourseCode);
+                    }
 
                     allCardItemsByCourse.Add(cardItems);
                 }

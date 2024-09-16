@@ -8,12 +8,16 @@
 <div class="cardm">
   <div class="card">
     <div class="main">@Model.courseCode: @Model.courseName</div>
+    <div class="mainsub">
+            @Model.instructorName
+
+    </div>
   </div>
 
   <div class="card2">
     <div class="upper">
       <div class="instructor">
-        @Model.instructorName
+                Seats Left: @Model.seatsLeft
 
       </div>
 
@@ -80,7 +84,11 @@
   .mainsub {
     font-size: 0.8em;
     margin: 0.5em;
-    font-weight: 600;
+    font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2em;
+        max-height: 1.2em;
 
   }
 

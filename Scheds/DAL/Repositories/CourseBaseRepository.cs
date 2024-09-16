@@ -17,19 +17,19 @@ namespace Scheds.DAL.Repositories
 
         public async Task<List<CourseBase>> GetAllCourseBasesAsync()
         {
-            return await _context.CourseBase_Spr24.ToListAsync();
+            return await _context.CourseBase_Fall25.ToListAsync();
         }
 
         public async Task<CourseBase> GetCourseBaseByCourseCodeAsync(string courseCode)
         {
-            return await _context.CourseBase_Spr24
+            return await _context.CourseBase_Fall25
                 .Where(courseBase => courseBase.CourseCode == courseCode)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<CourseBase> GetCourseBaseByNameAsync(string courseName)
         {
-            return await _context.CourseBase_Spr24
+            return await _context.CourseBase_Fall25
                 .Where(courseBase => courseBase.CourseName == courseName)
                 .FirstOrDefaultAsync();
         }

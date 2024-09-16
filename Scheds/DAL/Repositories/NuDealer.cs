@@ -11,8 +11,13 @@ namespace Scheds.DAL.Repositories
 {
     public class NuDealer
     {
-        public NuDealer() { }
-        public static List<CardItem> FetchCards(string CourseCode)
+        private readonly ParsingService ParsingService;
+        private readonly CardItemRepository CardItemRepository;
+        public NuDealer(ParsingService parsingService, CardItemRepository cardItemRepository) { 
+            ParsingService = parsingService;
+            CardItemRepository = cardItemRepository;
+        }
+        public async Task<List<CardItem>> FetchCards(string CourseCode)
         {
             using (var client = new HttpClient())
             {
@@ -30,8 +35,12 @@ namespace Scheds.DAL.Repositories
                     throw new Exception("Failed to fetch data from the server");
                 }
                 var responseContent = response.Content.ReadAsStringAsync().Result;
-                var cards= ParsingService.ParseCourseResponse(responseContent);
-                //TODO: update the db
+                
+                var cards= await ParsingService.ParseCourseResponse(responseContent);
+                foreach(var card in cards)
+                {
+                    await CardItemRepository.UpdateCardItemAsync(card);
+                }
                 return cards;
             } 
         }
