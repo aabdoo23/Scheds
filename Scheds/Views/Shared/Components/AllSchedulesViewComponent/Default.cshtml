@@ -3,22 +3,15 @@
 
 <div class="all-container">
     <div class="scroll-container">
-        @for (int i = 0; i < Model.Count; i++)
+        @for (int i = 1; i <= Model.Count; i++)
         {
             <div class="schedule">
-                @await Component.InvokeAsync("ScheduleViewComponent", Model[i])
+                <div class="current-schedule">Schedule @i</div> <!-- Schedule number -->
+                @await Component.InvokeAsync("ScheduleViewComponent", Model[i-1])
             </div>
         }
     </div>
-
-    <div class="bottom-bar">
-        <p id="currSchedule" class="current-schedule">Schedule 1 of @Model.Count</p>
-    </div>
 </div>
-
-<script>
-    
-</script>
 
 <style>
     .all-container {
@@ -26,30 +19,30 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
+        max-height: 850px;
     }
 
     .scroll-container {
         display: flex;
-        overflow-x: auto;
+        flex-direction: column;
         width: 100%;
+        height: 100%; /* Ensure it takes full height of the container */
+        @* max-height: 300px;  *@
+        overflow-y: auto; /* Vertical scroll bar */
         scroll-behavior: smooth;
+        @* hide scroll bar *@
+        scrollbar-width: none;
+
     }
 
     .schedule {
         flex: 0 0 auto; /* Prevent shrinking, keep natural width */
         width: 100%;
-        margin-right: 20px; /* Space between schedules */
-    }
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-top: 20px;
+        margin-bottom: 20px; /* Space between schedules */
     }
 
     .current-schedule {
-        font-size: 20px;
+        font-size: 18px;
+        margin-bottom: 10px; /* Space between number and schedule */
     }
 </style>
