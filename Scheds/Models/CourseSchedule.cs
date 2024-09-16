@@ -19,5 +19,9 @@
             EndTime = endTime;
             Location = location;
         }
+        public override string ToString()
+        {
+            return $"CardId: {CardId}, DayOfWeek: {DayOfWeek}, StartTime: {StartTime}, EndTime: {EndTime}, Location: {Location}";
+        }
     }
 }

@@ -116,5 +116,11 @@
             return start1BeforeEnd2 && end1AfterStart2;
 
         }
+        public override string ToString()
+        {
+            foreach(var s in Schedule) Console.WriteLine(s.ToString());
+            return $"CardId: {CardId}, CourseCode: {CourseCode}, CourseName: {CourseName}, Instructor: {Instructor}, Credits: {Credits}, Section: {Section}, SeatsLeft: {SeatsLeft}, SubType: {SubType}, LastUpdate: {LastUpdate}";
+        }
     }
+
 }
