@@ -33,5 +33,25 @@ namespace Scheds.DAL.Repositories
                 .Where(courseBase => courseBase.CourseName == courseName)
                 .FirstOrDefaultAsync();
         }
+        public async Task AddCourseBaseAsync(CourseBase courseBase)
+        {
+            _context.CourseBase_Fall25.Add(courseBase);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateCourseBaseAsync(CourseBase courseBase)
+        {
+            var existingCourseBase = await _context.CourseBase_Fall25
+                .Where(c => c.CourseCode == courseBase.CourseCode)
+                .FirstOrDefaultAsync();
+            if (existingCourseBase == null)
+            {
+                await AddCourseBaseAsync(courseBase);
+            }
+            else
+            {
+                existingCourseBase.CourseName = courseBase.CourseName;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

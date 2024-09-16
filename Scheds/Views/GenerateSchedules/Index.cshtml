@@ -33,7 +33,7 @@
         <section class="search-cart">
             <div class="search-section">
                 <h1>Search for Courses</h1>
-                <div class="search-bar">
+                <div class="search-bar" style="margin-right: 20px;">
                     <div class="group">
                         <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
                             <g>
@@ -47,7 +47,12 @@
 
                     </div>
 
-                    @* <button id="add-to-cart" class="btn-primary">Add to Cart</button> *@
+                    <button id="add-to-cart" class="btn-primary" style="height: auto;">Search Live (Beta)</button>
+                    <div class="tooltip"  style="margin-bottom: 20px;">
+                        <div class="icon">i</div>
+                        <div class="tooltiptext">This will get the data directly from the power campus, however it might
+                            be slower and a bit laggy. Only use it if you can't find the course from here.</div>
+                    </div>
                 </div>
                 <div id="search-results" class="search-results">
 
@@ -64,10 +69,13 @@
         <section class="customization">
             <div class="top-section">
                 <h2 class="top-section-text">Customize Your Schedule</h2>
-                <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData" value="true" />Use Live Data (Beta)</label>
+                <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData"
+                        value="true" />Use Live Data (Beta)</label>
                 <div class="tooltip">
                     <div class="icon">i</div>
-                    <div class="tooltiptext">This will get the data directly from the power campus, however it might be slower. Only use it if there is a change in the instructor or you want to check the seats from here.</div>
+                    <div class="tooltiptext">This will get the data directly from the power campus, however it might be
+                        slower. Only use it if there is a change in the instructor or you want to check the seats from
+                        here.</div>
                 </div>
             </div>
 
@@ -113,38 +121,50 @@
                 </form>
                 <div class="right-section">
                     <!-- Checkboxes Section -->
-                    @*< div class="customization-method">
-                    <h3>Pick your day customization method</h3>
-                    <label><input type="radio" name="scheduleMethod" value="maxDays" checked>Pick max number of
-                    days</label>
-                    <label><input type="radio" name="scheduleMethod" value="selectDays">Select Specific Days</label>
-                    </div> *@
+                    <div class="checkboxes right-section-header">
+                        <div class="customization-method" style="font-weight: 700;">
+                            <h3>Pick your day customization method</h3>
+                            <label>
+                                <input type="radio" name="scheduleMethod" value="maxDays" checked> Pick max number of
+                                days
+                            </label>
+                            <label>
+                                <input type="radio" name="scheduleMethod" value="selectDays"> Select Specific Days
+                            </label>
+                        </div>
 
-                    @* <!-- Sliders Section -->
-                    <div class="sliders" id="slider-section">
-                    <div class="box">
-                    <label class="slider-label">Maximum Days on Campus</label>
-                    <div class="inner-box">
-                    <div class="line"></div>
-                    <input type="range" name="numberOfDays" class="input-range" min="0" max="6" value="4" />
-                    </div>
-                    <p class="number">4</p>
-                    </div>
-                    </div> *@
+                        <!-- Sliders Section -->
+                        <div class="sliders" id="slider-section">
+                            <div class="box">
+                                <label class="slider-label">Maximum Days on Campus</label>
+                                <div class="inner-box">
+                                    <div class="line"></div>
+                                    <input type="range" name="numberOfDays" class="input-range" min="0" max="6"
+                                        value="4" />
+                                </div>
+                                <p class="number">4</p>
+                            </div>
+                        </div>
 
-                    <div class="checkboxes" id="checkbox-section">
-                        <div class="checkbox-group">
-                            <h3>Select Days on Campus</h3>
-                            <label><input type="checkbox" name="selectedDays" value="all" id="all-days" checked> All
-                                Week</label>
-                            <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
-                            <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
-                            <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
-                            <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
-                            <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
-                            <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
+                        <!-- Checkboxes Section -->
+                        <div class="checkboxes" id="checkbox-section" style="display: none; width: 90%;">
+                            <!-- Hidden by default -->
+                            <div class="checkbox-group">
+                                <h3>Select Days on Campus</h3>
+                                <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
+                                    Week</label>
+                                <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
+                                <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
+                                <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
+                                <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
+                                <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
+                                <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
+                            </div>
                         </div>
                     </div>
+
+
+
                     <div class="checkboxes">
                         <div class="checkbox-group">
                             <h3>Select First Slot Start Time</h3>
@@ -200,42 +220,59 @@
     </div>
 
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const maxDaysRadio = document.querySelector('input[name="scheduleMethod"][value="maxDays"]');
-            const selectDaysRadio = document.querySelector('input[name="scheduleMethod"][value="selectDays"]');
             const sliderSection = document.getElementById('slider-section');
             const checkboxSection = document.getElementById('checkbox-section');
+            const scheduleMethodRadios = document.querySelectorAll('input[name="scheduleMethod"]');
             const allDaysCheckbox = document.getElementById('all-days');
-            const dayCheckboxes = document.querySelectorAll('input[name="selectedDays"]:not([value="all"])');
+            const dayCheckboxes = document.querySelectorAll('input[name="selectedDays"]:not(#all-days)');
+            const rangeInput = document.querySelector('input[type="range"]');
+            const numberDisplay = document.querySelector('.number');
 
+            // Function to toggle between slider and checkbox sections
+            scheduleMethodRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    if (this.value === 'maxDays') {
+                        sliderSection.style.display = 'block';  // Show slider
+                        checkboxSection.style.display = 'none'; // Hide checkboxes
+                    } else {
+                        sliderSection.style.display = 'none';  // Hide slider
+                        checkboxSection.style.display = 'block'; // Show checkboxes
+                    }
+                });
+            });
 
-            // Handle "All Week" checkbox behavior
-            function toggleAllDaysCheckbox() {
-                if (allDaysCheckbox.checked) {
+            // Update the display for the number of days when using the slider
+            rangeInput.addEventListener('input', function () {
+                numberDisplay.textContent = this.value;
+            });
+
+            // Function to handle the "All Week" checkbox behavior
+            allDaysCheckbox.addEventListener('change', function () {
+                if (this.checked) {
                     dayCheckboxes.forEach(checkbox => {
-                        checkbox.checked = true;
-                        checkbox.disabled = true; // Disable individual day checkboxes
+                        checkbox.checked = false;    // Uncheck other checkboxes
+                        checkbox.disabled = true;    // Disable other checkboxes
                     });
                 } else {
                     dayCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                        checkbox.disabled = false; // Re-enable individual day checkboxes
+                        checkbox.disabled = false;   // Enable checkboxes when "All Week" is unchecked
                     });
                 }
+            });
+
+            // Initialize the correct visibility based on the initially selected radio button
+            if (document.querySelector('input[name="scheduleMethod"]:checked').value === 'maxDays') {
+                sliderSection.style.display = 'block';
+                checkboxSection.style.display = 'none';
+            } else {
+                sliderSection.style.display = 'none';
+                checkboxSection.style.display = 'block';
             }
-
-            // Event listeners
-            maxDaysRadio.addEventListener('change', toggleCustomizationMethod);
-            selectDaysRadio.addEventListener('change', toggleCustomizationMethod);
-            allDaysCheckbox.addEventListener('change', toggleAllDaysCheckbox);
-
-            // Initialize the correct section based on the default selected radio button
-            toggleCustomizationMethod();
         });
-
     </script>
-
 
     <script>
         let cart = [];
@@ -270,8 +307,30 @@
                 })
                 .catch(error => console.error('Error fetching cart items:', error));
 
+            const searchButton = document.getElementById('add-to-cart');
+            const searchInput = document.getElementById('course-search');
+            searchButton.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    alert('Please enter a search query.');
+                    return;
+                }
 
+                // Fetch search results from the API
+                fetch(`/api/coursebase/search/${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateSearchResults(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching search results:', error);
+                        searchResultsContainer.innerHTML = '<p>Error fetching results</p>';
+                    });
+            });
         });
+
+
+
 
         function updateSearchResults(courses) {
             const resultsContainer = document.getElementById('search-results');
@@ -349,31 +408,64 @@
 
         document.getElementById('generate-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent form submission
+
             // Capture form data inside the form
             const form = event.target;
             const minimumNumberOfItemsPerDay = form.minimumNumberOfItemsPerDay.value;
             const largestAllowedGap = form.largestAllowedGap.value;
             const maxNumberOfGeneratedSchedules = form.maxNumberOfGeneratedSchedules.value;
+            const sliderElement = document.querySelector('input[name="numberOfDays"]'); // Explicitly select the slider input
 
-            // Capture data outside the form (selected days, start time, and end time)
-            const selectedDays = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
+
+            // Define the days of the week in order (starting with Saturday)
+            const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
+
+            // Determine whether "Pick max number of days" or "Select specific days" is selected
+            const isNumberOfDaysSelected = document.querySelector('input[name="scheduleMethod"]:checked').value === 'maxDays';
+
+            let selectedDaysArray = [false, false, false, false, false, false]; // Default to false for each day
+
+            if (isNumberOfDaysSelected) {
+                // Max number of days selected, use the slider value
+                const numberOfDays = sliderElement ? sliderElement.value : 0; // Use the slider value or 0
+                // Example of additional logic for number of days, if required:
+                selectedDaysArray = Array(parseInt(numberOfDays)).fill(true).concat(Array(6 - numberOfDays).fill(false));
+            } else {
+                // Specific days selected, use the checkboxes
+                const selectedDaysCheckboxes = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
+
+                if (selectedDaysCheckboxes.includes('all')) {
+                    // If "All Week" is selected, set all days to true
+                    selectedDaysArray.fill(true);
+                } else {
+                    // Set the respective index to true for each selected day
+                    selectedDaysCheckboxes.forEach(day => {
+                        const dayIndex = daysOfWeek.indexOf(day); // Find the index of the selected day
+                        if (dayIndex !== -1) {
+                            selectedDaysArray[dayIndex] = true;
+                        }
+                    });
+                }
+            }
+
+            // Capture additional form data (start time, end time, etc.)
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
             const useLiveData = document.querySelector('#use-live-data').checked;
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
-            const numberOfDays = form.numberOfDays?.value || 0; // Only if max days is selected
 
             // Construct the GenerateRequest object
             const generateRequest = {
-                selectedDays,
+                selectedDays: selectedDaysArray, // Boolean array for selected days
                 daysStart,
                 daysEnd,
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
-                numberOfDays: parseInt(numberOfDays) || 0,
+                numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0, // Use slider value or 0
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
+                isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
                 useLiveData: useLiveData,
-                selectedItems: cart,
-                customSelectedItems: []
+                selectedItems: cart, // Assuming 'cart' is available in the current scope
+                customSelectedItems: [] // Assuming this is handled elsewhere or defaulting to an empty array
             };
 
             console.log(generateRequest);
@@ -398,6 +490,8 @@
                     console.error('There was a problem with the fetch operation:', error);
                 });
         });
+
+
 
 
     </script>
@@ -555,7 +649,11 @@
 
     .right-section {
         display: flex;
-        gap: 20px;
+        flex-direction: column;
+        width: 100%;
+        margin-right: 20px;
+        padding: 10px;
+    @*gap:10px;*@
     }
 
     /* From Uiverse.io by SmookyDev */
@@ -581,9 +679,7 @@
         padding: 10px;
         position: absolute;
         z-index: 1;
-        @* top: 80%; *@
-        @* left: 200%; *@
-        margin-left: 50px;
+    @*top:80%;*@@*left:200%;*@margin-left: 50px;
         opacity: 0;
         transition: opacity 0.3s;
     }
@@ -603,17 +699,25 @@
         display: inline-block;
         width: 20px;
         height: 20px;
-        background-color:#ff5100 ;
+        background-color: #ff5100;
         color: #fff;
         border-radius: 50%;
         text-align: center;
         line-height: 20px;
     }
 
-    .top-section{
+    .top-section {
         margin-top: 5px;
         display: flex;
         gap: 20px;
-        
+
+    }
+
+    .right-section-header {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+        width: 100%;
     }
 </style>

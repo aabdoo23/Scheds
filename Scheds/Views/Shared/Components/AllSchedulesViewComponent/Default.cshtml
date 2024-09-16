@@ -7,7 +7,7 @@
         {
             <div class="schedule">
                 <div class="current-schedule">Schedule @i</div> <!-- Schedule number -->
-                @await Component.InvokeAsync("ScheduleViewComponent", Model[i-1])
+                @await Component.InvokeAsync("ScheduleViewComponent", Model[i - 1])
             </div>
         }
     </div>
@@ -26,23 +26,26 @@
         display: flex;
         flex-direction: column;
         width: 100%;
-        height: 100%; /* Ensure it takes full height of the container */
-        @* max-height: 300px;  *@
-        overflow-y: auto; /* Vertical scroll bar */
+        height: 100%;
+        /* Ensure it takes full height of the container */
+    @*max-height:300px;*@overflow-y: auto;
+        /* Vertical scroll bar */
         scroll-behavior: smooth;
-        @* hide scroll bar *@
-        scrollbar-width: none;
+    @*hidescrollbar*@scrollbar-width: none;
 
     }
 
     .schedule {
-        flex: 0 0 auto; /* Prevent shrinking, keep natural width */
+        flex: 0 0 auto;
+        /* Prevent shrinking, keep natural width */
         width: 100%;
-        margin-bottom: 20px; /* Space between schedules */
+        margin-bottom: 20px;
+        /* Space between schedules */
     }
 
     .current-schedule {
         font-size: 18px;
-        margin-bottom: 10px; /* Space between number and schedule */
+        margin-bottom: 10px;
+        /* Space between number and schedule */
     }
 </style>
