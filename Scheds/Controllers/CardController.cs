@@ -12,9 +12,11 @@ namespace Scheds.Controllers
     public class CardController
     {
         private readonly CardItemRepository repository;
-        public CardController(CardItemRepository repository)
+        private readonly ParsingService parsingService;
+        public CardController(CardItemRepository repository, ParsingService parsingService)
         {
             this.repository = repository;
+            this.parsingService = parsingService;
         }
         [HttpGet]
         public async Task<ActionResult<List<CardItem>>> GetAllCards()
@@ -97,7 +99,7 @@ namespace Scheds.Controllers
             }
             var responseContent = await response.Content.ReadAsStringAsync();
             //return responseContent;
-            cards = ParsingService.ParseCourseResponse(responseContent);
+            cards = await parsingService.ParseCourseResponse(responseContent);
             //TODO: update the db
             foreach (var card in cards)
             {

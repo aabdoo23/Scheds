@@ -17,12 +17,12 @@ namespace Scheds.DAL.Repositories
 
         public async Task<List<Instructor>> GetAllInstructorsAsync()
         {
-            return await _context.All_Instructors_Spr24.ToListAsync();
+            return await _context.All_Instructors_Fall25.ToListAsync();
         }
 
         public async Task<string> GetInstructorNameById(int id)
         {
-            var instructor = await _context.All_Instructors_Spr24
+            var instructor = await _context.All_Instructors_Fall25
                 .Where(ins => ins.Id == id)
                 .FirstOrDefaultAsync();
 
