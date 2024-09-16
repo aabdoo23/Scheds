@@ -12,11 +12,11 @@ namespace Scheds.DAL.Repositories
         }
         public async Task<List<CourseSchedule>> GetCourseSchedulesAsync()
         {
-            return await context.Schedules_Spr24.ToListAsync();
+            return await context.Schedules_Fall25.ToListAsync();
         }
         public async Task<List<CourseSchedule>> GetCourseSchedulesByCardIdAsync(int cardId)
         {
-            return await context.Schedules_Spr24
+            return await context.Schedules_Fall25
                 .Where(schedule => schedule.CardId == cardId)
                 .ToListAsync();
         }

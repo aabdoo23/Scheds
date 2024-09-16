@@ -18,7 +18,7 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">
-            <a href="#"><img src="~/images/logo.png" alt="Scheds Logo" class="logo-img"></a>
+            <a href="/"><img src="~/images/logo.png" alt="Scheds Logo" class="logo-img"></a>
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
@@ -62,7 +62,15 @@
 
 
         <section class="customization">
-            <h2 class="top-section-text">Customize Your Schedule</h2>
+            <div class="top-section">
+                <h2 class="top-section-text">Customize Your Schedule</h2>
+                <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData" value="true" />Use Live Data (Beta)</label>
+                <div class="tooltip">
+                    <div class="icon">i</div>
+                    <div class="tooltiptext">This will get the data directly from the power campus, however it might be slower. Only use it if there is a change in the instructor or you want to check the seats from here.</div>
+                </div>
+            </div>
+
             <div class="customization-layout">
                 <form class="generate-form" id="generate-form">
 
@@ -106,28 +114,29 @@
                 <div class="right-section">
                     <!-- Checkboxes Section -->
                     @*< div class="customization-method">
-                        <h3>Pick your day customization method</h3>
-                        <label><input type="radio" name="scheduleMethod" value="maxDays" checked>Pick max number of
-                            days</label>
-                        <label><input type="radio" name="scheduleMethod" value="selectDays">Select Specific Days</label>
+                    <h3>Pick your day customization method</h3>
+                    <label><input type="radio" name="scheduleMethod" value="maxDays" checked>Pick max number of
+                    days</label>
+                    <label><input type="radio" name="scheduleMethod" value="selectDays">Select Specific Days</label>
                     </div> *@
 
                     @* <!-- Sliders Section -->
                     <div class="sliders" id="slider-section">
-                        <div class="box">
-                            <label class="slider-label">Maximum Days on Campus</label>
-                            <div class="inner-box">
-                                <div class="line"></div>
-                                <input type="range" name="numberOfDays" class="input-range" min="0" max="6" value="4" />
-                            </div>
-                            <p class="number">4</p>
-                        </div>
+                    <div class="box">
+                    <label class="slider-label">Maximum Days on Campus</label>
+                    <div class="inner-box">
+                    <div class="line"></div>
+                    <input type="range" name="numberOfDays" class="input-range" min="0" max="6" value="4" />
+                    </div>
+                    <p class="number">4</p>
+                    </div>
                     </div> *@
 
                     <div class="checkboxes" id="checkbox-section">
                         <div class="checkbox-group">
                             <h3>Select Days on Campus</h3>
-                            <label><input type="checkbox" name="selectedDays" value="all" id="all-days" checked> All Week</label>
+                            <label><input type="checkbox" name="selectedDays" value="all" id="all-days" checked> All
+                                Week</label>
                             <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
                             <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
                             <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
@@ -170,21 +179,22 @@
             <h2>Generated Schedules</h2>
             <div id=schedule-container class="schedule-container">
             </div>
-            @* <div id="schedule-container" style="margin: 20px; padding-left: 100px; height: 200px; background-color: yellow;" class="schedule-container">
-                @await Component.InvokeAsync("CardItemViewComponent", new ReturnedCardItem{
-                courseCode = "CSEN 401",
-                courseName = "Software EngineeringE EngineeringEngineering",
-                subType = "Lecture",
-                section = "1",
-                instructorName = "Dr.Ahmed Kandil kan",
-                credits = 3,
-                day = "Wednesday",
-                startTime = new TimeSpan(11, 30, 0),
-                endTime = new TimeSpan(14, 30, 0),
-                room = "C7.202",
-                seatsLeft = 20
+            @* <div id="schedule-container" style="margin: 20px; padding-left: 100px; height: 200px; background-color:
+            yellow;" class="schedule-container">
+            @await Component.InvokeAsync("CardItemViewComponent", new ReturnedCardItem{
+            courseCode = "CSEN 401",
+            courseName = "Software EngineeringE EngineeringEngineering",
+            subType = "Lecture",
+            section = "1",
+            instructorName = "Dr.Ahmed Kandil kan",
+            credits = 3,
+            day = "Wednesday",
+            startTime = new TimeSpan(11, 30, 0),
+            endTime = new TimeSpan(14, 30, 0),
+            room = "C7.202",
+            seatsLeft = 20
 
-                })
+            })
             </div> *@
         </section>
     </div>
@@ -348,8 +358,7 @@
             // Capture data outside the form (selected days, start time, and end time)
             const selectedDays = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
-            const isMaxNumberOfDaysChecked = false;
-
+            const useLiveData = document.querySelector('#use-live-data').checked;
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
             const numberOfDays = form.numberOfDays?.value || 0; // Only if max days is selected
 
@@ -362,9 +371,9 @@
                 largestAllowedGap: parseInt(largestAllowedGap),
                 numberOfDays: parseInt(numberOfDays) || 0,
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
-                isMaxNumberOfDaysChecked,
+                useLiveData: useLiveData,
                 selectedItems: cart,
-                customSelectedItems:[]
+                customSelectedItems: []
             };
 
             console.log(generateRequest);
@@ -522,7 +531,7 @@
         background-color: #ff6347;
         /* Match the scrollbar thumb with search result color */
         border-radius: 10px;
-        
+
     }
 
     #cart-items {
@@ -543,8 +552,68 @@
         border-radius: 10px;
         /* Same border radius */
     }
-    .right-section{
+
+    .right-section {
         display: flex;
         gap: 20px;
+    }
+
+    /* From Uiverse.io by SmookyDev */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        font-family: "Arial", sans-serif;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        @* top: 80%; *@
+        @* left: 200%; *@
+        margin-left: 50px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        margin-left: -10px;
+        border-width: 10px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+    }
+
+    .tooltip .icon {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-color:#ff5100 ;
+        color: #fff;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+    }
+
+    .top-section{
+        margin-top: 5px;
+        display: flex;
+        gap: 20px;
+        
     }
 </style>

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Scheds.DAL;
 using Scheds.DAL.Repositories;
+using Scheds.DAL.Services;
 
 namespace Scheds
 {
@@ -25,6 +26,10 @@ namespace Scheds
             builder.Services.AddScoped<CardItemRepository>();
             builder.Services.AddScoped<AllInstructorsRepository>();
             builder.Services.AddScoped<CourseBaseRepository>();
+            builder.Services.AddScoped<CourseScheduleRepository>();
+            builder.Services.AddScoped<ParsingService>();
+            builder.Services.AddScoped<NuDealer>();
+
 
             builder.Services.AddHttpClient();
 
