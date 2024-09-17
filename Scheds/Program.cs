@@ -21,8 +21,11 @@ namespace Scheds
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            builder.Services.AddDbContext<SchedsDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
+            builder.Services.AddDbContext<SchedsDbContext>(options => {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
+            });
             builder.Services.AddScoped<CardItemRepository>();
             builder.Services.AddScoped<AllInstructorsRepository>();
             builder.Services.AddScoped<CourseBaseRepository>();

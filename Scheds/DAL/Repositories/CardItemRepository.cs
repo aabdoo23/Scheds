@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Scheds.Models;
 
 namespace Scheds.DAL.Repositories
@@ -32,22 +33,51 @@ namespace Scheds.DAL.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
-
-        public async Task UpdateCardItemAsync(CardItem cardItem)
+        public async Task AddCardItemAsync(CardItem cardItem)
         {
-            var existingEntity = _context.Sections_Fall25.Local
-                .FirstOrDefault(c => c.CardId == cardItem.CardId);
-
-            if (existingEntity != null)
-            {
-                // Detach the existing tracked entity
-                _context.Entry(existingEntity).State = EntityState.Detached;
-            }
-
-            // Now attach and update the new entity
-            _context.Sections_Fall25.Update(cardItem);
+            _context.Sections_Fall25.Add(cardItem);
             await _context.SaveChangesAsync();
         }
+
+        public void UpdateCardItemAsync(CardItem course)
+        {
+            var sqlConnectionString = "REMOVED";
+            using var sqlConnection = new SqlConnection(sqlConnectionString);
+            sqlConnection.Open();
+            var sqlCommandText = @"
+                MERGE sections_Fall25 AS target
+                USING (SELECT @cardId AS cardId) AS source
+                ON target.cardId = source.cardId
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        courseCode = @courseCode, 
+                        courseName = @courseName, 
+                        instructor = @instructor, 
+                        credits = @credits, 
+                        section = @section, 
+                        seatsLeft = @seatsLeft, 
+                        subType = @subType, 
+                        lastUpdate = @lastUpdate
+                WHEN NOT MATCHED THEN
+                    INSERT (cardId, courseCode, courseName, instructor, credits, section, seatsLeft, subType, lastUpdate)
+                    VALUES (@cardId, @courseCode, @courseName, @instructor, @credits, @section, @seatsLeft, @subType, @lastUpdate);"
+            ;
+
+            using var sqlCommandSections = new SqlCommand(sqlCommandText, sqlConnection);
+            sqlCommandSections.Parameters.AddWithValue("@cardId", course.CardId);
+            sqlCommandSections.Parameters.AddWithValue("@courseCode", course.CourseCode);
+            sqlCommandSections.Parameters.AddWithValue("@courseName", course.CourseName);
+            sqlCommandSections.Parameters.AddWithValue("@instructor", course.Instructor);
+            sqlCommandSections.Parameters.AddWithValue("@credits", course.Credits);
+            sqlCommandSections.Parameters.AddWithValue("@section", course.Section);
+            sqlCommandSections.Parameters.AddWithValue("@seatsLeft", course.SeatsLeft);
+            sqlCommandSections.Parameters.AddWithValue("@subType", course.SubType);
+            sqlCommandSections.Parameters.AddWithValue("@lastUpdate", course.LastUpdate);
+
+            sqlCommandSections.ExecuteNonQuery();
+        }
+
+
 
     }
 }
