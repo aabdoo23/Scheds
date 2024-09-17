@@ -2,11 +2,12 @@
 @model List<List<List<ReturnedCardItem>>>
 
 <div class="all-container">
+    <div style="font-weight:600; font-size:18px; text-align: center;">@Model.Count Generated Schedules<br>Scroll down to see more</div>
     <div class="scroll-container">
         @for (int i = 1; i <= Model.Count; i++)
         {
             <div class="schedule">
-                <div class="current-schedule">Schedule @i</div> <!-- Schedule number -->
+                <div class="current-schedule">Schedule @i</div> 
                 @await Component.InvokeAsync("ScheduleViewComponent", Model[i - 1])
             </div>
         }
@@ -44,7 +45,8 @@
     }
 
     .current-schedule {
-        font-size: 18px;
+        font-size: 14px;
+        font-weight: 600;
         margin-bottom: 10px;
         /* Space between number and schedule */
     }

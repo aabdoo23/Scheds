@@ -1,4 +1,5 @@
-﻿namespace Scheds.Models
+﻿
+namespace Scheds.Models
 {
     public class CardItem
     {
@@ -93,14 +94,12 @@
                 return false; // Different days, no conflict
             }
             int startHr1, endHr1, startMin1, endMin1;
-            string startAMPM1, endAMPM1;
             startHr1 = startTime1.Hours;
             startMin1 = startTime1.Minutes;
             endHr1 = endTime1.Hours;
             endMin1 = endTime1.Minutes;
 
             int startHr2, endHr2, startMin2, endMin2;
-            string startAMPM2, endAMPM2;
             startHr2 = startTime2.Hours;
             startMin2 = startTime2.Minutes;
             endHr2 = endTime2.Hours;

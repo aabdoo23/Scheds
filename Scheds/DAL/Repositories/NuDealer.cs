@@ -6,17 +6,18 @@ using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 using System.Text;
 using Scheds.DAL.Services;
+using System.Linq.Expressions;
 
 namespace Scheds.DAL.Repositories
 {
     public class NuDealer
     {
-        private readonly ParsingService ParsingService;
+        private readonly ParsingService _ParsingService;
         private readonly CardItemRepository CardItemRepository;
         private readonly CourseBaseRepository CourseBaseRepository;
         private readonly CourseScheduleRepository CourseScheduleRepository;
         public NuDealer(ParsingService parsingService, CardItemRepository cardItemRepository, CourseBaseRepository courseBaseRepository, CourseScheduleRepository courseScheduleRepository) { 
-            ParsingService = parsingService;
+            _ParsingService = parsingService;
             CardItemRepository = cardItemRepository;
             CourseBaseRepository = courseBaseRepository;
             CourseScheduleRepository = courseScheduleRepository;
@@ -27,29 +28,28 @@ namespace Scheds.DAL.Repositories
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Origin", "https://register.nu.edu.eg");
-                client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Search/Section");
-                
-                var request = new SearchRequest(CourseCode);
-                var jsonRequest= JsonConvert.SerializeObject(request);
-                var content= new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Registration/Courses");
 
-                var response = client.PostAsync("https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search", content).Result;
-                
-                if(!response.IsSuccessStatusCode)
+                var request = new SearchRequest(CourseCode);
+                var jsonRequest = JsonConvert.SerializeObject(request);
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search", content);
+
+                if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception("Failed to fetch data from the server");
                 }
-                var responseContent = response.Content.ReadAsStringAsync().Result;
-                
-                var cards= await ParsingService.ParseCourseResponse(responseContent);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseContent);
+                var cards= await _ParsingService.ParseCourseResponse(responseContent);
                 
                 foreach(var card in cards)
                 {
-                    await CardItemRepository.UpdateCardItemAsync(card);
-                    foreach(CourseSchedule schedule in card.Schedule)
-                        await CourseScheduleRepository.UpdateCourseScheduleAsync(schedule);
+                    CardItemRepository.UpdateCardItemAsync(card);
+                    CourseScheduleRepository.UpdateCourseScheduleAsync(card);
                     CourseBase courseBase = new CourseBase(card.CourseCode, card.CourseName);
-                    await CourseBaseRepository.UpdateCourseBaseAsync(courseBase);
+                    CourseBaseRepository.UpdateCourseBaseAsync(card);
 
                 }
                 return cards;
@@ -58,40 +58,50 @@ namespace Scheds.DAL.Repositories
 
         public async Task<List<CourseBase>> FetchCoursBases(string CourseCode)
         {
-            using (var client = new HttpClient())
+            List<CourseBase> courseBases = new List<CourseBase>();
+            try {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("Origin", "https://register.nu.edu.eg");
+                    client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Registration/Courses");
+
+                    var request = new SearchRequest(CourseCode);
+                    var jsonRequest = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync("https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search", content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception("Failed to fetch data from the server");
+                    }
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseContent);
+                    var cards = await _ParsingService.ParseCourseResponse(responseContent);
+
+                    foreach (var card in cards)
+                    {
+                        Console.WriteLine("Parsed: "+card.ToString());
+
+                        CardItemRepository.UpdateCardItemAsync(card); // Ensure UpdateCardItemAsync handles tracking issues
+
+                        foreach (CourseSchedule schedule in card.Schedule)
+                            CourseScheduleRepository.UpdateCourseScheduleAsync(card);
+
+                        var courseBase = new CourseBase(card.CourseCode, card.CourseName);
+                        CourseBaseRepository.UpdateCourseBaseAsync(card);
+                        courseBases.Add(courseBase);
+                    }
+                    return courseBases;
+                }
+                
+            }catch(Exception e)
             {
-                client.DefaultRequestHeaders.Add("Origin", "https://register.nu.edu.eg");
-                client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Search/Section");
-
-                var request = new SearchRequest(CourseCode);
-                var jsonRequest = JsonConvert.SerializeObject(request);
-                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-
-                var response = client.PostAsync("https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search", content).Result;
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception("Failed to fetch data from the server");
-                }
-                var responseContent = response.Content.ReadAsStringAsync().Result;
-
-                var cards = await ParsingService.ParseCourseResponse(responseContent);
-                var courseBases = new List<CourseBase>();
-
-                foreach (var card in cards)
-                {
-                    await CardItemRepository.UpdateCardItemAsync(card); // Ensure UpdateCardItemAsync handles tracking issues
-
-                    foreach (CourseSchedule schedule in card.Schedule)
-                        await CourseScheduleRepository.UpdateCourseScheduleAsync(schedule);
-
-                    var courseBase = new CourseBase(card.CourseCode, card.CourseName);
-                    await CourseBaseRepository.UpdateCourseBaseAsync(courseBase);
-                    courseBases.Add(courseBase);
-                }
-                return courseBases;
+                Console.WriteLine(e.Message);
             }
+            return courseBases;
         }
+
 
     }
 }
