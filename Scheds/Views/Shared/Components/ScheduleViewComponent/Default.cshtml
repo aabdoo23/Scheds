@@ -47,7 +47,7 @@
                                 @if (Model.Count > j && Model[j] != null)
                                 {
                                     var cardItem = Model[j]
-                                        .FirstOrDefault(item => item?.startTime != null && item.startTime.Hours == hoursMapping[i]);
+                                        .FirstOrDefault(item => item?.startTime != null && (hoursMapping[i]==item.startTime.Hours||hoursMapping[i]==item.startTime.Hours-1) );
 
                                     if (cardItem != null)
                                     {
@@ -69,8 +69,8 @@
         padding-bottom: 10px;
         margin-left: 45px;
         margin-top: 20px;
-        width: 190vh;
-        height: 350px;
+        width: 180vh;
+        height: 300px;
         border-collapse: separate; /* Allows for border-radius */
         border-spacing: 0; /* Removes gaps between cells */
         border-radius: 10px; /* Applies rounded corners */

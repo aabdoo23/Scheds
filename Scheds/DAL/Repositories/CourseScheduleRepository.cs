@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Scheds.Models;
 
 namespace Scheds.DAL.Repositories
@@ -26,24 +27,41 @@ namespace Scheds.DAL.Repositories
             await context.SaveChangesAsync();
         }
         //update or add
-        public async Task UpdateCourseScheduleAsync(CourseSchedule schedule)
+        public void UpdateCourseScheduleAsync(CardItem course)
         {
-            CourseSchedule existingSchedule = await context.Schedules_Fall25
-                .Where(s => s.CardId == schedule.CardId)
-                .FirstOrDefaultAsync();
-            if (existingSchedule == null)
+            if (course.Schedule == null || course.Schedule.Count == 0)
             {
-                await AddCourseScheduleAsync(schedule);
+                return;
             }
-            else
+            var sqlConnectionString = "REMOVED";
+            using var sqlConnection = new SqlConnection(sqlConnectionString);
+            sqlConnection.Open();
+            var sqlSchedule = @"
+                MERGE schedules_Fall25 AS target
+                USING (SELECT @cardId AS cardId) AS source
+                ON target.cardId = source.cardId
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        dayOfWeek = @dayOfWeek, 
+                        startTime = @startTime, 
+                        endTime = @endTime, 
+                        location = @location
+                WHEN NOT MATCHED THEN
+                    INSERT (cardId, dayOfWeek, startTime, endTime, location)
+                    VALUES (@cardId, @dayOfWeek, @startTime, @endTime, @location);";
+
+
+            foreach (var schedule in course.Schedule)
             {
-                existingSchedule.CardId = schedule.CardId;
-                existingSchedule.StartTime = schedule.StartTime;
-                existingSchedule.EndTime = schedule.EndTime;
-                existingSchedule.DayOfWeek = schedule.DayOfWeek;
-                existingSchedule.Location = schedule.Location;
-                await context.SaveChangesAsync();
+                using var sqlCommandSchedule = new SqlCommand(sqlSchedule, sqlConnection);
+                sqlCommandSchedule.Parameters.AddWithValue("@cardId", course.CardId);
+                sqlCommandSchedule.Parameters.AddWithValue("@dayOfWeek", schedule.DayOfWeek);
+                sqlCommandSchedule.Parameters.AddWithValue("@startTime", schedule.StartTime);
+                sqlCommandSchedule.Parameters.AddWithValue("@endTime", schedule.EndTime);
+                sqlCommandSchedule.Parameters.AddWithValue("@location", schedule.Location);
+                sqlCommandSchedule.ExecuteNonQuery();
             }
         }
+
     }
 }

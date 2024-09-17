@@ -32,7 +32,16 @@
         <!-- Search and Cart Section -->
         <section class="search-cart">
             <div class="search-section">
-                <h1>Search for Courses</h1>
+                <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px;">
+                    <h1>Search for Courses</h1>
+                    <label style="margin-top: 5px; font-weight: 600;"><input type="checkbox" name="isLiveData" checked>
+                        Use Live Data in course selection.</label>
+                    <div class="tooltip" style="margin-top: 5px;">
+                        <div class="icon">i</div>
+                        <div class="tooltiptext">Fetches data for each course on selection from Self Service to
+                            <strong>ensure data is updated and all sections are there.</strong> Small delay.</div>
+                    </div>
+                </div>
                 <div class="search-bar" style="margin-right: 20px;">
                     <div class="group">
                         <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -44,14 +53,18 @@
                         </svg>
                         @* <input placeholder="Search" type="search" class="input"> *@
                         <input id="course-search" placeholder="Search" type="search" class="input">
+                        <div id="loading" style="display: none; font-weight: 600;">
+                            <div class="loader"></div>
+                            Loading... Please wait.
+                        </div>
 
                     </div>
 
-                    <button id="add-to-cart" class="btn-primary" style="height: auto;">Search Live (Beta)</button>
-                    <div class="tooltip"  style="margin-bottom: 20px;">
+                    <button id="add-to-cart" class="btn-primary">Search Live</button>
+                    <div class="tooltip" style="margin-bottom: 20px;">
                         <div class="icon">i</div>
-                        <div class="tooltiptext">This will get the data directly from the power campus, however it might
-                            be slower and a bit laggy. Only use it if you can't find the course from here.</div>
+                        <div class="tooltiptext">If you can't find the course you're searching for in the autocomplete,
+                            click this button.</div>
                     </div>
                 </div>
                 <div id="search-results" class="search-results">
@@ -69,14 +82,14 @@
         <section class="customization">
             <div class="top-section">
                 <h2 class="top-section-text">Customize Your Schedule</h2>
-                <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData"
-                        value="true" />Use Live Data (Beta)</label>
-                <div class="tooltip">
-                    <div class="icon">i</div>
-                    <div class="tooltiptext">This will get the data directly from the power campus, however it might be
-                        slower. Only use it if there is a change in the instructor or you want to check the seats from
-                        here.</div>
-                </div>
+                @* <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData"
+                value="true" />Use Live Data (Beta)</label>
+                <div class="tooltip"> *@
+                @* <div class="icon">i</div>
+                <div class="tooltiptext">This will get the data directly from the power campus, however it might be
+                slower. Only use it if there is a change in the instructor or you want to check the seats from
+                here.</div>
+                </div> *@
             </div>
 
             <div class="customization-layout">
@@ -140,9 +153,9 @@
                                 <div class="inner-box">
                                     <div class="line"></div>
                                     <input type="range" name="numberOfDays" class="input-range" min="0" max="6"
-                                        value="4" />
+                                        value="6" />
                                 </div>
-                                <p class="number">4</p>
+                                <p class="number">6</p>
                             </div>
                         </div>
 
@@ -196,26 +209,16 @@
 
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
-            <h2>Generated Schedules</h2>
+            <div style="display: flex;">
+                <h2>Generated Schedules</h2>
+                <div class="tooltip" style="margin-bottom: 20px;">
+                    <div class="icon">i</div>
+                    <div class="tooltiptext">If you can't see a course selected above, then it probably has no schedule.
+                        If not sure, search for the course using the Search live button and try again.</div>
+                </div>
+            </div>
             <div id=schedule-container class="schedule-container">
             </div>
-            @* <div id="schedule-container" style="margin: 20px; padding-left: 100px; height: 200px; background-color:
-            yellow;" class="schedule-container">
-            @await Component.InvokeAsync("CardItemViewComponent", new ReturnedCardItem{
-            courseCode = "CSEN 401",
-            courseName = "Software EngineeringE EngineeringEngineering",
-            subType = "Lecture",
-            section = "1",
-            instructorName = "Dr.Ahmed Kandil kan",
-            credits = 3,
-            day = "Wednesday",
-            startTime = new TimeSpan(11, 30, 0),
-            endTime = new TimeSpan(14, 30, 0),
-            room = "C7.202",
-            seatsLeft = 20
-
-            })
-            </div> *@
         </section>
     </div>
 
@@ -275,6 +278,7 @@
     </script>
 
     <script>
+
         let cart = [];
         //dont show any courses if empty
         document.addEventListener('DOMContentLoaded', () => {
@@ -315,21 +319,34 @@
                     alert('Please enter a search query.');
                     return;
                 }
-
-                // Fetch search results from the API
+                isLoading(true);
                 fetch(`/api/coursebase/search/${encodeURIComponent(query)}`)
                     .then(response => response.json())
                     .then(data => {
+                        isLoading(false);
                         updateSearchResults(data);
                     })
                     .catch(error => {
                         console.error('Error fetching search results:', error);
                         searchResultsContainer.innerHTML = '<p>Error fetching results</p>';
                     });
+
+
             });
         });
 
 
+        function isLoading(state) {
+            const searchInput = document.getElementById('course-search');
+            const loading = document.getElementById('loading');
+            if (state) {
+                loading.style.display = 'block';
+                searchInput.disabled = true;
+            } else {
+                loading.style.display = 'none';
+                searchInput.disabled = false;
+            }
+        }
 
 
         function updateSearchResults(courses) {
@@ -359,15 +376,29 @@
                     return;
                 }
                 cart.push(course); // Add full course object to cart
+                if (document.querySelector('input[name="isLiveData"]:checked')) {
+                    isLoading(true);
+                    fetch(`/api/coursebase/search/${encodeURIComponent(course.courseCode)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            isLoading(false);
+                            fetch('/api/cart/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(course)
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching search results:', error);
+                            searchResultsContainer.innerHTML = '<p>Error fetching results</p>';
+                        });
 
+
+                }
                 // Call backend to store in C# List
-                fetch('/api/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(course)
-                });
+
 
                 // Update the cart UI
                 updateCartUI(course);
@@ -392,7 +423,6 @@
             if (index > -1) {
                 cart.splice(index, 1); // Remove from cart array
 
-                // Call backend to remove from C# List
                 fetch('/api/cart/remove', {
                     method: 'POST',
                     headers: {
@@ -450,7 +480,6 @@
 
             // Capture additional form data (start time, end time, etc.)
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
-            const useLiveData = document.querySelector('#use-live-data').checked;
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
 
             // Construct the GenerateRequest object
@@ -460,12 +489,12 @@
                 daysEnd,
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
-                numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0, // Use slider value or 0
+                numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0,
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
                 isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
-                useLiveData: useLiveData,
-                selectedItems: cart, // Assuming 'cart' is available in the current scope
-                customSelectedItems: [] // Assuming this is handled elsewhere or defaulting to an empty array
+                useLiveData: false,
+                selectedItems: cart,
+                customSelectedItems: []
             };
 
             console.log(generateRequest);
@@ -720,5 +749,4 @@
         gap: 10px;
         width: 100%;
     }
-    
 </style>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Scheds.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,20 +39,27 @@ namespace Scheds.DAL.Repositories
             _context.CourseBase_Fall25.Add(courseBase);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateCourseBaseAsync(CourseBase courseBase)
+        public void UpdateCourseBaseAsync(CardItem course)
         {
-            var existingCourseBase = await _context.CourseBase_Fall25
-                .Where(c => c.CourseCode == courseBase.CourseCode)
-                .FirstOrDefaultAsync();
-            if (existingCourseBase == null)
-            {
-                await AddCourseBaseAsync(courseBase);
-            }
-            else
-            {
-                existingCourseBase.CourseName = courseBase.CourseName;
-                await _context.SaveChangesAsync();
-            }
+            var sqlConnectionString = "REMOVED";
+            using var sqlConnection = new SqlConnection(sqlConnectionString);
+            sqlConnection.Open();
+            var sqlCourseBase = @"
+MERGE courseBase_Fall25 AS target
+USING (SELECT @courseCode AS courseCode) AS source
+ON target.courseCode = source.courseCode
+WHEN MATCHED THEN
+    UPDATE SET 
+        courseName = @courseName
+WHEN NOT MATCHED THEN
+    INSERT (courseCode, courseName)
+    VALUES (@courseCode, @courseName);";
+
+            using var sqlCommandCourseBase = new SqlCommand(sqlCourseBase, sqlConnection);
+            sqlCommandCourseBase.Parameters.AddWithValue("@courseCode", course.CourseCode);
+            sqlCommandCourseBase.Parameters.AddWithValue("@courseName", course.CourseName);
+            Console.WriteLine( sqlCommandCourseBase.ExecuteNonQuery());
         }
+
     }
 }

@@ -8,7 +8,7 @@ namespace Scheds.DAL
         public SchedsDbContext(DbContextOptions<SchedsDbContext> options)
             : base(options)
         {
-            
+
         }
 
         public DbSet<CardItem> Sections_Fall25 { get; set; }
@@ -34,6 +34,19 @@ namespace Scheds.DAL
                 .OnDelete(DeleteBehavior.Cascade);  // Optional: Cascade delete behavior
 
             // Configure other entities if needed
+
+            base.OnModelCreating(modelBuilder);
+
+            foreach (var item in modelBuilder.Model.GetEntityTypes())
+            {
+                var p = item.FindPrimaryKey().Properties.FirstOrDefault(i => i.ValueGenerated != Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
+                if (p != null)
+                {
+                    p.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never;
+                }
+
+
+            }
         }
     }
 }
