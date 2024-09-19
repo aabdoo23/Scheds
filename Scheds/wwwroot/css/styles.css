@@ -361,7 +361,7 @@ body {
   align-items: center;
   border-radius: 20px;
   transition: 700ms;
-  background: #191919;
+  background: var(--light-blue);
 }
 
 .custom-subtitle {
