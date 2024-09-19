@@ -5,49 +5,50 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 </head>
-<div class="cardm">
-  <div class="card">
-    <div class="main">@Model.courseCode: @Model.courseName</div>
-    <div class="mainsub">
-      @Model.instructorName
+  <div class="cardm">
+    <div class="card">
+      <div class="main">@Model.courseCode: @Model.courseName</div>
+      <div class="mainsub">
+        @Model.instructorName
 
+      </div>
+    </div>
+
+    <div class="card2">
+      <div class="upper">
+        <div class="instructor">
+          Seats Left: @Model.seatsLeft
+
+        </div>
+
+        <div class="credits">
+          <div class="creditstext">Credits: @Model.credits CH</div>
+
+        </div>
+      </div>
+
+      <div class="lower">
+        <div class="schedule-text">
+          <i class="fa-regular fa-clock"></i>
+          <div class="scheduletext">@Model.day,<br> @Model.startTime.ToString(@"hh\:mm") -
+            @Model.endTime.ToString(@"hh\:mm")</div>
+        </div>
+        <div class="room">
+          <div class="roomtext">Room: @Model.room</div>
+        </div>
+
+        <div class="card3">
+          <p class="seatstext">
+            @Model.subType - @Model.section
+          </p>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="card2">
-    <div class="upper">
-      <div class="instructor">
-        Seats Left: @Model.seatsLeft
-
-      </div>
-
-      <div class="credits">
-        <div class="creditstext">Credits: @Model.credits CH</div>
-
-      </div>
-    </div>
-
-    <div class="lower">
-      <div class="schedule-text">
-        <i class="fa-regular fa-clock"></i>
-        <div class="scheduletext">@Model.day,<br> @Model.startTime.ToString(@"hh\:mm") -
-          @Model.endTime.ToString(@"hh\:mm")</div>
-      </div>
-      <div class="room">
-        <div class="roomtext">Room: @Model.room</div>
-      </div>
-
-      <div class="card3">
-        <p class="seatstext">
-          @Model.subType - @Model.section
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
   .cardm {
+    grid-row: span 2;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,13 +58,13 @@
 
   .card {
     position: relative;
-    width: 149px;
+    width: 148px;
     height: 80px;
     border-radius: 15px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    background: whitesmoke;
-    color: black;
+    background: var(--light-text);
+    color: var(--dark);
     z-index: 2;
     transition: .4s ease-in-out;
   @*border:1pxsolidrgb(0,24,37);*@
@@ -103,36 +104,58 @@
     margin-left: -151px;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    background: white;
+    background: var(--light-text);
     z-index: 1;
     transition: .4s ease-in-out;
-    border: 1px solid rgb(0, 24, 37);
+    border: 1px solid var(--lighter-dark);
 
+  }
+
+  .cardm:hover .card2 {
+    height: 190px;
+    cursor: cell;
+    margin-top: 20px;
+
+  }
+
+  .cardm:hover .lower {
+    top: 10.2em;
   }
 
   .card:hover {
-    background-color: rgb(193, 210, 218);
-    cursor: pointer;
+  @*background-color:rgb(193,210,218);*@cursor: cell;
   }
 
-  .card:hover+.card2 {
-    @* background-color: rgb(193, 210, 218); *@
-    height: 190px;
+  .card:hover .card2 {
+  @*background-color:rgb(193,210,218);*@height: 190px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
     margin-top: 20px;
 
   }
 
-  .card:hover+.card2 .lower {
+  .card:hover+.card2+.lower {
     top: 10.2em;
   }
+
+  .card2:hover {
+  @*background-color:rgb(193,210,218);*@height: 190px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    margin-top: 20px;
+
+  }
+
+  .card2:hover .lower {
+    top: 10.2em;
+  }
+
 
   .upper {
     display: flex;
     flex-direction: column;
     position: relative;
-    color: black;
+    color: var(--dark);
     left: 1.0em;
     top: 0.5em;
     gap: .2em;
@@ -160,7 +183,7 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-  @*text-align:center;*@color: black;
+  @*text-align:center;*@color: var(--dark);
     left: 1em;
     top: 1em;
     gap: 0.5em;
@@ -190,14 +213,14 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    width: 150px;
+    width: 151px;
     height: 30px;
     top: 4.4em;
-    left: -12px;
+    left: -12.5px;
     font-size: 1.24em;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
-    background: rgb(0, 80, 120);
+    background: var(--light-blue);
     transition: .4s ease-in-out;
     border: 1px solid rgb(0, 24, 37);
 
@@ -205,7 +228,7 @@
 
   .seatstext {
     font-size: 1em;
-    color: white;
+    color: var(--light-text);
     font-weight: 600;
   }
 </style>

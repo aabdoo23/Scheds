@@ -20,6 +20,32 @@
         <div class="logo">
             <a href="/"><img src="~/images/logo.png" alt="Scheds Logo" class="logo-img"></a>
         </div>
+        <div class="btn-container">
+            <svg viewBox="0 0 16 16" class="bi bi-moon-stars-fill" fill="currentColor" width="23"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
+                    color="orange"></path>
+                <path
+                    d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"
+                    color="white"></path>
+            </svg>
+            <label class="switch btn-color-mode-switch" style="font-size: 13px;
+  color: #828282;
+  font-weight: 700;">
+                <input value="1" id="color_mode" name="color_mode" type="checkbox">
+                <label class="btn-color-mode-switch-inner" style="font-size: 13px;
+  color: orange;
+  font-weight: 700;" data-off="Dark" data-on="Light" for="color_mode"></label>
+            </label>
+            
+            <svg viewBox="0 0 16 16" class="bi bi-sun-fill" fill="currentColor" width="23"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
+                    color="orange"></path>
+            </svg>
+        </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/GenerateSchedules">Generate Schedules</a></li>
@@ -34,12 +60,14 @@
             <div class="search-section">
                 <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px;">
                     <h1>Search for Courses</h1>
-                    <label style="margin-top: 5px; font-weight: 600;"><input type="checkbox" name="isLiveData" checked>
-                        Use Live Data in course selection.</label>
+                    <label style="margin-top: 5px; font-weight: 600; color:var(--dark-text)"><input type="checkbox"
+                            name="isLiveData" checked>
+                        Use Live Data in course selection</label>
                     <div class="tooltip" style="margin-top: 5px;">
                         <div class="icon">i</div>
                         <div class="tooltiptext">Fetches data for each course on selection from Self Service to
-                            <strong>ensure data is updated and all sections are there.</strong> Small delay.</div>
+                            <strong>ensure data is updated and all sections are there.</strong> Small delay.
+                        </div>
                     </div>
                 </div>
                 <div class="search-bar" style="margin-right: 20px;">
@@ -72,7 +100,8 @@
                 </div>
             </div>
             <div id="cart">
-                <h2>Your Courses</h2>
+                <h2 style="color:var(--light-text)">Your Courses</h2>
+
                 <ul id="cart-items"></ul>
             </div>
         </section>
@@ -82,14 +111,7 @@
         <section class="customization">
             <div class="top-section">
                 <h2 class="top-section-text">Customize Your Schedule</h2>
-                @* <label style="font-weight: 600;"><input type="checkbox" id="use-live-data" name="useLiveData"
-                value="true" />Use Live Data (Beta)</label>
-                <div class="tooltip"> *@
-                @* <div class="icon">i</div>
-                <div class="tooltiptext">This will get the data directly from the power campus, however it might be
-                slower. Only use it if there is a change in the instructor or you want to check the seats from
-                here.</div>
-                </div> *@
+
             </div>
 
             <div class="customization-layout">
@@ -218,7 +240,24 @@
                 </div>
             </div>
             <div id=schedule-container class="schedule-container">
+                @* @{
+                ReturnedCardItem sample=new ReturnedCardItem();
+                sample.courseCode="CSEN 401";
+                sample.courseName="Software Engineering";
+                sample.instructorName="Dr. Ahmed";
+                sample.seatsLeft=20;
+                sample.credits=3;
+                sample.day="Saturday";
+                sample.startTime=TimeSpan.Parse("08:30");
+                sample.endTime=TimeSpan.Parse("10:30");
+                sample.room="C7.202";
+                sample.subType="Tutorial";
+                sample.section="02A";
+
+                }
+                @await Component.InvokeAsync("OneHourCardItemViewComponent", sample) *@
             </div>
+
         </section>
     </div>
 
@@ -549,10 +588,11 @@
     .top-section-text {
         display: flex;
         margin-bottom: 20px;
+        color: var(--light-text);
     }
 
     .search-section {
-        background-color: #f9f9f9;
+        background-color: var(--lighter-dark);
         height: 400px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -560,6 +600,7 @@
         width: 60%;
         margin-right: 20px;
         padding: 20px;
+        color: var(--light-text);
     }
 
     .search-section h1,
@@ -572,7 +613,7 @@
     }
 
     .search-results {
-        background-color: #f9f9f9;
+        background-color: var(--lighter-dark);
         max-height: 280px;
         overflow-y: auto;
         padding: 10px;
@@ -580,14 +621,12 @@
     }
 
     .search-result-item {
-        background-color: #b8b6b6;
-        /* Blue background for individual result div */
+        background-color: var(--dark-text);
         color: white;
         padding: 15px;
         margin-bottom: 10px;
         border-radius: 5px;
         width: 100%;
-        cursor: pointer;
         /* Full width */
         box-sizing: border-box;
         font-size: 1.1rem;
@@ -599,7 +638,7 @@
     }
 
     .search-result-item:hover {
-        background-color: #ff7300;
+        background-color: var(--dark-blue);
     }
 
     .search-results::-webkit-scrollbar {
@@ -607,14 +646,14 @@
     }
 
     .search-results::-webkit-scrollbar-thumb {
-        background-color: #ff6347;
+        background-color: var(--dark-text);
         /* Custom scrollbar color */
         border-radius: 10px;
     }
 
     /* Cart Section with the same style as search results */
     #cart {
-        background-color: #f9f9f9;
+        background-color: var(--lighter-dark);
         /* Match the background with search-section */
         max-height: 400px;
         /* Limit height similar to search results */
@@ -627,7 +666,7 @@
 
     /* Cart item with the same look and feel as search result items */
     .cart-item {
-        background-color: #ff7300;
+        background-color: var(--light-blue);
         /* Match the search result item color */
         color: white;
         padding: 15px;
@@ -651,7 +690,7 @@
     }
 
     #cart::-webkit-scrollbar-thumb {
-        background-color: #ff6347;
+        background-color: var(--dark-text);
         /* Match the scrollbar thumb with search result color */
         border-radius: 10px;
 
@@ -659,16 +698,17 @@
 
     #cart-items {
         padding: 0;
+        list-style-type: none;
     }
 
     /* Hover effect for cart items */
     .cart-item:hover {
-        background-color: #ff5100;
+        background-color: var(--dark-blue);
     }
 
 
     #all-schedules {
-        background-color: #f9f9f9;
+        background-color: var(--lighter-dark);
         /* Match the background with search-section */
         overflow-y: auto;
         padding: 20px;
@@ -701,35 +741,25 @@
     .tooltiptext {
         visibility: hidden;
         width: 200px;
-        background-color: #333;
-        color: #fff;
+        background-color: var(--lighter);
+        color: var(--light-text);
         text-align: center;
         border-radius: 5px;
         padding: 10px;
         position: absolute;
         z-index: 1;
+        font-weight: 500;
     @*top:80%;*@@*left:200%;*@margin-left: 50px;
         opacity: 0;
         transition: opacity 0.3s;
-    }
-
-    .tooltiptext::after {
-        content: "";
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        margin-left: -10px;
-        border-width: 10px;
-        border-style: solid;
-        border-color: transparent transparent #333 transparent;
     }
 
     .tooltip .icon {
         display: inline-block;
         width: 20px;
         height: 20px;
-        background-color: #ff5100;
-        color: #fff;
+        background-color: var(--dark-text);
+        color: var(--light-text);
         border-radius: 50%;
         text-align: center;
         line-height: 20px;
@@ -750,3 +780,27 @@
         width: 100%;
     }
 </style>
+
+<script>
+
+    const rootElement = document.documentElement;
+    const colorModeCheckbox = document.getElementById('color_mode');
+
+    // Check if user has a mode preference saved in localStorage
+    const currentMode = localStorage.getItem('theme');
+    if (currentMode === 'light') {
+        rootElement.classList.add('light-mode');
+        colorModeCheckbox.checked = true;  // Ensure the checkbox reflects the current mode
+    }
+
+    // Event listener for the checkbox to toggle dark/light mode
+    colorModeCheckbox.addEventListener('change', () => {
+        if (colorModeCheckbox.checked) {
+            rootElement.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        } else {
+            rootElement.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>
