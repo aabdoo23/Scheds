@@ -17,12 +17,21 @@
         @{
             // Define the time slots and corresponding hours
             var timeSlots = new[] {
-        "8:30 AM - 10:29 AM", "10:30 AM - 12:29 PM",
-        "12:30 PM - 2:29 PM", "2:30 PM - 4:29 PM",
-        "4:30 PM - 6:29 PM", "6:30 PM - 8:29 PM"
+        "8:30 AM - 9:29 AM",
+        "9:30 AM - 10:29 AM",
+        "10:30 AM - 11:29 AM",
+        "11:30 AM - 12:29 PM",
+        "12:30 PM - 1:29 PM",
+        "1:30 PM - 2:29 PM",
+        "2:30 PM - 3:29 PM",
+        "3:30 PM - 4:29 PM",
+        "4:30 PM - 5:29 PM",
+        "5:30 PM - 6:29 PM",
+        "6:30 PM - 7:29 PM",
+        "7:30 PM - 8:29 PM"
         };
 
-            var hoursMapping = new[] { 8, 10, 12, 14, 16, 18 };
+            var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 
             if (Model == null || Model.Count == 0)
             {
@@ -30,7 +39,6 @@
                     <td colspan="7">No data available</td>
                 </tr>
             }
-
             else
             {
                 // Loop through each time slot
@@ -39,22 +47,35 @@
                     <tr>
                         <!-- Time slot column -->
                         <td class="timeslot">@timeSlots[i]</td>
-                        
+
                         <!-- Loop through the 6 days of the week (Saturday to Thursday) -->
                         @for (int j = 0; j < 6; j++)
                         {
-                            <td>
-                                @if (Model.Count > j && Model[j] != null)
-                                {
-                                    var cardItem = Model[j]
-                                        .FirstOrDefault(item => item?.startTime != null && (hoursMapping[i]==item.startTime.Hours||hoursMapping[i]==item.startTime.Hours-1) );
+                            @if (Model.Count > j && Model[j] != null)
+                            {
+                                var cardItem = Model[j]
+                                .FirstOrDefault(item => item?.startTime != null &&
+                                hoursMapping[i] == item.startTime.Hours);
 
-                                    if (cardItem != null)
-                                    {
-                                        @await Component.InvokeAsync("CardItemViewComponent", cardItem)
-                                    }
+                                if (cardItem != null)
+                                {
+                                    var duration = cardItem.endTime - cardItem.startTime;
+                                    var rowspan = (duration.TotalMinutes+1)/60;
+                                    <td rowspan="@rowspan">
+
+                                        @if (duration.TotalMinutes == 59)
+                                        {
+                                            @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
+                                        }
+                                        else
+                                        {
+                                            @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+                                        }
+                                    </td>
+
                                 }
-                            </td>
+                            }
+
                         }
                     </tr>
                 }
@@ -66,62 +87,70 @@
 <style>
     /* Table styles */
     table {
-        padding-bottom: 10px;
+        padding-bottom: 0px;
         margin-left: 45px;
         margin-top: 20px;
         width: 180vh;
         height: 300px;
-        border-collapse: separate; /* Allows for border-radius */
-        border-spacing: 0; /* Removes gaps between cells */
-        border-radius: 10px; /* Applies rounded corners */
-        overflow: hidden; /* Hides overflow on corners */
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Adds shadow for aesthetic */
-        
+        border-collapse: separate;
+        /* Allows for border-radius */
+        border-spacing: 0;
+        /* Removes gaps between cells */
+        border-radius: 10px;
+        /* Applies rounded corners */
+        overflow: hidden;
+        /* Hides overflow on corners */
+        box-shadow: rgba(255, 255, 255, 0.2) 0px 2px 8px 0px;
     }
 
-    th, td {
-        padding: 12px;
-        @* text-align: center; /* Centers text horizontally */ *@
-        @* vertical-align: middle; /* Centers text vertically */ *@
-        border: 1px solid #ddd; /* Sets border for all cells */
-        font-size: 1em; /* Text size */
-        
-        
+    thead tr th:first-child,
+    tbody tr td:first-child {
+        width: 10em;
+        min-width: 10em;
+        max-width: 10em;
+        word-break: break-all;
+    }
 
+    td {
+        padding: 12px;
+        height: 35px;
+        border: none;
     }
 
     th {
-        background-color: rgb(0, 34, 52); /* Header background color */
-        color: white; /* Header text color */
+        padding: 12px;
+        background-color: var(--light-blue);
+        /* Header background color */
+        color: white;
+        /* Header text color */
+        border: 1px solid var(--dark-blue);
+        /* Header border color */
         font-weight: bold;
     }
-    td{
-        height:70px;
-    }
+
     .timeslot {
-        background-color: rgb(0, 62, 94); /* Slot background color */
-        color: white;
+        background-color: var(--lighter);
+        /* Slot background color */
+        color: var(--light-text);
         font-weight: 550;
         font-size: 1em;
         text-align: center;
-        max-width:70px;
+        max-width: 70px;
+        border: none;
+        border-bottom: 1px solid var(--dark);
 
     }
 
     /* Optional: Highlight even rows (striped table effect) */
     tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: var(--dark);
     }
 
     /* Applies rounded corners to outer borders */
     table {
-        border: 2px solid #463161f6; /* Outer border color */
-        border-radius: 10px; /* Rounded borders for the table */
-    }
-
-    /* Removes border around individual cells */
-    td, th {
-        border: none; /* No internal borders */
-
+        border: 2px transparent var(--dark-blue);
+        /* Outer border color */
+        border-radius: 10px;
+        /* Rounded borders for the table */
     }
 </style>
