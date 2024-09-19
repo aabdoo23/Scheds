@@ -30,7 +30,7 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-height: 950px;
+        max-height: 800px;
     }
 
     .scroll-container {
@@ -42,8 +42,17 @@
     @*max-height:300px;*@overflow-y: auto;
         /* Vertical scroll bar */
         scroll-behavior: smooth;
-    @*hidescrollbar*@scrollbar-width: none;
+    @* hidescrollbarscrollbar-width: none; *@
 
+    }
+    .scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+        background-color: var(--dark-text);
+        /* Custom scrollbar color */
+        border-radius: 10px;
     }
 
     .schedule {

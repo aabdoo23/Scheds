@@ -1,5 +1,5 @@
 @using Scheds.Models
-@model List<ReturnedCardItem> 
+@model List<ReturnedCardItem>
 
 <table border="1">
     <thead>
@@ -16,19 +16,19 @@
     <tbody>
         @{
             var timeSlots = new[] {
-                "8:30 AM - 9:29 AM",
-                "9:30 AM - 10:29 AM",
-                "10:30 AM - 11:29 AM",
-                "11:30 AM - 12:29 PM",
-                "12:30 PM - 1:29 PM",
-                "1:30 PM - 2:29 PM",
-                "2:30 PM - 3:29 PM",
-                "3:30 PM - 4:29 PM",
-                "4:30 PM - 5:29 PM",
-                "5:30 PM - 6:29 PM",
-                "6:30 PM - 7:29 PM",
-                "7:30 PM - 8:29 PM"
-            };
+        "8:30 AM - 9:29 AM",
+        "9:30 AM - 10:29 AM",
+        "10:30 AM - 11:29 AM",
+        "11:30 AM - 12:29 PM",
+        "12:30 PM - 1:29 PM",
+        "1:30 PM - 2:29 PM",
+        "2:30 PM - 3:29 PM",
+        "3:30 PM - 4:29 PM",
+        "4:30 PM - 5:29 PM",
+        "5:30 PM - 6:29 PM",
+        "6:30 PM - 7:29 PM",
+        "7:30 PM - 8:29 PM"
+        };
 
             var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 
@@ -42,6 +42,8 @@
             }
             else
             {
+                var skipSlots = new int[6]; // Track how many columns to skip per day
+
                 for (int i = 0; i < timeSlots.Length; i++)
                 {
                     <tr>
@@ -49,28 +51,39 @@
 
                         @for (int dayIndex = 0; dayIndex < 6; dayIndex++)
                         {
-                            var currentDay = daysOfWeek[dayIndex];
+                            if (skipSlots[dayIndex] > 0)
+                            {
+                                // If there's a rowspan still active, decrease the counter and skip rendering
+                                skipSlots[dayIndex]--;
+                                continue;
+                            }
 
-                            var cardItem = Model
-                                .FirstOrDefault(item => item?.startTime != null &&
-                                                        item.startTime.Hours == hoursMapping[i] &&
-                                                        item.day.ToLower() == currentDay.ToLower());
+                            var currentDay = daysOfWeek[dayIndex];
+                            var cardItem = Model.FirstOrDefault(item => item?.startTime != null &&
+                            item.startTime.Hours == hoursMapping[i] &&
+                            item.day.ToLower() == currentDay.ToLower());
 
                             if (cardItem != null)
                             {
                                 var duration = cardItem.endTime - cardItem.startTime;
                                 var rowspan = (duration.TotalMinutes + 1) / 60;
-
                                 <td rowspan="@rowspan">
-                                    @if (duration.TotalMinutes == 59)
-                                    {
-                                        @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
-                                    }
-                                    else
-                                    {
-                                        @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+                                    @{
+                                        if (duration.TotalMinutes == 59)
+                                        {
+                                            @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
+
+                                        }
+                                        else
+                                        {
+                                            @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+
+                                        }
                                     }
                                 </td>
+
+                                // Set the number of slots to skip for this day based on rowspan
+                                skipSlots[dayIndex] = (int)(rowspan - 1);
                             }
                             else
                             {
@@ -85,13 +98,14 @@
 </table>
 
 
+
 <style>
     /* Table styles */
     table {
         padding-bottom: 0px;
         margin-left: 45px;
         margin-top: 20px;
-        width: 180vh;
+        min-width: 180vh;
         height: 300px;
         border-collapse: separate;
         /* Allows for border-radius */
@@ -106,14 +120,13 @@
 
     thead tr th:first-child,
     tbody tr td:first-child {
-        width: 10em;
-        min-width: 10em;
-        max-width: 10em;
-        word-break: break-all;
+        width: 9.5em;
+        min-width: 9.5em;
+    @*max-width:10em;*@word-break: break-all;
     }
 
     td {
-        padding: 12px;
+        padding: 5px;
         height: 35px;
         border: none;
     }
@@ -143,9 +156,7 @@
     }
 
     /* Optional: Highlight even rows (striped table effect) */
-    @* tr:nth-child(even) {
-        background-color: var(--dark);
-    } *@
+    @*tr:nth-child(even){background-color:var(--dark);}*@
 
     /* Applies rounded corners to outer borders */
     table {
