@@ -239,5 +239,28 @@
     </div>
 
     <script src="~/js/find-study-rooms.js"></script>
+    <script>
+
+    const rootElement = document.documentElement;
+    const colorModeCheckbox = document.getElementById('color_mode');
+
+    // Check if user has a mode preference saved in localStorage
+    const currentMode = localStorage.getItem('theme');
+    if (currentMode === 'light') {
+        rootElement.classList.add('light-mode');
+        colorModeCheckbox.checked = true;  // Ensure the checkbox reflects the current mode
+    }
+
+    // Event listener for the checkbox to toggle dark/light mode
+    colorModeCheckbox.addEventListener('change', () => {
+        if (colorModeCheckbox.checked) {
+            rootElement.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        } else {
+            rootElement.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>
 </body>
 </html>
