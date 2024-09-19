@@ -44,8 +44,8 @@
 .btn-color-mode-switch > label.btn-color-mode-switch-inner {
   margin: 0px;
   width: 140px;
-  height: 30px;
-  background: #000000;
+  height: 40px;
+  background: var(--lighter);
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -57,17 +57,20 @@
 .btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
   content: attr(data-on);
   position: absolute;
-  font-size: 12px;
-  font-weight: 500;
-  top: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--light-text);
+
+  top: 13px;
   right: 20px;
 }
 
 .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
   content: attr(data-off);
   width: 70px;
-  height: 16px;
-  background: #4f4f4f;
+  height: 24px;
+  font-size: 16px;
+  background: var(--lightest-dark);
   border-radius: 8px;
   position: absolute;
   left: 2px;
@@ -75,7 +78,11 @@
   text-align: center;
   transition: all 0.3s ease;
   box-shadow: 0px 0px 6px -2px #111;
-  padding: 5px 0px;
+  padding-top: 8px ;
+  padding-bottom: 2px;
+  margin-top: 1px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .btn-color-mode-switch > .alert {
@@ -83,6 +90,7 @@
   background: #FF9800;
   border: none;
   color: #fff;
+
 }
 
 .btn-color-mode-switch input[type="checkbox"] {
@@ -94,27 +102,32 @@
   top: 0;
   z-index: 1;
   margin: 0px;
+  
 }
 
 .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
   background: #e3e3e3;
   color: #fff;
+  
 }
 
 .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
   content: attr(data-on);
   left: 68px;
   background: #3c3c3c;
+  
 }
 
 .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
   content: attr(data-off);
   right: auto;
   left: 20px;
+  
 }
 
 .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert {
   display: block;
+  
 }
 
 .dark-preview {
@@ -222,7 +235,7 @@ body {
 .hero {
   height: 100vh;
   background-color: var(--dark);
-  background: url('../images/new-bg.png') no-repeat center center/cover;
+  background: url('../images/new-bg-final.png') no-repeat center center/cover;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -302,11 +315,12 @@ body {
   text-align: center;
   text-decoration: none;
   width: 100%;
-  padding: 18px 25px;
+  padding: 15px 20px;
   color: #fff;
-  font-size: 1.125em;
+  font-size: 1.7em;
   font-weight: 700;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.1em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   z-index: 20;
   transition: all 0.3s ease-in-out;
 }
@@ -806,7 +820,7 @@ body {
   height: 70px;
   background-color: var(--lighter);
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.081);
   color: var(--light-text);
   display: flex;
   justify-content: center;
@@ -981,7 +995,7 @@ input:hover {
 .generated-schedules {
   padding: 20px;
   background-color: var(--lighter-dark);
-  height: 145vh;
+  height: 850px;
   border-radius: 10px;
   color: var(--light-text);
   box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);

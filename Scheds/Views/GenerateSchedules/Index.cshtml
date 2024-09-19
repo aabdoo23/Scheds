@@ -15,7 +15,6 @@
 </head>
 
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">
             <a href="/"><img src="~/images/logo-new.png" alt="Scheds Logo" class="logo-img"></a>
@@ -47,19 +46,18 @@
                         color="orange"></path>
                 </svg>
             </div>
-            <div class="tooltip" style="margin-bottom: 20px;">
-                <div class="icon">i</div>
-                <div class="tooltiptext">Light view might be a bit unclear, stick to the dark.</div>
-            </div>
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/GenerateSchedules">Generate Schedules</a></li>
             <li><a href="/FindStudyRooms">Find Study Rooms</a></li>
-            <li><a href="https://forms.gle/2qJ84eaXxJh3r5TD8">Support Form</a></li>
+            <li><a href="https://forms.gle/2qJ84eaXxJh3r5TD8" target="_blank">Support Form</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61566138420193&mibextid=LQQJ4d"
+                    target="_blank">Facebook</a></li>
 
         </ul>
     </nav>
+
 
     <!-- Generate Schedules Page -->
     <div class="Container">
@@ -119,52 +117,45 @@
         <section class="customization">
             <div class="top-section">
                 <h2 class="top-section-text">Customize Your Schedule</h2>
-
             </div>
 
             <div class="customization-layout">
-                <form class="generate-form" id="generate-form">
-
-                    <!-- Sliders Section -->
-                    <div class="sliders">
-                        <div class="box">
-                            <label class="slider-label">Minimum Slots per Day</label>
-                            <div class="inner-box">
-                                <div class="line"></div>
-                                <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0"
-                                    max="4" value="0" />
-                            </div>
-                            <p class="number">0</p>
+                <!-- Sliders Section -->
+                <div class="sliders">
+                    <div class="box">
+                        <label class="slider-label">Minimum Slots per Day</label>
+                        <div class="inner-box">
+                            <div class="line"></div>
+                            <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0" max="4"
+                                value="0" />
                         </div>
-
-                        <div class="box">
-                            <label class="slider-label">Maximum Gap Period (hours)</label>
-                            <div class="inner-box">
-                                <div class="line"></div>
-                                <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
-                                    value="4" />
-                            </div>
-                            <p class="number">4</p>
-                        </div>
-
-                        <div class="box">
-                            <label class="slider-label">Maximum Number of Schedules</label>
-                            <div class="inner-box">
-                                <div class="line"></div>
-                                <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
-                                    max="30" value="20" />
-                            </div>
-                            <p class="number">20</p>
-                        </div>
+                        <p class="number">0</p>
                     </div>
-                    <div class="pp">
+
+                    <div class="box">
+                        <label class="slider-label">Maximum Gap Period (hours)</label>
+                        <div class="inner-box">
+                            <div class="line"></div>
+                            <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
+                                value="4" />
+                        </div>
+                        <p class="number">4</p>
                     </div>
-                    <button id="generate-schedule" class="btn-primary" style="width: 100%; background-color:var(--light-blue)" type="submit">
-                        Generate Schedules</button>
-                </form>
+
+                    <div class="box">
+                        <label class="slider-label">Maximum Number of Schedules</label>
+                        <div class="inner-box">
+                            <div class="line"></div>
+                            <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
+                                max="30" value="20" />
+                        </div>
+                        <p class="number">20</p>
+                    </div>
+                </div>
+
                 <div class="right-section">
                     <!-- Checkboxes Section -->
-                    <div class="checkboxes right-section-header">
+                    <div class="checkboxes right-section-header" style="margin-top: 10px;">
                         <div class="customization-method" style="font-weight: 700;">
                             <h3>Pick your day customization method</h3>
                             <label>
@@ -178,7 +169,7 @@
 
                         <!-- Sliders Section -->
                         <div class="sliders" id="slider-section">
-                            <div class="box">
+                            <div class="box" style="margin: 0;">
                                 <label class="slider-label">Maximum Days on Campus</label>
                                 <div class="inner-box">
                                     <div class="line"></div>
@@ -190,8 +181,8 @@
                         </div>
 
                         <!-- Checkboxes Section -->
-                        <div class="checkboxes" id="checkbox-section" style="display: none; width: 90%;">
-                            <!-- Hidden by default -->
+                        <div class="checkboxes" id="checkbox-section"
+                            style="display: none; width: 90%; margin: 0; box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);">
                             <div class="checkbox-group">
                                 <h3>Select Days on Campus</h3>
                                 <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
@@ -206,9 +197,7 @@
                         </div>
                     </div>
 
-
-
-                    <div class="checkboxes">
+                    <div class="checkboxes" style="margin-top: 0;">
                         <div class="checkbox-group">
                             <h3>Select First Slot Start Time</h3>
                             <label><input type="radio" name="daysStart" value="08:30" checked> 8:30 AM</label>
@@ -216,10 +205,8 @@
                             <label><input type="radio" name="daysStart" value="12:30"> 12:30 PM</label>
                             <label><input type="radio" name="daysStart" value="14:30"> 2:30 PM</label>
                             <label><input type="radio" name="daysStart" value="16:30"> 4:30 PM</label>
-
                         </div>
 
-                        <!-- Third Checkbox Group -->
                         <div class="checkbox-group">
                             <h3>Select Last Slot End Time</h3>
                             <label><input type="radio" name="daysEnd" value="12:30"> 12:30 PM</label>
@@ -227,14 +214,17 @@
                             <label><input type="radio" name="daysEnd" value="16:30"> 4:30 PM</label>
                             <label><input type="radio" name="daysEnd" value="18:30"> 6:30 PM</label>
                             <label><input type="radio" name="daysEnd" value="20:30" checked> 8:30 PM</label>
-
                         </div>
                     </div>
                 </div>
+
             </div>
-
-
+            <button id="generate-schedule" class="btn-primary"
+                    style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
+                    Generate Schedules
+                </button>
         </section>
+
 
 
         <!-- Generated Schedules Section -->
@@ -248,22 +238,6 @@
                 </div>
             </div>
             <div id=schedule-container class="schedule-container">
-                @* @{
-                ReturnedCardItem sample=new ReturnedCardItem();
-                sample.courseCode="CSEN 401";
-                sample.courseName="Software Engineering";
-                sample.instructorName="Dr. Ahmed";
-                sample.seatsLeft=20;
-                sample.credits=3;
-                sample.day="Saturday";
-                sample.startTime=TimeSpan.Parse("08:30");
-                sample.endTime=TimeSpan.Parse("10:30");
-                sample.room="C7.202";
-                sample.subType="Tutorial";
-                sample.section="02A";
-
-                }
-                @await Component.InvokeAsync("OneHourCardItemViewComponent", sample) *@
             </div>
 
         </section>
@@ -483,16 +457,14 @@
             }
         }
 
-        document.getElementById('generate-form').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent form submission
+        document.getElementById('generate-schedule').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default button behavior
 
-            // Capture form data inside the form
-            const form = event.target;
-            const minimumNumberOfItemsPerDay = form.minimumNumberOfItemsPerDay.value;
-            const largestAllowedGap = form.largestAllowedGap.value;
-            const maxNumberOfGeneratedSchedules = form.maxNumberOfGeneratedSchedules.value;
+            // Capture input values using their selectors
+            const minimumNumberOfItemsPerDay = document.querySelector('input[name="minimumNumberOfItemsPerDay"]').value;
+            const largestAllowedGap = document.querySelector('input[name="largestAllowedGap"]').value;
+            const maxNumberOfGeneratedSchedules = document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value;
             const sliderElement = document.querySelector('input[name="numberOfDays"]'); // Explicitly select the slider input
-
 
             // Define the days of the week in order (starting with Saturday)
             const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
@@ -505,7 +477,6 @@
             if (isNumberOfDaysSelected) {
                 // Max number of days selected, use the slider value
                 const numberOfDays = sliderElement ? sliderElement.value : 0; // Use the slider value or 0
-                // Example of additional logic for number of days, if required:
                 selectedDaysArray = Array(parseInt(numberOfDays)).fill(true).concat(Array(6 - numberOfDays).fill(false));
             } else {
                 // Specific days selected, use the checkboxes
@@ -515,7 +486,6 @@
                     // If "All Week" is selected, set all days to true
                     selectedDaysArray.fill(true);
                 } else {
-                    // Set the respective index to true for each selected day
                     selectedDaysCheckboxes.forEach(day => {
                         const dayIndex = daysOfWeek.indexOf(day); // Find the index of the selected day
                         if (dayIndex !== -1) {
@@ -534,17 +504,19 @@
                 selectedDays: selectedDaysArray, // Boolean array for selected days
                 daysStart,
                 daysEnd,
+                selectedItems: cart,
+                customSelectedItems: [],
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
                 numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0,
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
                 isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
-                useLiveData: false,
-                selectedItems: cart,
-                customSelectedItems: []
+                selectedDaysCheckbox: !isNumberOfDaysSelected ? selectedDaysArray : [] // If specific days are chosen
             };
 
-            console.log(generateRequest);
+        @* console.log('Generate Request:', generateRequest); *@
+
+                console.log(generateRequest);
 
             // URL for the fetch call
             const url = '/api/generate';
@@ -593,9 +565,10 @@
 </html>
 
 <style>
-    .pp{
+    .pp {
         padding: 30px;
     }
+
     .top-section-text {
         display: flex;
         margin-bottom: 20px;
@@ -638,6 +611,7 @@
         margin-bottom: 10px;
         border-radius: 5px;
         width: 100%;
+        cursor: pointer;
         /* Full width */
         box-sizing: border-box;
         font-size: 1.1rem;
@@ -732,6 +706,7 @@
         flex-direction: column;
         width: 100%;
         margin-right: 20px;
+        margin-left: 10px;
         padding: 10px;
     @*gap:10px;*@
     }
