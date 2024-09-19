@@ -1,5 +1,5 @@
 @using Scheds.Models
-@model List<List<ReturnedCardItem>>
+@model List<ReturnedCardItem> 
 
 <table border="1">
     <thead>
@@ -15,23 +15,24 @@
     </thead>
     <tbody>
         @{
-            // Define the time slots and corresponding hours
             var timeSlots = new[] {
-        "8:30 AM - 9:29 AM",
-        "9:30 AM - 10:29 AM",
-        "10:30 AM - 11:29 AM",
-        "11:30 AM - 12:29 PM",
-        "12:30 PM - 1:29 PM",
-        "1:30 PM - 2:29 PM",
-        "2:30 PM - 3:29 PM",
-        "3:30 PM - 4:29 PM",
-        "4:30 PM - 5:29 PM",
-        "5:30 PM - 6:29 PM",
-        "6:30 PM - 7:29 PM",
-        "7:30 PM - 8:29 PM"
-        };
+                "8:30 AM - 9:29 AM",
+                "9:30 AM - 10:29 AM",
+                "10:30 AM - 11:29 AM",
+                "11:30 AM - 12:29 PM",
+                "12:30 PM - 1:29 PM",
+                "1:30 PM - 2:29 PM",
+                "2:30 PM - 3:29 PM",
+                "3:30 PM - 4:29 PM",
+                "4:30 PM - 5:29 PM",
+                "5:30 PM - 6:29 PM",
+                "6:30 PM - 7:29 PM",
+                "7:30 PM - 8:29 PM"
+            };
 
             var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+
+            var daysOfWeek = new[] { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" };
 
             if (Model == null || Model.Count == 0)
             {
@@ -41,41 +42,40 @@
             }
             else
             {
-                // Loop through each time slot
                 for (int i = 0; i < timeSlots.Length; i++)
                 {
                     <tr>
-                        <!-- Time slot column -->
                         <td class="timeslot">@timeSlots[i]</td>
 
-                        <!-- Loop through the 6 days of the week (Saturday to Thursday) -->
-                        @for (int j = 0; j < 6; j++)
+                        @for (int dayIndex = 0; dayIndex < 6; dayIndex++)
                         {
-                            @if (Model.Count > j && Model[j] != null)
-                            {
-                                var cardItem = Model[j]
+                            var currentDay = daysOfWeek[dayIndex];
+
+                            var cardItem = Model
                                 .FirstOrDefault(item => item?.startTime != null &&
-                                hoursMapping[i] == item.startTime.Hours);
+                                                        item.startTime.Hours == hoursMapping[i] &&
+                                                        item.day.ToLower() == currentDay.ToLower());
 
-                                if (cardItem != null)
-                                {
-                                    var duration = cardItem.endTime - cardItem.startTime;
-                                    var rowspan = (duration.TotalMinutes+1)/60;
-                                    <td rowspan="@rowspan">
+                            if (cardItem != null)
+                            {
+                                var duration = cardItem.endTime - cardItem.startTime;
+                                var rowspan = (duration.TotalMinutes + 1) / 60;
 
-                                        @if (duration.TotalMinutes == 59)
-                                        {
-                                            @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
-                                        }
-                                        else
-                                        {
-                                            @await Component.InvokeAsync("CardItemViewComponent", cardItem)
-                                        }
-                                    </td>
-
-                                }
+                                <td rowspan="@rowspan">
+                                    @if (duration.TotalMinutes == 59)
+                                    {
+                                        @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
+                                    }
+                                    else
+                                    {
+                                        @await Component.InvokeAsync("CardItemViewComponent", cardItem)
+                                    }
+                                </td>
                             }
-
+                            else
+                            {
+                                <td></td>
+                            }
                         }
                     </tr>
                 }
@@ -83,6 +83,7 @@
         }
     </tbody>
 </table>
+
 
 <style>
     /* Table styles */
@@ -142,9 +143,9 @@
     }
 
     /* Optional: Highlight even rows (striped table effect) */
-    tr:nth-child(even) {
+    @* tr:nth-child(even) {
         background-color: var(--dark);
-    }
+    } *@
 
     /* Applies rounded corners to outer borders */
     table {
