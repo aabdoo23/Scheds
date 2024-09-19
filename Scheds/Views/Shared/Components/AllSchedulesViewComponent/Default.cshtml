@@ -2,7 +2,17 @@
 @model List<List<List<ReturnedCardItem>>>
 
 <div class="all-container">
-    <div style="font-weight:600; font-size:18px; text-align: center;">@Model.Count Generated Schedules<br>Scroll down to see more</div>
+    <div style="font-weight:600; font-size:18px; text-align: center;">
+        @if(Model.Count==0)
+        {
+            <div>No Schedules Available with the selected customizations, try changing the customizations and try again.</div>
+        }
+        else
+        {
+            <div>@Model.Count Generated Schedules<br>Scroll down to see more</div>
+        }
+        
+    </div>
     <div class="scroll-container">
         @for (int i = 1; i <= Model.Count; i++)
         {
@@ -20,7 +30,7 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-height: 850px;
+        max-height: 950px;
     }
 
     .scroll-container {
