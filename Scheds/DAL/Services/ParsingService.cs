@@ -91,6 +91,7 @@ namespace Scheds.DAL.Services
                                 EndTime = endTime,
                                 Location = location
                             };
+                            IdGeneration.GenerateCourseScheduleId(singleSchedule);
                             schedule.Add(singleSchedule);
                         }
                     }
@@ -114,7 +115,7 @@ namespace Scheds.DAL.Services
                         Schedule = schedule,
                         LastUpdate = lastUpdated
                     };
-                    //Console.WriteLine(cardItem.ToString());
+                    Console.WriteLine(cardItem.ToString());
 
                     ParsedContent.Add(cardItem);
                 }

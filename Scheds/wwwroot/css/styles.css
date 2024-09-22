@@ -182,6 +182,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: default;
   padding-bottom: 0px;
   color: var(--light-text);
 }
@@ -211,7 +212,7 @@ body {
 
 .navbar .nav-links li {
   display: inline-block;
-  margin-left: 20px;
+  margin-left: 5px;
 }
 
 .navbar .nav-links li a {
@@ -1075,7 +1076,7 @@ input:hover {
   }
 
   .navbar .nav-links li {
-    margin: 10px 0;
+    margin-left: 10px;
   }
 
   .find-study-rooms-container {
