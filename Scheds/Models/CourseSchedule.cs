@@ -2,6 +2,7 @@
 {
     public class CourseSchedule
     {
+        public int ScheduleId { get; set; }
         public int CardId { get; set; }
         public string DayOfWeek { get; set; }
         public TimeSpan StartTime { get; set; }
@@ -11,8 +12,9 @@
         {
             
         }
-        public CourseSchedule(int cardId, string dayOfWeek, TimeSpan startTime, TimeSpan endTime, string location)
+        public CourseSchedule(int scheduleId ,int cardId, string dayOfWeek, TimeSpan startTime, TimeSpan endTime, string location)
         {
+            ScheduleId = scheduleId;
             CardId = cardId;
             DayOfWeek = dayOfWeek;
             StartTime = startTime;
@@ -21,7 +23,7 @@
         }
         public override string ToString()
         {
-            return $"CardId: {CardId}, DayOfWeek: {DayOfWeek}, StartTime: {StartTime}, EndTime: {EndTime}, Location: {Location}";
+            return $"ScheduleId: {ScheduleId}, CardId: {CardId}, DayOfWeek: {DayOfWeek}, StartTime: {StartTime}, EndTime: {EndTime}, Location: {Location}";
         }
     }
 }

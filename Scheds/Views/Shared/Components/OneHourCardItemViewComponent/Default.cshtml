@@ -39,7 +39,7 @@
 
       <div class="card31">
         <p class="seatstext1">
-           @Model.section
+           @Model.section <br> @Model.subType.Substring(0,3).ToUpper()
         </p>
       </div>
     </div>
@@ -207,7 +207,7 @@
 }
 
 .seatstext1 {
-  font-size: 0.7em;
+  font-size: 0.65em;
   color: var(--light-text);
   font-weight: 600;
   @* rotate: 180deg; *@

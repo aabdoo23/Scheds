@@ -21,23 +21,29 @@ namespace Scheds.DAL.Services
         private static bool HasLabAndTutorial(List<CardItem> course)
         {
             Dictionary<string, int> freq = new Dictionary<string, int>();
+
             foreach (var card in course)
             {
-                if(freq.ContainsKey(card.Section))
+                if (card.isMainSection()) continue;
+                string section = card.Section.Substring(0, 3);
+
+                if (freq.TryGetValue(section, out int count))
                 {
-                    freq[card.Section]++;
+                    freq[section] = count + 1;
                 }
                 else
                 {
-                    freq[card.Section] = 1;
+                    freq[section] = 1;
                 }
-                if (freq[card.Section] > 1)
+
+                if (freq[section] > 1)
                 {
                     return true;
                 }
             }
             return false;
         }
+
         public static int GetTimeDiffInMins(TimeSpan t1, TimeSpan t2)
         {
             return (int)(t2 - t1).TotalMinutes;
@@ -45,16 +51,11 @@ namespace Scheds.DAL.Services
 
         private static bool PassesTimeGapConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            if (request.largestAllowedGap == 0)
-            {
-                return true;
-            }
+            if (request.largestAllowedGap == 0) return true;
 
             foreach (var day in ItemsPerDay)
             {
                 List<CardItem> items = day.Value;
-
-                // Sort based on StartTime directly, not by the difference
                 items.Sort((a, b) => a.getStartTime().CompareTo(b.getStartTime()));
 
                 for (int i = 0; i < items.Count - 1; i++)
@@ -62,15 +63,12 @@ namespace Scheds.DAL.Services
                     int gap = GetTimeDiffInMins(items[i].getEndTime(), items[i + 1].getStartTime());
                     if (gap > ((request.largestAllowedGap + 1) * 60))
                     {
-                        System.Console.WriteLine(gap);
-                        System.Console.WriteLine(items[i].ToString());
                         return false;
                     }
                 }
             }
             return true;
         }
-
 
         private static bool PassesNumberOfDaysConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
@@ -104,89 +102,92 @@ namespace Scheds.DAL.Services
         //TODO: Test
         private static bool PassesDayStartConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            // If no specific start time is given in the request, always return true
             if (string.IsNullOrEmpty(request.daysStart)) return true;
 
-            // Parse the provided start time from the request
             var dayStart = TimeSpan.Parse(request.daysStart);
 
             foreach (var day in ItemsPerDay)
             {
-                // Sort the items by start time to ensure we check the earliest item
-                var items = day.Value.Where(item => item != null).OrderBy(item => item.getStartTime()).ToList();
-                if (items.Count == 0) continue; // If no items exist for this day, skip it
+                var items = day.Value;
+                if (items.Count == 0) continue;
+
+                // Sort in-place once
+                items.Sort((a, b) => a.getStartTime().CompareTo(b.getStartTime()));
 
                 // Check if the earliest item's start time is earlier than the allowed start time
-                if (items.First().getStartTime() < dayStart)
+                if (items[0].getStartTime() < dayStart)
                 {
                     return false;
                 }
             }
-
             return true;
         }
 
-
         private static bool PassesDayEndConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            // If no specific end time is given in the request, always return true
             if (string.IsNullOrEmpty(request.daysEnd)) return true;
 
-            // Parse the provided end time from the request
             var dayEnd = TimeSpan.Parse(request.daysEnd);
 
             foreach (var day in ItemsPerDay)
             {
-                // Sort the items by end time to ensure we check the latest item
-                var items = day.Value.Where(item => item != null).OrderByDescending(item => item.getEndTime()).ToList();
-                if (items.Count == 0) continue; // If no items exist for this day, skip it
+                var items = day.Value;
+                if (items.Count == 0) continue;
 
-                // Check if the latest item's end time is later than the allowed end time
-                if (items.First().getEndTime() > dayEnd)
+                // Sort in place
+                items.Sort((a, b) => b.getEndTime().CompareTo(a.getEndTime()));
+
+                if (items[0].getEndTime() > dayEnd)
                 {
                     return false;
                 }
             }
-
             return true;
         }
-
         private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            // If no minimum is specified, always return true
             if (request.minimumNumberOfItemsPerDay == 0) return true;
 
-            foreach (var day in ItemsPerDay)
-            {
-                // Filter out null or empty lists
-                var items = day.Value.Where(item => item != null).ToList();
-
-                // If there are any items on that day, check the count against the minimum
-                if (items.Count > 0 && items.Count < request.minimumNumberOfItemsPerDay)
-                {
-                    return false;  // Not enough items for this day
-                }
-            }
-
-            return true;
+            return ItemsPerDay.All(day => day.Value.Count >= request.minimumNumberOfItemsPerDay);
         }
+
 
         public static Dictionary<int, List<CardItem>> ConstructItemsPerDay(List<CardItem> currentTimetable)
         {
-            // Group by day for customization
-            Dictionary<int, List<CardItem>> itemsPerDay = new Dictionary<int, List<CardItem>>();
+            Dictionary<int, List<CardItem>> itemsPerDay = new Dictionary<int, List<CardItem>>(6); // Preallocate for 6 days
             List<string> days = new List<string> { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" };
+
             foreach (var item in currentTimetable)
             {
                 if (item.Schedule.Count == 0) continue;
+
                 var dayOfWeek = days.IndexOf(item.Schedule[0].DayOfWeek);
-                if (!itemsPerDay.ContainsKey(dayOfWeek))
+
+                if (!itemsPerDay.TryGetValue(dayOfWeek, out var dayItems))
                 {
-                    itemsPerDay[dayOfWeek] = new List<CardItem>();
+                    dayItems = new List<CardItem>();
+                    itemsPerDay[dayOfWeek] = dayItems;
                 }
-                itemsPerDay[dayOfWeek].Add(item);
+
+                dayItems.Add(item);
             }
             return itemsPerDay;
+        }
+
+        public static bool CardItemPassesConstraints(CardItem item, GenerateRequest request, List<CardItem> currentTimetable)
+        {
+            // return true;
+            List<CardItem> currentTimetableCopy = new List<CardItem>(currentTimetable)
+            {
+                item
+            };
+            var itemsPerDay = ConstructItemsPerDay(currentTimetableCopy);
+            return PassesNumberOfDaysConstraint(request, itemsPerDay) &&
+                PassesNumberOfItemsPerDayConstraint(request, itemsPerDay) &&
+                PassesTimeGapConstraint(request, itemsPerDay) &&
+                PassesDayStartConstraint(request, itemsPerDay) &&
+                PassesSpecificDaysConstraint(request, itemsPerDay) &&
+                PassesDayEndConstraint(request, itemsPerDay);
 
         }
 
@@ -223,32 +224,45 @@ namespace Scheds.DAL.Services
             List<CardItem> currentCourse = courses[currentIndex];
             foreach (var mainSection in currentCourse)
             {
+                System.Console.WriteLine("Processing " + mainSection.ToString());
                 if (!mainSection.isMainSection()) continue;  // Only process main sections
 
                 if (mainSection.Schedule.Count == 0)  // No schedule
                 {
-                    currentTimetable.Add(mainSection);
-                    GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
-                    currentTimetable.Remove(mainSection);
+                    System.Console.WriteLine("No schedule for " + mainSection.ToString());
+                    if (CardItemPassesConstraints(mainSection, request, currentTimetable))
+                    {
+                        currentTimetable.Add(mainSection);
+                        GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
+                        currentTimetable.Remove(mainSection);
+                    }
                 }
                 else if (isCompatible(currentTimetable, mainSection))  // Schedule exists and is compatible
                 {
                     if (HasLabAndTutorial(currentCourse))  // Handle multiple subsections
                     {
-                        HandleLabAndTutorials(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
+                        System.Console.WriteLine("Has lab and tutorial for " + mainSection.ToString());
+                        if (request.isEngineering)
+                        {
+                            HandleLabAndTutorialsEngineering(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
+                        }
+                        else HandleLabAndTutorials(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
                     }
                     else if (mainSection.hasMultipleSchedules())  // Handle multiple schedules
                     {
+                        System.Console.WriteLine("Has multiple schedules for " + mainSection.ToString());
                         HandleMultipleSchedules(mainSection, currentTimetable, courses, currentIndex, timetables, request);
                     }
                     else if (!HasSubsections(currentCourse))  // Electives with no subsections
                     {
+                        System.Console.WriteLine("No subsections for " + mainSection.ToString());
                         currentTimetable.Add(mainSection);
                         GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
                         currentTimetable.Remove(mainSection);
                     }
                     else  // Handle one subsection per main section
                     {
+                        System.Console.WriteLine("One subsection for " + mainSection.ToString());
                         HandleMainAndSubSections(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
                     }
                 }
@@ -260,21 +274,23 @@ namespace Scheds.DAL.Services
         {
             Dictionary<string, List<CardItem>> common = new Dictionary<string, List<CardItem>>();
             string mainSectionName = mainSection.Section;
-            foreach (var item in currentCourse.Where(i => !i.isMainSection() && isCompatible(currentTimetable, i)&& i.Section.StartsWith(mainSectionName)))
+            foreach (var item in currentCourse.Where(i => !i.isMainSection() && isCompatible(currentTimetable, i) && i.Section.StartsWith(mainSectionName)))
             {
                 // Check if the key exists and ensure it is not added again
-                if (!common.ContainsKey(item.Section))
+                string section = item.Section.Substring(0, 3);
+
+                if (!common.ContainsKey(section))
                 {
-                    common[item.Section] = new List<CardItem>();
+                    common[section] = new List<CardItem>();
                 }
 
                 // Add only if the section is not already present in the list
-                if (!common[item.Section].Contains(item))
+                if (!common[section].Contains(item))
                 {
-                    common[item.Section].Add(item);
+                    common[section].Add(item);
                 }
             }
-            
+
             foreach (var entry in common)
             {
                 currentTimetable.Add(mainSection);
@@ -286,27 +302,87 @@ namespace Scheds.DAL.Services
         }
 
 
+        private static void HandleLabAndTutorialsEngineering(List<CardItem> currentTimetable, List<CardItem> currentCourse,
+    CardItem mainSection, int currentIndex, List<List<ReturnedCardItem>> timetables, GenerateRequest request, List<List<CardItem>> courses)
+        {
+            List<CardItem> labs = new List<CardItem>();
+            List<CardItem> tutorials = new List<CardItem>();
+            string mainSectionName = mainSection.Section;
+            foreach (var item in currentCourse.Where(i => !i.isMainSection() && isCompatible(currentTimetable, i) && i.Section.StartsWith(mainSectionName)))
+            {
+                if (item.SubType.ToLower() == "lab")
+                {
+                    labs.Add(item);
+                }
+                else if (item.SubType.ToLower() == "tutorial")
+                {
+                    tutorials.Add(item);
+                }
+
+            }
+
+            foreach (var entry in labs)
+            {
+                foreach (var entry2 in tutorials)
+                {
+                    if (CardItemPassesConstraints(entry, request, currentTimetable) && CardItemPassesConstraints(entry2, request, currentTimetable))
+                    {
+                        currentTimetable.Add(mainSection);
+                        currentTimetable.Add(entry);
+                        currentTimetable.Add(entry2);
+                        GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
+                        currentTimetable.Remove(entry2);
+                        currentTimetable.Remove(entry);
+                        currentTimetable.Remove(mainSection);
+                    }
+
+                }
+            }
+        }
+
+
         private static void HandleMultipleSchedules(CardItem mainSection, List<CardItem> currentTimetable,
             List<List<CardItem>> courses, int currentIndex, List<List<ReturnedCardItem>> timetables, GenerateRequest request)
         {
+            List<CardItem> mainCourse = new List<CardItem>();
             foreach (var schedule in mainSection.Schedule)
             {
                 var card = new CardItem(mainSection) { Schedule = new List<CourseSchedule> { schedule } };
-                currentTimetable.Add(card);
-                GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
-                currentTimetable.Remove(card);
+                System.Console.WriteLine(card.ToString());
+
+                mainCourse.Add(card);
             }
+            if(!mainCourse.Any(i => CardItemPassesConstraints(i, request, currentTimetable)))
+            {
+                return;
+            }
+            currentTimetable.AddRange(mainCourse);
+            GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
+            currentTimetable.RemoveAll(mainCourse.Contains);
         }
 
         private static void HandleMainAndSubSections(List<CardItem> currentTimetable, List<CardItem> currentCourse,
             CardItem mainSection, int currentIndex, List<List<ReturnedCardItem>> timetables, GenerateRequest request, List<List<CardItem>> courses)
         {
+            System.Console.WriteLine("Handling main and subsections for " + mainSection.ToString());
             foreach (var subSection in currentCourse.Where(sub => !sub.isMainSection() && sub.Section.StartsWith(mainSection.Section) && isCompatible(currentTimetable, sub)))
             {
+                List<CardItem> subSections = new List<CardItem>();
+                foreach (var schedule in subSection.Schedule)
+                {
+                    var card = new CardItem(subSection) { Schedule = new List<CourseSchedule> { schedule } };
+                    System.Console.WriteLine("subsection: " + card.ToString());
+                    subSections.Add(card);
+                }
+                if(!subSections.Any(i => CardItemPassesConstraints(i, request, currentTimetable)))
+                {
+                    // currentTimetable.Remove(mainSection);
+                    continue;
+                }
                 currentTimetable.Add(mainSection);
-                currentTimetable.Add(subSection);
+                currentTimetable.AddRange(subSections);
                 GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
-                currentTimetable.Remove(subSection);
+                currentTimetable.RemoveAll(subSections.Contains);
                 currentTimetable.Remove(mainSection);
             }
         }

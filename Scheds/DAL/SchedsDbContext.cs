@@ -14,7 +14,7 @@ namespace Scheds.DAL
         public DbSet<CardItem> Sections_Fall25 { get; set; }
         public DbSet<Instructor> All_Instructors_Fall25 { get; set; }
         public DbSet<CourseBase> CourseBase_Fall25 { get; set; }
-        public DbSet<CourseSchedule> Schedules_Fall25 { get; set; }
+        public DbSet<CourseSchedule> Schedules_Fall25_New { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace Scheds.DAL
             modelBuilder.Entity<CourseBase>()
                 .HasKey(c => c.CourseCode); // If CourseCode is the primary key, configure it here
             modelBuilder.Entity<CourseSchedule>()
-       .HasKey(cs => new { cs.CardId, cs.DayOfWeek, cs.StartTime });
+       .HasKey(cs => cs.ScheduleId);
 
             // Define the foreign key relationship
             modelBuilder.Entity<CourseSchedule>()
