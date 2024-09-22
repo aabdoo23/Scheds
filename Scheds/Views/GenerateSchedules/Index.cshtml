@@ -139,7 +139,7 @@
                             <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
                                 value="4" />
                         </div>
-                        <p class="number">4</p>
+                        <p id="largestAllowedGapValue" class="number">4</p>
                     </div>
 
                     <div class="box">
@@ -149,7 +149,7 @@
                             <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
                                 max="30" value="20" />
                         </div>
-                        <p class="number">20</p>
+                        <p id="maxNumberOfGeneratedSchedulesValue" class="number">20</p>
                     </div>
                     <div class="box" style="height: 20px; justify-content:flex-start;">
                         <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;"><input
@@ -179,18 +179,25 @@
                             </label>
                         </div>
 
-                        <!-- Sliders Section -->
                         <div class="sliders" id="slider-section">
                             <div class="box" style="margin: 0;">
                                 <label class="slider-label">Maximum Days on Campus</label>
                                 <div class="inner-box">
                                     <div class="line"></div>
-                                    <input type="range" name="numberOfDays" class="input-range" min="0" max="6"
-                                        value="6" />
+                                    <input type="range" id="numberOfDaysRange" name="numberOfDays" class="input-range"
+                                        min="0" max="6" value="6" />
                                 </div>
-                                <p class="number">6</p>
+                                <p id="numberOfDaysValue" class="number">6</p>
                             </div>
                         </div>
+                        <script>
+                            const rangeInput = document.getElementById('numberOfDaysRange');
+                            const valueDisplay = document.getElementById('numberOfDaysValue');
+
+                            rangeInput.addEventListener('input', function () {
+                                valueDisplay.textContent = this.value;
+                            });
+                        </script>
 
                         <!-- Checkboxes Section -->
                         <div class="checkboxes" id="checkbox-section"
@@ -235,8 +242,9 @@
                 style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
                 Generate Schedules
             </button>
-            <h3 id="generate-loading" style="text-align-last: center; color:var(--light-text); display: none;">Working the magic, please wait...<br>
-            Don't panic it's not stuck, it's just amazed by your choices.</h3>
+            <h3 id="generate-loading" style="text-align-last: center; color:var(--light-text); display: none;">Working
+                the magic, please wait...<br>
+                Don't panic it's not stuck, it's just amazed by your choices.</h3>
         </section>
 
 
@@ -248,7 +256,8 @@
                 <div class="tooltip" style="margin-bottom: 0px;">
                     <div class="icon">i</div>
                     <div class="tooltiptext">If you can't see a course selected above, then it probably has no schedule.
-                        If not sure, search for the course using the Search live button and try again. If all fails, report it in the form in the main page, bottom right.</div>
+                        If not sure, search for the course using the Search live button and try again. If all fails,
+                        report it in the form in the main page, bottom right.</div>
                 </div>
             </div>
             <div id=schedule-container class="schedule-container">
@@ -312,22 +321,24 @@
             }
         });
     </script>
-
     <script>
         //cookie
-         document.querySelector('input[name="minimumNumberOfItemsPerDay"]').addEventListener('input', function () {
-                document.getElementById('minimumNumberOfItemsPerDayValue').textContent = this.value;
-            });
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/api/cart/getGenerateRequest')
                 .then(response => response.json())
                 .then(data => {
-                    @* console.log(data); *@
-                    document.querySelector('input[name="minimumNumberOfItemsPerDay"]').value = data.minimumNumberOfItemsPerDay;
+        @* console.log(data); *@
+                        document.querySelector('input[name="minimumNumberOfItemsPerDay"]').value = data.minimumNumberOfItemsPerDay;
+                    document.getElementById('minimumNumberOfItemsPerDayValue').textContent = data.minimumNumberOfItemsPerDay;
+
                     document.querySelector('input[name="largestAllowedGap"]').value = data.largestAllowedGap;
+                    document.getElementById('largestAllowedGapValue').textContent = data.largestAllowedGap;
                     document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value = data.maxNumberOfGeneratedSchedules;
+                    document.getElementById('maxNumberOfGeneratedSchedulesValue').textContent = data.maxNumberOfGeneratedSchedules;
+
                     document.querySelector('input[name="isEngineering"]').checked = data.isEngineering;
                     document.querySelector('input[name="numberOfDays"]').value = data.numberOfDays;
+                    document.getElementById('numberOfDaysValue').textContent = data.numberOfDays;
                     document.querySelector('input[name="daysStart"][value="' + data.daysStart + '"]').checked = true;
                     document.querySelector('input[name="daysEnd"][value="' + data.daysEnd + '"]').checked = true;
                     document.querySelector('input[name="scheduleMethod"][value="' + (data.isNumberOfDaysSelected ? 'maxDays' : 'selectDays') + '"]').checked = true;
@@ -375,8 +386,8 @@
             fetch('/api/cart/getCartItems')
                 .then(response => response.json())
                 .then(cartItems => {
-                    @* console.log(cartItems); *@
-                    cart = cartItems; // Store full course objects in the cart array
+        @* console.log(cartItems); *@
+                        cart = cartItems; // Store full course objects in the cart array
                     cart.forEach(course => updateCartUI(course));
                 })
                 .catch(error => console.error('Error fetching cart items:', error));
@@ -583,7 +594,7 @@
                 body: JSON.stringify(generateRequest)
             });
 
-            @* console.log(generateRequest); *@
+        @* console.log(generateRequest); *@
 
             // URL for the fetch call
             const url = '/api/generate';
