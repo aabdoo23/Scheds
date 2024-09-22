@@ -18,13 +18,13 @@ namespace Scheds.Controllers
         {
             var t = TimeSpan.Parse(time);
             // Find occupied rooms using deferred execution
-            var occupiedRoomsQuery = _context.Schedules_Fall25
+            var occupiedRoomsQuery = _context.Schedules_Fall25_New
                 .Where(schedule => schedule.DayOfWeek == dayOfWeek &&
                     t >= schedule.StartTime &&
                     t < schedule.EndTime)
                 .Select(schedule => schedule.Location);
 
-            var allRooms = await _context.Schedules_Fall25
+            var allRooms = await _context.Schedules_Fall25_New
             .Select(schedule => schedule.Location)
             .Where(room => !string.IsNullOrWhiteSpace(room) && room != "Online")
             .Distinct()

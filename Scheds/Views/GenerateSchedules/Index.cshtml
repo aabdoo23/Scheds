@@ -126,10 +126,10 @@
                         <label class="slider-label">Minimum Slots per Day</label>
                         <div class="inner-box">
                             <div class="line"></div>
-                            <input type="range" name="minimumNumberOfItemsPerDay" class="input-range" min="0" max="4"
-                                value="0" />
+                            <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
+                                class="input-range" min="0" max="4" value="0" />
                         </div>
-                        <p class="number">0</p>
+                        <p id="minimumNumberOfItemsPerDayValue" class="number">0</p>
                     </div>
 
                     <div class="box">
@@ -150,6 +150,18 @@
                                 max="30" value="20" />
                         </div>
                         <p class="number">20</p>
+                    </div>
+                    <div class="box" style="height: 20px; justify-content:flex-start;">
+                        <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;"><input
+                                type="checkbox" name="isEngineering">Check this if you're an Engineering
+                            student.</label>
+                        <div class="tooltip" style="margin-bottom: 20px;">
+                            <div class="icon">i</div>
+                            <div class="tooltiptext">This considers different sections of labs and tutorials together.
+                                For example: if a course needs a lab and a tutorial to be considered together, then when
+                                considering lecture 1, it will consider lab 1A and tutorial 1B together, etc. which is
+                                not normal for cs students for example.</div>
+                        </div>
                     </div>
                 </div>
 
@@ -220,24 +232,27 @@
 
             </div>
             <button id="generate-schedule" class="btn-primary"
-                    style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
-                    Generate Schedules
-                </button>
+                style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
+                Generate Schedules
+            </button>
+            <h3 id="generate-loading" style="text-align-last: center; color:var(--light-text); display: none;">Working the magic, please wait...<br>
+            Don't panic it's not stuck, it's just amazed by your choices.</h3>
         </section>
 
 
 
         <!-- Generated Schedules Section -->
         <section class="generated-schedules">
-            <div style="display: flex;">
+            <div style="display: flex; flex-direction: row;">
                 <h2>Generated Schedules</h2>
-                <div class="tooltip" style="margin-bottom: 20px;">
+                <div class="tooltip" style="margin-bottom: 0px;">
                     <div class="icon">i</div>
                     <div class="tooltiptext">If you can't see a course selected above, then it probably has no schedule.
-                        If not sure, search for the course using the Search live button and try again.</div>
+                        If not sure, search for the course using the Search live button and try again. If all fails, report it in the form in the main page, bottom right.</div>
                 </div>
             </div>
             <div id=schedule-container class="schedule-container">
+                <h3>Click "Generate Schedules" to see your schedules here.</h3>
             </div>
 
         </section>
@@ -299,6 +314,40 @@
     </script>
 
     <script>
+        //cookie
+         document.querySelector('input[name="minimumNumberOfItemsPerDay"]').addEventListener('input', function () {
+                document.getElementById('minimumNumberOfItemsPerDayValue').textContent = this.value;
+            });
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/cart/getGenerateRequest')
+                .then(response => response.json())
+                .then(data => {
+                    @* console.log(data); *@
+                    document.querySelector('input[name="minimumNumberOfItemsPerDay"]').value = data.minimumNumberOfItemsPerDay;
+                    document.querySelector('input[name="largestAllowedGap"]').value = data.largestAllowedGap;
+                    document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value = data.maxNumberOfGeneratedSchedules;
+                    document.querySelector('input[name="isEngineering"]').checked = data.isEngineering;
+                    document.querySelector('input[name="numberOfDays"]').value = data.numberOfDays;
+                    document.querySelector('input[name="daysStart"][value="' + data.daysStart + '"]').checked = true;
+                    document.querySelector('input[name="daysEnd"][value="' + data.daysEnd + '"]').checked = true;
+                    document.querySelector('input[name="scheduleMethod"][value="' + (data.isNumberOfDaysSelected ? 'maxDays' : 'selectDays') + '"]').checked = true;
+                    if (data.isNumberOfDaysSelected) {
+                        document.getElementById('slider-section').style.display = 'block';
+                        document.getElementById('checkbox-section').style.display = 'none';
+                    } else {
+                        document.getElementById('slider-section').style.display = 'none';
+                        document.getElementById('checkbox-section').style.display = 'block';
+                        document.querySelector('input[name="selectedDays"][value="all"]').checked = data.selectedDaysCheckbox.length === 0;
+                        document.querySelectorAll('input[name="selectedDays"]:not([value="all"])').forEach(checkbox => {
+                            checkbox.checked = data.selectedDaysCheckbox.includes(checkbox.value);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching generate request:', error));
+        });
+    </script>
+
+    <script>
 
         let cart = [];
         //dont show any courses if empty
@@ -326,7 +375,7 @@
             fetch('/api/cart/getCartItems')
                 .then(response => response.json())
                 .then(cartItems => {
-                    console.log(cartItems);
+                    @* console.log(cartItems); *@
                     cart = cartItems; // Store full course objects in the cart array
                     cart.forEach(course => updateCartUI(course));
                 })
@@ -366,6 +415,17 @@
             } else {
                 loading.style.display = 'none';
                 searchInput.disabled = false;
+            }
+        }
+        function isGenerating(state) {
+            const generateButton = document.getElementById('generate-schedule');
+            const loading = document.getElementById('generate-loading');
+            if (state) {
+                loading.style.display = 'block';
+                generateButton.disabled = true;
+            } else {
+                loading.style.display = 'none';
+                generateButton.disabled = false;
             }
         }
 
@@ -458,6 +518,7 @@
         }
 
         document.getElementById('generate-schedule').addEventListener('click', function (event) {
+            isGenerating(true);
             event.preventDefault(); // Prevent the default button behavior
 
             // Capture input values using their selectors
@@ -465,7 +526,7 @@
             const largestAllowedGap = document.querySelector('input[name="largestAllowedGap"]').value;
             const maxNumberOfGeneratedSchedules = document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value;
             const sliderElement = document.querySelector('input[name="numberOfDays"]'); // Explicitly select the slider input
-
+            const isEngineering = document.querySelector('input[name="isEngineering"]').checked;
             // Define the days of the week in order (starting with Saturday)
             const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
 
@@ -505,6 +566,7 @@
                 daysStart,
                 daysEnd,
                 selectedItems: cart,
+                isEngineering: isEngineering,
                 customSelectedItems: [],
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
@@ -513,15 +575,18 @@
                 isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
                 selectedDaysCheckbox: !isNumberOfDaysSelected ? selectedDaysArray : [] // If specific days are chosen
             };
+            fetch('/api/cart/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(generateRequest)
+            });
 
-        @* console.log('Generate Request:', generateRequest); *@
-
-                console.log(generateRequest);
+            @* console.log(generateRequest); *@
 
             // URL for the fetch call
             const url = '/api/generate';
-
-            // Make the AJAX POST request
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -531,10 +596,13 @@
             })
                 .then(response => response.text()) // Expect HTML response
                 .then(html => {
+                    isGenerating(false);
                     // Inject the returned HTML into the page
                     document.getElementById('schedule-container').innerHTML = html;
                 })
                 .catch(error => {
+                    isGenerating(flase);
+
                     console.error('There was a problem with the fetch operation:', error);
                 });
         });

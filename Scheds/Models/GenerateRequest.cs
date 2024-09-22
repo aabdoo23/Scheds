@@ -11,6 +11,7 @@
         public int maxNumberOfGeneratedSchedules { get; set; }
         public bool useLiveData { get; set; }
         public bool isNumberOfDaysSelected { get; set; }
+        public bool isEngineering { get; set; }
         public List<CourseBase> selectedItems { get; set; }
         public List<CustomCourseBase> customSelectedItems { get; set; }
     }

@@ -11,6 +11,7 @@ namespace Scheds.Controllers
     public class CartController : ControllerBase
     {
         private const string CookieKeyCart = "CartItems";
+        private const string GenerateRequestCookieKey= "GenerateRequest";
 
         // Add to cart (POST)
         [HttpPost("add")]
@@ -64,12 +65,41 @@ namespace Scheds.Controllers
             var cartJson = JsonConvert.SerializeObject(cart);
             CookieOptions options = new()
             {
-                Expires = DateTime.Now.AddDays(1) // Set cookie to expire in one day
+                Expires = DateTime.Now.AddMonths(1) // Set cookie to expire in one day
             };
             Response.Cookies.Append(CookieKeyCart, cartJson, options);
         }
-
-
-
+        private void SaveGenerateRequestToCookies(GenerateRequest generateRequest)
+        {
+            var generateRequestJson = JsonConvert.SerializeObject(generateRequest);
+            CookieOptions options = new()
+            {
+                Expires = DateTime.Now.AddMonths(1) // Set cookie to expire in one day
+            };
+            //update cookie
+            Response.Cookies.Append(GenerateRequestCookieKey, generateRequestJson, options);
+        }
+        private GenerateRequest GetGenerateRequestFromCookies()
+        {
+            var generateRequestJson = Request.Cookies[GenerateRequestCookieKey];
+            if (string.IsNullOrEmpty(generateRequestJson))
+            {
+                System.Console.WriteLine("GenerateRequest is empty");
+                return new GenerateRequest();
+            }
+            return JsonConvert.DeserializeObject<GenerateRequest>(generateRequestJson);
+        }
+        [HttpPost("generate")]
+        public IActionResult GenerateRequest([FromBody] GenerateRequest generateRequest)
+        {
+            SaveGenerateRequestToCookies(generateRequest);
+            return Ok();
+        }
+        [HttpGet("getGenerateRequest")]
+        public IActionResult GetGenerateRequest()
+        {
+            var generateRequest = GetGenerateRequestFromCookies();
+            return Ok(generateRequest);
+        }
     }
 }
