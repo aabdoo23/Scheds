@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    @* <nav class="navbar">
+    <nav class="navbar">
         <div class="logo">
             <a href="/"><img src="~/images/logo-new.png" alt="Scheds Logo" class="logo-img"></a>
         </div>
@@ -57,206 +57,214 @@
                     target="_blank">Facebook</a></li>
 
         </ul>
-    </nav> *@
+    </nav>
 
 
     <!-- Generate Schedules Page -->
     @* <div class="Container p-0 p-0"> *@
         <!-- Search and Cart Section -->
         
-        <section class="search-cart w-100  mt-2 px-0 mx-0">
-            <div class="container-fluid mx-0 ">
-                <div class="row gy-5">
-                    <div class="col-lg-7 col-md-12 col-sm-12">
-                        <div class="search-section w-100" style="overflow: hidden;">
-                            <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px; align-items: center;">
-                                <h1>Search for Courses</h1>
-                                <label style="margin-top: 8px; font-weight: 600; color:var(--dark-text)"><input type="checkbox"
-                                        name="isLiveData" checked>
-                                    Use Live Data in course selection</label>
-                                <div class="tooltip" style="margin-top: 7px;">
-                                    <div class="icon">i</div>
-                                    <div class="tooltiptext">Fetches data for each course on selection from Self Service to
-                                        <strong>ensure data is updated and all sections are there.</strong> Small delay.
-                                    </div>
+    <section class="search-cart w-100  mt-2 px-0 mx-0">
+        <div class="container-fluid mx-0 ">
+            <div class="row gy-2">
+                <div class=" p-2 col-lg-7 col-md-12 col-sm-12">
+                    <div class="search-section w-100" style="overflow: hidden;">
+                        <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px; align-items: center;">
+                            <h1>Search for Courses</h1>
+                            <label style="margin-top: 8px; font-weight: 600; color:var(--dark-text)"><input type="checkbox"
+                                    name="isLiveData" checked>
+                                Use Live Data in course selection</label>
+                            <div class="tooltip" style="margin-top: 7px;">
+                                <div class="icon">i</div>
+                                <div class="tooltiptext">Fetches data for each course on selection from Self Service to
+                                    <strong>ensure data is updated and all sections are there.</strong> Small delay.
                                 </div>
-                            </div>
-                            <div class="search-bar mt-2" style="margin-right: 20px;">
-                                <div class="group">
-                                    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                                        <g>
-                                            <path
-                                                d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
-                                            </path>
-                                        </g>
-                                    </svg>
-                                    @* <input placeholder="Search" type="search" class="input"> *@
-                                    <input id="course-search" placeholder="Search" type="search" class="input">
-                                    <div id="loading" style="display: none; font-weight: 600;">
-                                        <div class="loader"></div>
-                                        Loading... Please wait.
-                                    </div>
-
-                                </div>
-
-                                <button id="add-to-cart" class="btn-primary">Search Live</button>
-                                <div class="tooltip" style="margin-bottom: 20px;">
-                                    <div class="icon">i</div>
-                                    <div class="tooltiptext">If you can't find the course you're searching for in the autocomplete,
-                                        click this button.</div>
-                                </div>
-                            </div>
-                            <div id="search-results" class="search-results">
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-5 col-md-12 col-sm-12 mx-0">
-                        <div id="cart" class="w-100">
-                            <h2 style="color:var(--light-text">Your Courses</h2>
+                        <div class="search-bar mt-2" style="margin-right: 20px;">
+                            <div class="group">
+                                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                                    <g>
+                                        <path
+                                            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                                        </path>
+                                    </g>
+                                </svg>
+                                @* <input placeholder="Search" type="search" class="input"> *@
+                                <input id="course-search" placeholder="Search" type="search" class="input">
+                                <div id="loading" style="display: none; font-weight: 600;">
+                                    <div class="loader"></div>
+                                    Loading... Please wait.
+                                </div>
 
-                            <ul id="cart-items"></ul>
+                            </div>
+
+                            <button id="add-to-cart" class="btn-primary">Search Live</button>
+                            <div class="tooltip" style="margin-bottom: 20px;">
+                                <div class="icon">i</div>
+                                <div class="tooltiptext">If you can't find the course you're searching for in the autocomplete,
+                                    click this button.</div>
+                            </div>
+                        </div>
+                        <div id="search-results" class="search-results">
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="p-2 col-lg-5 col-md-12 col-sm-12 mx-0">
+                    <div id="cart" class="w-100">
+                        <h2 style="color:var(--light-text">Your Courses</h2>
 
-        </section>
-
-
-
-
-         @* <section class="customization">
-            <div class="top-section">
-                <h2 class="top-section-text">Customize Your Schedule</h2>
-            </div>
-
-            <div class="customization-layout">
-                <!-- Sliders Section -->
-                <div class="sliders">
-                    <div class="box">
-                        <label class="slider-label">Minimum Slots per Day</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
-                                class="input-range" min="0" max="4" value="0" />
-                        </div>
-                        <p id="minimumNumberOfItemsPerDayValue" class="number">0</p>
-                    </div>
-
-                    <div class="box">
-                        <label class="slider-label">Maximum Gap Period (hours)</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
-                                value="4" />
-                        </div>
-                        <p id="largestAllowedGapValue" class="number">4</p>
-                    </div>
-
-                    <div class="box">
-                        <label class="slider-label">Maximum Number of Schedules</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
-                                max="30" value="20" />
-                        </div>
-                        <p id="maxNumberOfGeneratedSchedulesValue" class="number">20</p>
-                    </div>
-                    <div class="box" style="height: 20px; justify-content:flex-start;">
-                        <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;"><input
-                                type="checkbox" name="isEngineering">Check this if you're an Engineering
-                            student.</label>
-                        <div class="tooltip" style="margin-bottom: 20px;">
-                            <div class="icon">i</div>
-                            <div class="tooltiptext">This considers different sections of labs and tutorials together.
-                                For example: if a course needs a lab and a tutorial to be considered together, then when
-                                considering lecture 1, it will consider lab 1A and tutorial 1B together, etc. which is
-                                not normal for cs students for example.</div>
-                        </div>
+                        <ul id="cart-items"></ul>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="right-section">
-                    <!-- Checkboxes Section -->
-                    <div class="checkboxes right-section-header" style="margin-top: 10px;">
-                        <div class="customization-method" style="font-weight: 700;">
-                            <h3>Pick your day customization method</h3>
-                            <label>
-                                <input type="radio" name="scheduleMethod" value="maxDays" checked> Pick max number of
-                                days
-                            </label>
-                            <label>
-                                <input type="radio" name="scheduleMethod" value="selectDays"> Select Specific Days
-                            </label>
-                        </div>
+    </section>
 
-                        <div class="sliders" id="slider-section">
-                            <div class="box" style="margin: 0;">
-                                <label class="slider-label">Maximum Days on Campus</label>
+    <section class="customization mx-2">
+        <div class="top-section">
+            <h2 class="top-section-text">Customize Your Schedule</h2>
+        </div>
+
+        <div class="customization-layout">
+            <!-- Sliders Section -->
+            <div class="container-fluid">
+                <div class="row mx-0">
+                    <div class="col-sm-12 col-md-12 col-lg-5">
+                        <div class="sliders">
+                            <div class="box mt-4" >
+                                <label class="slider-label">Minimum Slots per Day</label>
                                 <div class="inner-box">
                                     <div class="line"></div>
-                                    <input type="range" id="numberOfDaysRange" name="numberOfDays" class="input-range"
-                                        min="0" max="6" value="6" />
+                                    <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
+                                        class="input-range" min="0" max="4" value="0" />
                                 </div>
-                                <p id="numberOfDaysValue" class="number">6</p>
+                                <p id="minimumNumberOfItemsPerDayValue" class="number">0</p>
                             </div>
-                        </div>
-                        <script>
-                            const rangeInput = document.getElementById('numberOfDaysRange');
-                            const valueDisplay = document.getElementById('numberOfDaysValue');
 
-                            rangeInput.addEventListener('input', function () {
-                                valueDisplay.textContent = this.value;
-                            });
-                        </script>
+                            <div class="box mt-3">
+                                <label class="slider-label">Maximum Gap Period (hours)</label>
+                                <div class="inner-box">
+                                    <div class="line"></div>
+                                    <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
+                                        value="4" />
+                                </div>
+                                <p id="largestAllowedGapValue" class="number">4</p>
+                            </div>
 
-                        <!-- Checkboxes Section -->
-                        <div class="checkboxes" id="checkbox-section"
-                            style="display: none; width: 90%; margin: 0; box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);">
-                            <div class="checkbox-group">
-                                <h3>Select Days on Campus</h3>
-                                <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
-                                    Week</label>
-                                <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
+                            <div class="box mt-3">
+                                <label class="slider-label">Maximum Number of Schedules</label>
+                                <div class="inner-box">
+                                    <div class="line"></div>
+                                    <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
+                                        max="30" value="20" />
+                                </div>
+                                <p id="maxNumberOfGeneratedSchedulesValue" class="number">20</p>
+                            </div>
+                            <div class="box mt-3" style="height: 20px; justify-content:flex-start;">
+                                <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;"><input
+                                        type="checkbox" name="isEngineering">
+                                        Check this if you're an Engineering student.</label>
+                                <div class="tooltip" style="margin-bottom: 20px;">
+                                    <div class="icon" style="color: wheat;">i</div>
+                                    <div class="tooltiptext">This considers different sections of labs and tutorials together.
+                                        For example: if a course needs a lab and a tutorial to be considered together, then when
+                                        considering lecture 1, it will consider lab 1A and tutorial 1B together, etc. which is
+                                        not normal for cs students for example.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-12 col-md-12 col-lg-7">
+                        <div class="right-section mt-2">
+                            <!-- Checkboxes Section -->
+                            <div class="checkboxes right-section-header" style="margin-top: 10px;">
+                                <div class="customization-method p-3" style="flex-direction: column; font-weight: 700;">
+                                    <h3>Pick your day customization method</h3>
+                                    <div class="w-100 flex justify-content-between">
+                                        <div>
+                                            <input type="radio" name="scheduleMethod" value="maxDays" checked> Pick max number of
+                                            days
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="scheduleMethod" value="selectDays"> Select Specific Days
+                                        </div>
+                                    </div>
+                                    
+                                </div>
 
-                    <div class="checkboxes" style="margin-top: 0;">
-                        <div class="checkbox-group">
-                            <h3>Select First Slot Start Time</h3>
-                            <label><input type="radio" name="daysStart" value="08:30" checked> 8:30 AM</label>
-                            <label><input type="radio" name="daysStart" value="10:30"> 10:30 AM</label>
-                            <label><input type="radio" name="daysStart" value="12:30"> 12:30 PM</label>
-                            <label><input type="radio" name="daysStart" value="14:30"> 2:30 PM</label>
-                            <label><input type="radio" name="daysStart" value="16:30"> 4:30 PM</label>
-                        </div>
+                                <div class="sliders" id="slider-section">
+                                    <div class="box" style="margin: 0;">
+                                        <label class="slider-label">Maximum Days on Campus</label>
+                                        <div class="inner-box">
+                                            <div class="line"></div>
+                                            <input type="range" id="numberOfDaysRange" name="numberOfDays" class="input-range"
+                                                min="0" max="6" value="6" />
+                                        </div>
+                                        <p id="numberOfDaysValue" class="number">6</p>
+                                    </div>
+                                </div>
+                                <script>
+                                    const rangeInput = document.getElementById('numberOfDaysRange');
+                                    const valueDisplay = document.getElementById('numberOfDaysValue');
 
-                        <div class="checkbox-group">
-                            <h3>Select Last Slot End Time</h3>
-                            <label><input type="radio" name="daysEnd" value="12:30"> 12:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="14:30"> 2:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="16:30"> 4:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="18:30"> 6:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="20:30" checked> 8:30 PM</label>
+                                    rangeInput.addEventListener('input', function () {
+                                        valueDisplay.textContent = this.value;
+                                    });
+                                </script>
+
+                                <!-- Checkboxes Section -->
+                                <div class="checkboxes" id="checkbox-section"
+                                    style="display: none; width: 90%; margin: 0; box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);">
+                                    <div class="checkbox-group">
+                                        <h3>Select Days on Campus</h3>
+                                        <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
+                                            Week</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
+                                        <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="checkboxes p-4" style="margin-top: 0;">
+                                <div class="checkbox-group">
+                                    <h4>Select First Slot Start Time</h4>
+                                    <label><input type="radio" name="daysStart" value="08:30" checked> 8:30 AM</label>
+                                    <label><input type="radio" name="daysStart" value="10:30"> 10:30 AM</label>
+                                    <label><input type="radio" name="daysStart" value="12:30"> 12:30 PM</label>
+                                    <label><input type="radio" name="daysStart" value="14:30"> 2:30 PM</label>
+                                    <label><input type="radio" name="daysStart" value="16:30"> 4:30 PM</label>
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <h4>Select Last Slot End Time</h4>
+                                    <label><input type="radio" name="daysEnd" value="12:30"> 12:30 PM</label>
+                                    <label><input type="radio" name="daysEnd" value="14:30"> 2:30 PM</label>
+                                    <label><input type="radio" name="daysEnd" value="16:30"> 4:30 PM</label>
+                                    <label><input type="radio" name="daysEnd" value="18:30"> 6:30 PM</label>
+                                    <label><input type="radio" name="daysEnd" value="20:30" checked> 8:30 PM</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
+        </div>
+        <div class="d-flex w-100 justify-content-center align-items-center">
             <button id="generate-schedule" class="btn-primary"
-                style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
+                style="width: 60%; background-color:var(--light-blue); font-size: 20px;">
                 Generate Schedules
             </button>
-            <h3 id="generate-loading" style="text-align-last: center; color:var(--light-text); display: none;">Working
-                the magic, please wait...<br>
-                Don't panic it's not stuck, it's just amazed by your choices.</h3>
-        </section>  *@
+        </div>
+        <h3 id="generate-loading" style="text-align-last: center; color:var(--light-text); display: none;">Working
+            the magic, please wait...<br>
+            Don't panic it's not stuck, it's just amazed by your choices.</h3>
+    </section>  
 
 
 
@@ -797,9 +805,6 @@
         display: flex;
         flex-direction: column;
         width: 100%;
-        margin-right: 20px;
-        margin-left: 10px;
-        padding: 10px;
     @*gap:10px;*@
     }
 
