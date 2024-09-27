@@ -1,4 +1,4 @@
-﻿@using Scheds.Models
+@using Scheds.Models
 @model ReturnedCardItem
 
 <head>
@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="mainsubsmall" style="display: none;">
-      @Model.subType - @Model.section
+      @Model.subType-@Model.section
     </div>
     <div class="card2">
       <div class="upper">
@@ -67,8 +67,9 @@
     width: 100%;
     display: flex !important;
     align-items: center;
-    font-size: larger;
-    font-weight: bold;
+    font-size: medium;
+    @* font-weight: bold; *@
+
     justify-content: center;
   }
    .mainsub{
@@ -80,17 +81,20 @@
     text-align: center !important;
     background-color: var(--light-blue);
     width: 100%;
+    font-size: 13px;
     border-radius: 0px 0px 15px 15px;
     padding: 5px;
   }
   table{
     table-layout: fixed;
-    width: 800px;
-    min-width: 700px !important;
+    width: 650px;
+    min-width: 650px !important;
     margin-left: 5px !important;
   }
   td{
-    padding: 10px;
+    padding: 7px;
+    width: 90px;
+    min-width: 60px !important;
     @* width: 30px; *@
   }
   th{
@@ -297,7 +301,7 @@
     font-weight: 600;
   }
 }
-}
+
 
   
 
