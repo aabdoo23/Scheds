@@ -16,18 +16,18 @@
     <tbody>
         @{
             var timeSlots = new[] {
-        "8:30 AM - 9:29 AM",
-        "9:30 AM - 10:29 AM",
-        "10:30 AM - 11:29 AM",
-        "11:30 AM - 12:29 PM",
-        "12:30 PM - 1:29 PM",
-        "1:30 PM - 2:29 PM",
-        "2:30 PM - 3:29 PM",
-        "3:30 PM - 4:29 PM",
-        "4:30 PM - 5:29 PM",
-        "5:30 PM - 6:29 PM",
-        "6:30 PM - 7:29 PM",
-        "7:30 PM - 8:29 PM"
+        "8:30 AM",
+        "9:30 AM",
+        "10:30 AM",
+        "11:30 AM",
+        "12:30 PM",
+        "1:30 PM",
+        "2:30 PM",
+        "3:30 PM",
+        "4:30 PM" ,
+        "5:30 PM",
+        "6:30 PM",
+        "7:30 PM"
         };
 
             var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
@@ -121,8 +121,9 @@
 
     thead tr th:first-child,
     tbody tr td:first-child {
-        width: 9.5em;
-        min-width: 9.5em;
+        @* width: 9.5em; *@
+        @* min-width: 9.5em; *@
+        width: 90px;
     @*max-width:10em;*@word-break: break-all;
     }
 
@@ -150,7 +151,7 @@
         font-weight: 550;
         font-size: 1em;
         text-align: center;
-        max-width: 70px;
+        max-width: 50px;
         border: none;
         border-bottom: 1px solid var(--dark);
 
