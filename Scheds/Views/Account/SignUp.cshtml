@@ -1,0 +1,66 @@
+﻿@model Scheds.Models.Forum.ViewModels.UserRegistrationViewModel
+@{
+    Layout = null;
+}
+<form asp-action="SignUp" asp-controller="Account" method="post">
+    <div>
+        <label>Username</label>
+        <input asp-for="UserName" required />
+    </div>
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" type="email" required />
+    </div>
+    <div>
+        <label>Phone Number</label>
+        <input asp-for="PhoneNumber" type="tel" required />
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" type="password" required />
+    </div>
+    <div>
+        <label>Confirm Password</label>
+        <input asp-for="ConfirmPassword" type="password" required />
+    </div>
+    <div>
+        <label>Select Faculty</label>
+        <select id="facultySelect" required>
+            <option value="">-- Select Faculty --</option>
+            @foreach (var faculty in Model.Faculties)
+            {
+                <option value="@faculty.Value">@faculty.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label>Select Major</label>
+        <select id="majorSelect" name="MajorId" asp-for="MajorId" required>
+            <option value="">-- Select Major --</option>
+            <!-- Options will be loaded dynamically -->
+        </select>
+    </div>
+
+    <script>
+        document.getElementById('facultySelect').addEventListener('change', function () {
+            var facultyId = this.value;
+            fetch('/Account/GetMajorsByFaculty?facultyId=' + facultyId)
+                .then(response => response.json())
+                .then(data => {
+                    var majorSelect = document.getElementById('majorSelect');
+                    majorSelect.innerHTML = ''; // Clear existing options
+                    data.forEach(major => {
+                        var option = document.createElement('option');
+                        option.value = major.value;
+                        option.text = major.text;
+                        majorSelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
+
+    <button type="submit">Register</button>
+</form>
+

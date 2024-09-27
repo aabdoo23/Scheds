@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scheds.DAL;
 using Scheds.DAL.Repositories;
 using Scheds.DAL.Services;
+using Scheds.Models.Forum;
 
 namespace Scheds
 {
@@ -32,6 +34,16 @@ namespace Scheds
             builder.Services.AddScoped<CourseScheduleRepository>();
             builder.Services.AddScoped<ParsingService>();
             builder.Services.AddScoped<NuDealer>();
+            builder.Services.AddScoped<UserRepository>();
+
+            //builder.Services.AddIdentity<User, IdentityRole>()
+            //    .AddEntityFrameworkStores<SchedsDbContext>()
+            //    .AddDefaultTokenProviders();
+            //builder.Services.Configure<IdentityOptions>(options =>
+            //{
+            //    options.Password.RequiredLength = 6;
+            //    options.Password.RequireDigit = true;
+            //});
 
 
             builder.Services.AddHttpClient();
@@ -42,7 +54,6 @@ namespace Scheds
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -50,9 +61,10 @@ namespace Scheds
             app.UseStaticFiles();
             app.UseSession();
 
-            app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseRouting();
 
             app.MapControllerRoute(
                 name: "default",

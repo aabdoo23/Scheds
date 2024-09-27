@@ -1,0 +1,21 @@
+﻿@model Scheds.Models.Forum.ViewModels.SignInViewModel
+@{
+    Layout = null;
+}
+<form asp-action="SignIn" asp-controller="Account" method="post">
+    <div>
+        <label>Username</label>
+        <input asp-for="UserName" required />
+    </div>
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" type="password" required />
+    </div>
+    <button type="submit">Sign In</button>
+    <div>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <p style="color:red;">@ViewBag.ErrorMessage</p>
+        }
+    </div>
+</form>

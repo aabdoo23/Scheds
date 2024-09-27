@@ -146,15 +146,28 @@ namespace Scheds.DAL.Services
         }
         private static bool PassesNumberOfItemsPerDayConstraint(GenerateRequest request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
+            // If no minimum is specified, always return true
             if (request.minimumNumberOfItemsPerDay == 0) return true;
 
-            return ItemsPerDay.All(day => day.Value.Count >= request.minimumNumberOfItemsPerDay);
+            foreach (var day in ItemsPerDay)
+            {
+                // Filter out null or empty lists
+                var items = day.Value.Where(item => item != null).ToList();
+
+                // If there are any items on that day, check the count against the minimum
+                if (items.Count > 0 && items.Count < request.minimumNumberOfItemsPerDay)
+                {
+                    return false;  // Not enough items for this day
+                }
+            }
+
+            return true;
         }
 
 
         public static Dictionary<int, List<CardItem>> ConstructItemsPerDay(List<CardItem> currentTimetable)
         {
-            Dictionary<int, List<CardItem>> itemsPerDay = new Dictionary<int, List<CardItem>>(6); // Preallocate for 6 days
+            Dictionary<int, List<CardItem>> itemsPerDay = new Dictionary<int, List<CardItem>>(6); 
             List<string> days = new List<string> { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" };
 
             foreach (var item in currentTimetable)

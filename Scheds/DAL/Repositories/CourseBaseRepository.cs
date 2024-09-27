@@ -45,15 +45,15 @@ namespace Scheds.DAL.Repositories
             using var sqlConnection = new SqlConnection(sqlConnectionString);
             sqlConnection.Open();
             var sqlCourseBase = @"
-MERGE courseBase_Fall25 AS target
-USING (SELECT @courseCode AS courseCode) AS source
-ON target.courseCode = source.courseCode
-WHEN MATCHED THEN
-    UPDATE SET 
-        courseName = @courseName
-WHEN NOT MATCHED THEN
-    INSERT (courseCode, courseName)
-    VALUES (@courseCode, @courseName);";
+                MERGE courseBase_Fall25 AS target
+                USING (SELECT @courseCode AS courseCode) AS source
+                ON target.courseCode = source.courseCode
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        courseName = @courseName
+                WHEN NOT MATCHED THEN
+                    INSERT (courseCode, courseName)
+                    VALUES (@courseCode, @courseName);";
 
             using var sqlCommandCourseBase = new SqlCommand(sqlCourseBase, sqlConnection);
             sqlCommandCourseBase.Parameters.AddWithValue("@courseCode", course.CourseCode);
