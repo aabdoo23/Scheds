@@ -8,12 +8,15 @@
   <div class="cardm">
     <div class="card">
       <div class="main">@Model.courseCode: @Model.courseName</div>
+      <div class="mainsmall" style="display: none;"><div>@Model.courseCode</div></div>
       <div class="mainsub">
         @Model.instructorName
 
       </div>
     </div>
-
+    <div class="mainsubsmall" style="display: none;">
+      @Model.subType - @Model.section
+    </div>
     <div class="card2">
       <div class="upper">
         <div class="instructor">
@@ -51,16 +54,68 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  @*margin:1em;*@margin-bottom: 2em;
+  @* margin:1em;margin-bottom: 2em; *@
   @*margin-bottom:20em;*@
   }
 
 @@media screen and (max-width: 699px) {
+  @* .cardm{
+    width: fit-content;
+  } *@
+  .main{display: none;}
+  .mainsmall{
+    width: 100%;
+    display: flex !important;
+    align-items: center;
+    font-size: larger;
+    font-weight: bold;
+    justify-content: center;
+  }
+   .mainsub{
+    display: none;
+  }
+  .mainsubsmall{
+    display: flex !important;
+    justify-content: center;
+    text-align: center !important;
+    background-color: var(--light-blue);
+    width: 100%;
+    border-radius: 0px 0px 15px 15px;
+    padding: 5px;
+  }
+  table{
+    table-layout: fixed;
+    width: 800px;
+    min-width: 700px !important;
+    margin-left: 5px !important;
+  }
+  td{
+    padding: 10px;
+    @* width: 30px; *@
+  }
+  th{
+    text-align: center;
+    @* width:80px; *@
+  }
   .card {
-    @* width: 100px;
-    height: 300px; *@
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px 15px 0px 0px;
     background-color: lightgray;
   }
+  .cardm{
+    @* width: 100%;  *@
+    height: 100%;
+    flex-direction: column;
+  }
+  .card2{
+    display: none;
+  }
+
 }
 
 @@media screen and (min-width: 700px) {
