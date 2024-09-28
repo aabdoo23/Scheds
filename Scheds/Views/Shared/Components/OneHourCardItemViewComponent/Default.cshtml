@@ -10,9 +10,10 @@
     <div class="main1">@Model.courseCode: @Model.courseName</div>
     <div class="mainsub1">
       @Model.instructorName
-
     </div>
   </div>
+  <div class="sectionName"></div>
+  <div class="main1small">@Model.courseCode</div>
 
   <div class="card21">
     <div class="upper1">
@@ -47,170 +48,196 @@
 </div>
 
 <style>
-  .cardm1 {
-  color: var(--lighter-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 1.5em;
-  transition: 0.4s ease-in-out;
-}
+  @@media screen and (max-width: 699px) {
+    .card21, .main1, .mainsub1{
+      display: none;
+    }
+    table{
+    table-layout: fixed;
+    width: 650px;
+    min-width: 650px !important;
+    margin-left: 5px !important;
+    }
+    .cardm1{display: flex; flex-direction: row; width: 100%;}
+    .sectionName{ border-radius: 3px 0px 0px 3px; width: 5px; background-color: var(--light-blue); color: var(--lighter-dark);}
+    
+    .main1small{
+      display: flex;
+      padding: 5px;
+      border-radius: 0px 8px 8px 0px;
+      @* overflow: scroll; *@
+      align-items: center;
+      color: var(--lighter-dark);
+      background-color: var(--light-text);}
+  }
+  @@media screen and (min-width: 700px) {
+    .main1small{display: none;}
+    .cardm1 {
+    color: var(--lighter-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1.5em;
+    transition: 0.4s ease-in-out;
+    }
+      
+    .card1 {
+      position: relative;
+      width: 149px;
+      height: 35px;
+      border-radius: 10px;
+      border-bottom-left-radius: 0px;
+      border-top-left-radius: 0px;
+      background: var(--light-text);
+      @* color: var(--dark); *@
+      z-index: 2;
+      transition: 0.4s ease-in-out;
+    }
 
-.card1 {
-  position: relative;
-  width: 149px;
-  height: 35px;
-  border-radius: 10px;
-  border-bottom-left-radius: 0px;
-  border-top-left-radius: 0px;
-  background: var(--light-text);
-  @* color: var(--dark); *@
-  z-index: 2;
-  transition: 0.4s ease-in-out;
-}
+    .main1 {
+      font-size: 0.85em;
+      font-weight: 700;
+      padding: 0.4em;
+      padding-bottom: 0em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.1em;
+      max-height: 1.1em;
+    }
 
-.main1 {
-  font-size: 0.85em;
-  font-weight: 700;
-  padding: 0.4em;
-  padding-bottom: 0em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.1em;
-  max-height: 1.1em;
-}
+    .mainsub1 {
+      font-size: 0.6em;
+      margin: 0.4em;
+      margin-left: 0.6em;
+      margin-top: 0.18em;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.1em;
+      max-height: 1.1em;
+    }
 
-.mainsub1 {
-  font-size: 0.6em;
-  margin: 0.4em;
-  margin-left: 0.6em;
-  margin-top: 0.18em;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.1em;
-  max-height: 1.1em;
-}
+    .card21 {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      width: 149px;
+      height: 30px;
+      margin-left: -150px;
+      border-bottom-right-radius: 10px;
+      border-top-right-radius: 10px;
+      background: var(--light-text);  
+      z-index: 1;
+      transition: 0.4s ease-in-out;
+      border: 1px solid var(--lighter-dark);
+    }
 
-.card21 {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  width: 149px;
-  height: 30px;
-  margin-left: -150px;
-  border-bottom-right-radius: 10px;
-  border-top-right-radius: 10px;
-  background: var(--light-text);  
-  z-index: 1;
-  transition: 0.4s ease-in-out;
-  border: 1px solid var(--lighter-dark);
-}
+    .cardm1:hover .lower1 {
+      top: 8.33em;
+    }
 
-.cardm1:hover .lower1 {
-  top: 8.33em;
-}
+    .cardm1:hover .card21 {
+      height: 140px;
+      cursor:cell;
+      margin-top: 10px;
+    }
 
-.cardm1:hover .card21 {
-  height: 140px;
-  cursor:cell;
-  margin-top: 10px;
-}
-
-.cardm1:hover .card31 {
-  height: 140px;
-  cursor: cell;
-  top: -5.1em;
-}
-.cardm1:hover .card1 {
-  background-color: rgb(213, 231, 240);
-  cursor: cell;
-}
-.card1:hover {
-  background-color: rgb(213, 231, 240);
-  cursor: cell;
-}
+    .cardm1:hover .card31 {
+      height: 140px;
+      cursor: cell;
+      top: -5.1em;
+    }
+    .cardm1:hover .card1 {
+      background-color: rgb(213, 231, 240);
+      cursor: cell;
+    }
+    .card1:hover {
+      background-color: rgb(213, 231, 240);
+      cursor: cell;
+    }
 
 
-.upper1 {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  @* color: var(--dark); *@
-  left: 1.0em;
-  top: 0.5em;
-  gap: 0.2em;
-}
+    .upper1 {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      @* color: var(--dark); *@
+      left: 1.0em;
+      top: 0.5em;
+      gap: 0.2em;
+    }
 
-.instructor1 {
-  font-size: 0.75em;
-  font-weight: 700;
-  padding-right: 20px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.2em;
-  max-height: 1.2em;
-}
+    .instructor1 {
+      font-size: 0.75em;
+      font-weight: 700;
+      padding-right: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2em;
+      max-height: 1.2em;
+    }
 
-.creditstext1 {
-  font-size: 0.65em;
-  font-weight: 500;
-}
+    .creditstext1 {
+      font-size: 0.65em;
+      font-weight: 500;
+    }
 
-.lower1 {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  @* color: var(--dark); *@
-  left: 1em;
-  top: 0em;
-  gap: 0.5em;
-  margin-top: -0.5em;
-  font-size: 0.65em;
-  transition: top 0.4s ease-in-out; /* Smooth transition for the top property */
-}
+    .lower1 {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      @* color: var(--dark); *@
+      left: 1em;
+      top: 0em;
+      gap: 0.5em;
+      margin-top: -0.5em;
+      font-size: 0.65em;
+      transition: top 0.4s ease-in-out; /* Smooth transition for the top property */
+    }
 
-.schedule-text1 {
-  margin-top: 0.8em;
-  font-weight: 600;
-  font-size: 1em;
-  display: flex;
-  flex-direction: row;
-  gap: 0.5em;
-}
+    .schedule-text1 {
+      margin-top: 0.8em;
+      font-weight: 600;
+      font-size: 1em;
+      display: flex;
+      flex-direction: row;
+      gap: 0.5em;
+    }
 
-.room1 {
-  font-size: 1.1em;
-  font-weight: 700;
-}
+    .room1 {
+      font-size: 1.1em;
+      font-weight: 700;
+    }
 
-.card31 {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 35px;
-  top: 0.15em;
-  left: -40px;
-  font-size: 1.1em;
-  border-radius: 10px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  background: var(--light-blue);
-  transition: 0.4s ease-in-out;
-  @* writing-mode:vertical-rl; *@
-  font-weight: 700;
-  font-size: 16px;
-  text-align: center;
-}
+    .card31 {
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 35px;
+      top: 0.15em;
+      left: -40px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+      background: var(--light-blue);
+      transition: 0.4s ease-in-out;
+      @* writing-mode:vertical-rl; *@
+      font-weight: 700;
+      font-size: 16px;
+      text-align: center;
+    }
 
-.seatstext1 {
-  font-size: 0.65em;
-  color: var(--light-text);
-  font-weight: 600;
-  @* rotate: 180deg; *@
-}
+    .seatstext1 {
+      font-size: 0.65em;
+      color: var(--light-text);
+      font-weight: 600;
+      @* rotate: 180deg; *@
+    }
+
+  }
 
 </style>
