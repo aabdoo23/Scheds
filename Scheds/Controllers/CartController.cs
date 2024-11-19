@@ -1,19 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Scheds.Models;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Scheds.Domain.DTOs;
+using Scheds.Domain.Entities;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/cart")]
     public class CartController : ControllerBase
     {
         private const string CookieKeyCart = "CartItems";
-        private const string GenerateRequestCookieKey= "GenerateRequest";
+        private const string GenerateRequestCookieKey = "GenerateRequest";
 
-        // Add to cart (POST)
         [HttpPost("add")]
         public IActionResult AddToCart([FromBody] CourseBase course)
         {
@@ -53,7 +51,7 @@ namespace Scheds.Controllers
             var cartJson = Request.Cookies[CookieKeyCart];
             if (string.IsNullOrEmpty(cartJson))
             {
-                System.Console.WriteLine("Cart is empty");
+                Console.WriteLine("Cart is empty");
                 return new List<CourseBase>();
             }
             return JsonConvert.DeserializeObject<List<CourseBase>>(cartJson);
@@ -69,7 +67,7 @@ namespace Scheds.Controllers
             };
             Response.Cookies.Append(CookieKeyCart, cartJson, options);
         }
-        private void SaveGenerateRequestToCookies(GenerateRequest generateRequest)
+        private void SaveGenerateRequestToCookies(GenerateRequestDTO generateRequest)
         {
             var generateRequestJson = JsonConvert.SerializeObject(generateRequest);
             CookieOptions options = new()
@@ -79,18 +77,18 @@ namespace Scheds.Controllers
             //update cookie
             Response.Cookies.Append(GenerateRequestCookieKey, generateRequestJson, options);
         }
-        private GenerateRequest GetGenerateRequestFromCookies()
+        private GenerateRequestDTO GetGenerateRequestFromCookies()
         {
             var generateRequestJson = Request.Cookies[GenerateRequestCookieKey];
             if (string.IsNullOrEmpty(generateRequestJson))
             {
-                System.Console.WriteLine("GenerateRequest is empty");
-                return new GenerateRequest();
+                Console.WriteLine("GenerateRequest is empty");
+                return new GenerateRequestDTO();
             }
-            return JsonConvert.DeserializeObject<GenerateRequest>(generateRequestJson);
+            return JsonConvert.DeserializeObject<GenerateRequestDTO>(generateRequestJson);
         }
         [HttpPost("generate")]
-        public IActionResult GenerateRequest([FromBody] GenerateRequest generateRequest)
+        public IActionResult GenerateRequest([FromBody] GenerateRequestDTO generateRequest)
         {
             SaveGenerateRequestToCookies(generateRequest);
             return Ok();

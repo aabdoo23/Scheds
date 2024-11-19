@@ -1,17 +1,12 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Scheds.Models;
+using Scheds.Domain.ViewModels;
+using System.Diagnostics;
 
-namespace Scheds.Controllers;
+namespace Scheds.MVC.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<HomeController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public IActionResult Index()
     {
