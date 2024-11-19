@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Scheds.Models;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/cart")]

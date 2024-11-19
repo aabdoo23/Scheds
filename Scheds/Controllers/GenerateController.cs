@@ -1,50 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Scheds.DAL.Repositories;
-using Scheds.DAL.Services;
-using Scheds.Models;
+using Scheds.Application.Interfaces.Repositories;
+using Scheds.Application.Interfaces.Services;
+using Scheds.Domain.DTOs;
+using Scheds.Domain.Entities;
+using Scheds.Infrastructure.Repositories;
+using Scheds.Infrastructure.Util;
 
 namespace Scheds.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GenerateController : Controller
+    public class GenerateController(ICardItemRepository cardItemRepository, ISelfServiceLiveFetchService selfServiceLiveFetchService) : Controller
     {
-        private readonly CardItemRepository CardItemRepository;
-        private readonly NuDealer NuDealer;
-        public GenerateController(CardItemRepository cardItemRepository, NuDealer nuDealer)
-        {
-            this.CardItemRepository = cardItemRepository;
-            this.NuDealer = nuDealer;
-        }
+        private readonly ICardItemRepository _cardItemRepository = cardItemRepository 
+            ?? throw new ArgumentNullException(nameof(cardItemRepository));
+        private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService 
+            ?? throw new ArgumentNullException(nameof(selfServiceLiveFetchService));
 
 
         [HttpPost]
-        public async Task<IActionResult> Generate(GenerateRequest request)
+        public async Task<IActionResult> Generate(GenerateRequestDTO request)
         {
             System.Console.WriteLine(request.ToString());
-            List<List<CardItem>> allCardItemsByCourse = new List<List<CardItem>>();
+            List<List<CardItem>> allCardItemsByCourse = [];
 
             // Handle custom selected items
-            if (request.customSelectedItems != null && request.customSelectedItems.Count > 0)
+            if (request.CustomSelectedItems != null && request.CustomSelectedItems.Count > 0)
             {
-                foreach (CustomCourseBase customCourse in request.customSelectedItems)
+                foreach (CustomCourseBaseDTO customCourse in request.CustomSelectedItems)
                 {
-                    List<CardItem> cardItems = await CardItemRepository.GetCardItemsByCourseCodeAsync(customCourse.courseCode);
+                    List<CardItem> cardItems = await _cardItemRepository.GetCardItemsByCourseCodeAsync(customCourse.CourseCode);
 
-                    if (request.useLiveData)
+                    if (request.UseLiveData)
                     {
-                       cardItems = await NuDealer.FetchCards(customCourse.courseCode);
+                        cardItems = await _selfServiceLiveFetchService.FetchCards(customCourse.CourseCode);
                     }
 
-                    List<CardItem> customizedCards = new List<CardItem>();
+                    List<CardItem> customizedCards = [];
 
                     // Filter by custom main and sub section
-                    if (!string.IsNullOrEmpty(customCourse.customMainSection) || !string.IsNullOrEmpty(customCourse.customSubSection))
+                    if (!string.IsNullOrEmpty(customCourse.CustomMainSection) || !string.IsNullOrEmpty(customCourse.CustomSubSection))
                     {
                         foreach (CardItem card in cardItems)
                         {
-                            if (card.Section.Substring(0, 2) == customCourse.customMainSection ||
-                                card.Section.Substring(0, 2) == customCourse.customSubSection.Substring(0, 2))
+                            if (card.Section[..2] == customCourse.CustomMainSection ||
+                                card.Section[..2] == customCourse.CustomSubSection[..2])
                             {
                                 if (!customizedCards.Contains(card)) customizedCards.Add(card);
                             }
@@ -52,12 +52,12 @@ namespace Scheds.Controllers
                     }
 
                     // Filter by custom TA
-                    if (!string.IsNullOrEmpty(customCourse.customTA))
+                    if (!string.IsNullOrEmpty(customCourse.CustomTA))
                     {
-                        HashSet<string> sections = new HashSet<string>();
+                        HashSet<string> sections = [];
                         foreach (CardItem card in cardItems)
                         {
-                            if (card.Instructor == customCourse.customTA)
+                            if (card.Instructor == customCourse.CustomTA)
                             {
                                 if (!customizedCards.Contains(card))
                                 {
@@ -74,7 +74,7 @@ namespace Scheds.Controllers
                             {
                                 foreach (string section in sections)
                                 {
-                                    if (card.Section.Substring(0, 2) == section.Substring(0, 2))
+                                    if (card.Section[..2] == section[..2])
                                     {
                                         customizedCards.Add(card);
                                     }
@@ -84,12 +84,12 @@ namespace Scheds.Controllers
                     }
 
                     // Filter by custom professor
-                    if (!string.IsNullOrEmpty(customCourse.customProfessor))
+                    if (!string.IsNullOrEmpty(customCourse.CustomProfessor))
                     {
-                        HashSet<string> sections = new HashSet<string>();
+                        HashSet<string> sections = [];
                         foreach (CardItem card in cardItems)
                         {
-                            if (card.Instructor == customCourse.customProfessor)
+                            if (card.Instructor == customCourse.CustomProfessor)
                             {
                                 if (!customizedCards.Contains(card))
                                 {
@@ -106,7 +106,7 @@ namespace Scheds.Controllers
                             {
                                 foreach (string section in sections)
                                 {
-                                    if (card.Section.Substring(0, 2) == section)
+                                    if (card.Section[..2] == section)
                                     {
                                         customizedCards.Add(card);
                                     }
@@ -120,25 +120,23 @@ namespace Scheds.Controllers
             }
 
             // Handle general selected items
-            if (request.selectedItems != null && request.selectedItems.Count > 0)
+            if (request.SelectedItems != null && request.SelectedItems.Count > 0)
             {
-                foreach (CourseBase course in request.selectedItems)
+                foreach (CourseBase course in request.SelectedItems)
                 {
-                    List<CardItem> cardItems = await CardItemRepository.GetCardItemsByCourseCodeAsync(course.CourseCode);
+                    List<CardItem> cardItems = await _cardItemRepository.GetCardItemsByCourseCodeAsync(course.CourseCode);
 
-                    if (request.useLiveData)
+                    if (request.UseLiveData)
                     {
-                       cardItems = await NuDealer.FetchCards(course.CourseCode);
+                        cardItems = await _selfServiceLiveFetchService.FetchCards(course.CourseCode);
                     }
 
                     allCardItemsByCourse.Add(cardItems);
                 }
             }
 
-            var generatedSchedules = GenerationHelper.GenerateAllTimetables(allCardItemsByCourse, request);
+            var generatedSchedules = GenerationUtil.GenerateAllTimetables(allCardItemsByCourse, request);
             return ViewComponent("AllSchedulesViewComponent", generatedSchedules);
-            
         }
-
     }
 }
