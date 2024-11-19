@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Scheds.Models;
+using Scheds.Domain.DTOs;
 
-
-namespace Scheds.Views.Shared.ViewComponents.CardItemViewComponent
+namespace Scheds.MVC.Views.Shared.Components.OneHourCardItemViewComponent
 {
     [ViewComponent(Name = "OneHourCardItemViewComponent")]
     public class OneHourCardItemViewComponent : ViewComponent
     {
-        public IViewComponentResult Invoke(ReturnedCardItem model)
+        public IViewComponentResult Invoke(ReturnedCardItemDTO model)
         {
             return View(model);
         }

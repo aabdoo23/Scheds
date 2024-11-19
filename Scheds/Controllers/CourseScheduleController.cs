@@ -1,28 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Scheds.DAL.Repositories;
-using Scheds.Models;
+using Scheds.Application.Interfaces.Repositories;
+using Scheds.Domain.Entities;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CourseScheduleController : Controller
+    public class CourseScheduleController(ICourseScheduleRepository courseScheduleRepository) : Controller
     {
-        private readonly CourseScheduleRepository courseScheduleRepository;
-        public CourseScheduleController(CourseScheduleRepository courseScheduleRepository)
-        {
-            this.courseScheduleRepository = courseScheduleRepository;
-        }
+        private readonly ICourseScheduleRepository courseScheduleRepository = courseScheduleRepository
+            ?? throw new ArgumentNullException(nameof(courseScheduleRepository));
+
         [HttpGet]
-        public async Task<IActionResult> GetCourseSchedulesByCardId(int cardId)
+        public async Task<IActionResult> GetCourseSchedulesByCardId(string cardId)
         {
             var schedules = await courseScheduleRepository.GetCourseSchedulesByCardIdAsync(cardId);
             return Ok(schedules);
         }
+
         [HttpPost]
         public async Task<IActionResult> AddCourseSchedule(CourseSchedule schedule)
         {
-            await courseScheduleRepository.AddCourseScheduleAsync(schedule);
+            await courseScheduleRepository.InsertAsync(schedule);
             return Ok();
         }
     }

@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 
-public class FindStudyRoomsController : Controller
+namespace Scheds.MVC.Controllers
 {
-    public IActionResult Index()
+    public class FindStudyRoomsController : Controller
     {
-        return View();
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }

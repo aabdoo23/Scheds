@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Scheds.DAL;
-using Scheds.DAL.Repositories;
-using Scheds.DAL.Services;
+using Scheds.Infrastructure;
+using Scheds.Infrastructure.Contexts;
 
-namespace Scheds
+namespace Scheds.MVC
 {
     public class Program
     {
@@ -11,7 +10,6 @@ namespace Scheds
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddControllers();
             builder.Services.AddDistributedMemoryCache();
@@ -21,18 +19,13 @@ namespace Scheds
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            builder.Services.AddDbContext<SchedsDbContext>(options => {
+            builder.Services.AddDbContext<SchedsDbContext>(options =>
+            {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-
             });
-            builder.Services.AddScoped<CardItemRepository>();
-            builder.Services.AddScoped<AllInstructorsRepository>();
-            builder.Services.AddScoped<CourseBaseRepository>();
-            builder.Services.AddScoped<CourseScheduleRepository>();
-            builder.Services.AddScoped<ParsingService>();
-            builder.Services.AddScoped<NuDealer>();
 
+            builder.Services.AddServices();
+            builder.Services.AddRepositories();
 
             builder.Services.AddHttpClient();
 
