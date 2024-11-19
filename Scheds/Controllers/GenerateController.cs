@@ -3,25 +3,24 @@ using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.DTOs;
 using Scheds.Domain.Entities;
-using Scheds.Infrastructure.Repositories;
 using Scheds.Infrastructure.Util;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class GenerateController(ICardItemRepository cardItemRepository, ISelfServiceLiveFetchService selfServiceLiveFetchService) : Controller
     {
-        private readonly ICardItemRepository _cardItemRepository = cardItemRepository 
+        private readonly ICardItemRepository _cardItemRepository = cardItemRepository
             ?? throw new ArgumentNullException(nameof(cardItemRepository));
-        private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService 
+        private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService
             ?? throw new ArgumentNullException(nameof(selfServiceLiveFetchService));
 
 
         [HttpPost]
         public async Task<IActionResult> Generate(GenerateRequestDTO request)
         {
-            System.Console.WriteLine(request.ToString());
+            Console.WriteLine(request.ToString());
             List<List<CardItem>> allCardItemsByCourse = [];
 
             // Handle custom selected items
