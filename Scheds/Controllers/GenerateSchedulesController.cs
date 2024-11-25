@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-public class GenerateSchedulesController : Controller
+
+namespace Scheds.MVC.Controllers
 {
-    public IActionResult Index()
+    public class GenerateSchedulesController : Controller
     {
-        return View();
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }

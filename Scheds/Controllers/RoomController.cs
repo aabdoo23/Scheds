@@ -1,41 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Scheds.DAL;
+using Scheds.Application.Interfaces.Services;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RoomController : Controller
+    public class RoomController(IEmptyRoomsService emptyRoomsService) : Controller
     {
-        private readonly SchedsDbContext _context;
-        public RoomController(SchedsDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IEmptyRoomsService _emptyRoomsService = emptyRoomsService
+            ?? throw new ArgumentNullException(nameof(emptyRoomsService));
+
         [HttpGet]
         public async Task<IActionResult> GetEmptyRooms(string dayOfWeek, string time)
         {
-            var t = TimeSpan.Parse(time);
-            // Find occupied rooms using deferred execution
-            var occupiedRoomsQuery = _context.Schedules_Fall25_New
-                .Where(schedule => schedule.DayOfWeek == dayOfWeek &&
-                    t >= schedule.StartTime &&
-                    t < schedule.EndTime)
-                .Select(schedule => schedule.Location);
-
-            var allRooms = await _context.Schedules_Fall25_New
-            .Select(schedule => schedule.Location)
-            .Where(room => !string.IsNullOrWhiteSpace(room) && room != "Online")
-            .Distinct()
-            .ToListAsync();
-
-            // Fetch occupied rooms
-            var occupiedRooms = await occupiedRoomsQuery.ToListAsync();
-
-            // Get the empty rooms
-            var emptyRooms = allRooms.Except(occupiedRooms).ToList();
-
+            var emptyRooms = await _emptyRoomsService.GetEmptyRooms(dayOfWeek, time);
 
             if (emptyRooms.Count == 0)
             {
@@ -44,7 +22,5 @@ namespace Scheds.Controllers
 
             return Ok(emptyRooms);
         }
-
-
     }
 }
