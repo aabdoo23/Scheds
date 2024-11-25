@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Scheds.Models;
+using Scheds.Domain.DTOs;
 
-
-namespace Scheds.Views.Shared.ViewComponents.ScheduleViewComponent
+namespace Scheds.MVC.Views.Shared.Components.ScheduleViewComponent
 {
     [ViewComponent(Name = "ScheduleViewComponent")]
     public class ScheduleViewComponent : ViewComponent
     {
-        public IViewComponentResult Invoke(List<ReturnedCardItem> model)
+        public IViewComponentResult Invoke(List<ReturnedCardItemDTO> model)
         {
             return View(model);
         }

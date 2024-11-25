@@ -1,33 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Scheds.DAL.Repositories;
-using Scheds.DAL.Services;
-using Scheds.Models;
-using System.Text;
+using Scheds.Application.Interfaces.Repositories;
+using Scheds.Domain.Entities;
 
-namespace Scheds.Controllers
+namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CardController
+    public class CardController(ICardItemRepository repository)
     {
-        private readonly CardItemRepository repository;
-        private readonly ParsingService parsingService;
-        public CardController(CardItemRepository repository, ParsingService parsingService)
-        {
-            this.repository = repository;
-            this.parsingService = parsingService;
-        }
+        private readonly ICardItemRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+
         [HttpGet]
         public async Task<ActionResult<List<CardItem>>> GetAllCards()
         {
-            var cardItems = await repository.GetAllCardItemsAsync();
-            return cardItems;
+            var cardItems = await _repository.GetAllAsync();
+            return cardItems.ToList();
         }
+
         [HttpGet("byId/{id}")]
-        public async Task<ActionResult<CardItem>> GetCard(int id)
+        public async Task<ActionResult<CardItem>> GetCard(string id)
         {
-            var cardItem = await repository.GetCardItemByIdAsync(id);
+            var cardItem = await _repository.GetByIdAsync(id);
             if (cardItem == null)
             {
                 return new NotFoundResult();
@@ -38,13 +31,13 @@ namespace Scheds.Controllers
         [HttpGet("{courseCode}")]
         public async Task<ActionResult<List<CardItem>>> GetCardByCourseCode(string courseCode)
         {
-            var cardItems = await repository.GetCardItemsByCourseCodeAsync(courseCode);
+            var cardItems = await _repository.GetCardItemsByCourseCodeAsync(courseCode);
             if (cardItems == null)
             {
                 return new NotFoundResult();
             }
             return cardItems;
         }
-        
+
     }
 }

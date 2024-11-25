@@ -1,5 +1,5 @@
-@using Scheds.Models
-@model List<ReturnedCardItem>
+@using Scheds.Domain.DTOs
+@model List<ReturnedCardItemDTO>
 
 <table border="1">
     <thead>
@@ -59,13 +59,13 @@
                             }
 
                             var currentDay = daysOfWeek[dayIndex];
-                            var cardItem = Model.FirstOrDefault(item => item?.startTime != null &&
-                            item.startTime.Hours == hoursMapping[i] &&
-                            item.day.ToLower() == currentDay.ToLower());
+                            var cardItem = Model.FirstOrDefault(item => item?.StartTime != null &&
+                            item.StartTime.Hours == hoursMapping[i] &&
+                            item.Day.ToLower() == currentDay.ToLower());
 
                             if (cardItem != null)
                             {
-                                var duration = cardItem.endTime - cardItem.startTime;
+                                var duration = cardItem.EndTime - cardItem.StartTime;
                                 var rowspan = (duration.TotalMinutes + 1) / 60;
                                 <td rowspan="@rowspan">
                                     @{

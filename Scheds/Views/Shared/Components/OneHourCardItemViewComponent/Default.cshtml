@@ -1,5 +1,5 @@
-﻿@using Scheds.Models
-@model ReturnedCardItem
+﻿@using Scheds.Domain.DTOs
+@model ReturnedCardItemDTO
 
 <head>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -7,9 +7,9 @@
 </head>
 <div class="cardm1">
   <div class="card1">
-    <div class="main1">@Model.courseCode: @Model.courseName</div>
+    <div class="main1">@Model.CourseCode: @Model.CourseName</div>
     <div class="mainsub1">
-      @Model.instructorName
+      @Model.InstructorName
 
     </div>
   </div>
@@ -17,12 +17,12 @@
   <div class="card21">
     <div class="upper1">
       <div class="instructor1">
-        Seats Left: @Model.seatsLeft
+        Seats Left: @Model.SeatsLeft
 
       </div>
 
       <div class="credits">
-        <div class="creditstext1">Credits: @Model.credits CH</div>
+        <div class="creditstext1">Credits: @Model.Credits CH</div>
 
       </div>
     </div>
@@ -30,16 +30,16 @@
     <div class="lower1">
       <div class="schedule-text1">
         <i class="fa-regular fa-clock"></i>
-        <div class="scheduletext">@Model.day,<br> @Model.startTime.ToString(@"hh\:mm") -
-          @Model.endTime.ToString(@"hh\:mm")</div>
+        <div class="scheduletext">@Model.Day,<br> @Model.StartTime.ToString(@"hh\:mm") -
+          @Model.EndTime.ToString(@"hh\:mm")</div>
       </div>
       <div class="room1">
-        <div class="roomtext">Room: @Model.room</div>
+        <div class="roomtext">Room: @Model.Room</div>
       </div>
 
       <div class="card31">
         <p class="seatstext1">
-           @Model.section <br> @Model.subType.Substring(0,3).ToUpper()
+           @Model.Section <br> @Model.SubType.Substring(0,3).ToUpper()
         </p>
       </div>
     </div>
