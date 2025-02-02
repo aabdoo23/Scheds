@@ -58,7 +58,7 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CardItems");
+                    b.ToTable("CardItems", (string)null);
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CourseBase", b =>
@@ -76,7 +76,7 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CourseBases");
+                    b.ToTable("CourseBases", (string)null);
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
@@ -106,7 +106,7 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.HasIndex("CardItemId");
 
-                    b.ToTable("CourseSchedules");
+                    b.ToTable("CourseSchedules", (string)null);
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.Instructor", b =>
@@ -120,7 +120,7 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Instructors");
+                    b.ToTable("Instructors", (string)null);
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>

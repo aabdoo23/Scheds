@@ -15,23 +15,6 @@
     </thead>
     <tbody>
         @{
-            var timeSlots = new[] {
-        "8:30 AM - 9:29 AM",
-        "9:30 AM - 10:29 AM",
-        "10:30 AM - 11:29 AM",
-        "11:30 AM - 12:29 PM",
-        "12:30 PM - 1:29 PM",
-        "1:30 PM - 2:29 PM",
-        "2:30 PM - 3:29 PM",
-        "3:30 PM - 4:29 PM",
-        "4:30 PM - 5:29 PM",
-        "5:30 PM - 6:29 PM",
-        "6:30 PM - 7:29 PM",
-        "7:30 PM - 8:29 PM"
-        };
-
-            var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
-
             var daysOfWeek = new[] { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday" };
 
             if (Model == null || Model.Count == 0)
@@ -42,8 +25,45 @@
             }
             else
             {
+                // Add a row for items with no schedule
+                <tr>
+                    <td class="timeslot">No Schedule</td>
+                    @{
+                        var noScheduleItems = Model.Where(item => item.Day == "").ToList();
+                        var itemIndex = 0;
+                    }
+                    @for (int dayIndex = 0; dayIndex < 6; dayIndex++)
+                    {
+                        <td>
+                            @if (itemIndex < noScheduleItems.Count)
+                            {
+                                @await Component.InvokeAsync("OneHourCardItemViewComponent", noScheduleItems[itemIndex])
+                                itemIndex++;
+                            }
+                        </td>
+                    }
+                </tr>
+
+                // Rest of the existing time slots
+                var timeSlots = new[] {
+                    "8:30 AM - 9:29 AM",
+                    "9:30 AM - 10:29 AM",
+                    "10:30 AM - 11:29 AM",
+                    "11:30 AM - 12:29 PM",
+                    "12:30 PM - 1:29 PM",
+                    "1:30 PM - 2:29 PM",
+                    "2:30 PM - 3:29 PM",
+                    "3:30 PM - 4:29 PM",
+                    "4:30 PM - 5:29 PM",
+                    "5:30 PM - 6:29 PM",
+                    "6:30 PM - 7:29 PM",
+                    "7:30 PM - 8:29 PM"
+                };
+
+                var hoursMapping = new[] { 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
                 var skipSlots = new int[6]; // Track how many columns to skip per day
 
+                // Existing time slot rows
                 for (int i = 0; i < timeSlots.Length; i++)
                 {
                     <tr>
@@ -53,15 +73,15 @@
                         {
                             if (skipSlots[dayIndex] > 0)
                             {
-                                // If there's a rowspan still active, decrease the counter and skip rendering
                                 skipSlots[dayIndex]--;
                                 continue;
                             }
 
                             var currentDay = daysOfWeek[dayIndex];
-                            var cardItem = Model.FirstOrDefault(item => item?.StartTime != null &&
-                            item.StartTime.Hours == hoursMapping[i] &&
-                            item.Day.ToLower() == currentDay.ToLower());
+                            var cardItem = Model.FirstOrDefault(item => 
+                                item?.StartTime != null &&
+                                item.StartTime.Hours == hoursMapping[i] &&
+                                item.Day.ToLower() == currentDay.ToLower());
 
                             if (cardItem != null)
                             {
@@ -72,17 +92,13 @@
                                         if (duration.TotalMinutes == 59)
                                         {
                                             @await Component.InvokeAsync("OneHourCardItemViewComponent", cardItem)
-
                                         }
                                         else
                                         {
                                             @await Component.InvokeAsync("CardItemViewComponent", cardItem)
-
                                         }
                                     }
                                 </td>
-
-                                // Set the number of slots to skip for this day based on rowspan
                                 skipSlots[dayIndex] = (int)(rowspan - 1);
                             }
                             else
