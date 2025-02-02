@@ -70,7 +70,7 @@ namespace Scheds.Infrastructure.Util
 
         private static bool PassesNumberOfDaysConstraint(GenerateRequestDTO request, Dictionary<int, List<CardItem>> ItemsPerDay)
         {
-            if (!request.IsNumberOfDaysSelected) return true;
+            if (!request.IsNumberOfDaysSelected || request.NumberOfDays == 0) return true;
             int cnt = 0;
             for (int i = 0; i < 6; i++)
             {
@@ -141,9 +141,12 @@ namespace Scheds.Infrastructure.Util
         {
             if (request.MinimumNumberOfItemsPerDay == 0) return true;
 
-            return ItemsPerDay.All(day => day.Value.Count >= request.MinimumNumberOfItemsPerDay);
+            foreach (var day in ItemsPerDay)
+            {
+                if (day.Value.Count < request.MinimumNumberOfItemsPerDay && day.Value.Count > 0) return false;
+            }
+            return true;
         }
-
 
         public static Dictionary<int, List<CardItem>> ConstructItemsPerDay(List<CardItem> currentTimetable)
         {
