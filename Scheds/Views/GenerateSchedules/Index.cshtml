@@ -106,8 +106,12 @@
                 </div>
             </div>
             <div id="cart">
-                <h2 style="color:var(--light-text)">Your Courses</h2>
-
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="color:var(--light-text); margin: 0;">Your Courses</h2>
+                    <button id="clear-cart" class="clear-cart-btn">
+                        Clear Cart
+                    </button>
+                </div>
                 <ul id="cart-items"></ul>
             </div>
         </section>
@@ -843,6 +847,80 @@
         padding: 10px;
         gap: 10px;
         width: 100%;
+    }
+
+    .clear-cart-btn {
+        background-color: var(--lighter-dark);
+        color: var(--light-text);
+        border: 1px solid var(--light-text);
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .clear-cart-btn:hover {
+        background-color: #ff4444;
+        border-color: #ff4444;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 2rem;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-img {
+        height: 45px;
+        width: auto;
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logo-text h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--light-text);
+        font-weight: 600;
+    }
+
+    .logo-text span {
+        font-size: 0.7rem;
+        color: var(--dark-text);
+        font-style: italic;
+    }
+
+    .mode-toggle {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem;
+        background: var(--dark);
+        border-radius: 20px;
+    }
+
+    .mode-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
     }
 </style>
 
