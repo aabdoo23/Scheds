@@ -99,5 +99,14 @@ namespace Scheds.MVC.Controllers
             var generateRequest = GetGenerateRequestFromCookies();
             return Ok(generateRequest);
         }
+        [HttpPost("clear")]
+        public IActionResult ClearCart()
+        {
+            // Delete the cart cookie
+            Response.Cookies.Delete(CookieKeyCart);
+            // Delete the generate request cookie as well since it depends on cart items
+            Response.Cookies.Delete(GenerateRequestCookieKey);
+            return Ok();
+        }
     }
 }

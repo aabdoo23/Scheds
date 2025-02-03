@@ -8,11 +8,17 @@ namespace Scheds.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<CourseSchedule> builder)
         {
+            builder.HasKey(cs => cs.Id);
+
             builder
-                .HasOne<CardItem>()
-                .WithMany(ci => ci.CourseSchedules)
+                .HasOne(cs => cs.CardItem)
+                .WithMany(c => c.CourseSchedules)
                 .HasForeignKey(cs => cs.CardItemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Ensure the CardItemId column is required
+            builder.Property(cs => cs.CardItemId)
+                .IsRequired();
         }
     }
 }

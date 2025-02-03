@@ -4,6 +4,11 @@ namespace Scheds.Domain.Entities
 {
     public class CardItem : BaseEntity
     {
+        public CardItem()
+        {
+            CourseSchedules = new List<CourseSchedule>();
+        }
+
         public string CourseCode { get; set; }
         public string CourseName { get; set; }
         public string Instructor { get; set; }
@@ -11,7 +16,7 @@ namespace Scheds.Domain.Entities
         public string Section { get; set; }
         public int SeatsLeft { get; set; }
         public string SubType { get; set; }
-        public virtual IList<CourseSchedule> CourseSchedules { get; set; }
+        public virtual ICollection<CourseSchedule> CourseSchedules { get; set; }
         public DateTime LastUpdate { get; set; }
 
         public bool IsMainSection()
@@ -21,7 +26,7 @@ namespace Scheds.Domain.Entities
 
         public static CardItem CopyCardItem(CardItem item)
         {
-            return new()
+            var copy = new CardItem
             {
                 Id = item.Id,
                 CourseName = item.CourseName,
@@ -30,21 +35,36 @@ namespace Scheds.Domain.Entities
                 Instructor = item.Instructor,
                 Section = item.Section,
                 SubType = item.SubType,
-                CourseSchedules = item.CourseSchedules,
                 SeatsLeft = item.SeatsLeft,
                 LastUpdate = item.LastUpdate
             };
+
+            // Create new CourseSchedules with new IDs
+            foreach (var schedule in item.CourseSchedules)
+            {
+                copy.CourseSchedules.Add(new CourseSchedule
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    CardItemId = copy.Id,
+                    DayOfWeek = schedule.DayOfWeek,
+                    StartTime = schedule.StartTime,
+                    EndTime = schedule.EndTime,
+                    Location = schedule.Location
+                });
+            }
+
+            return copy;
         }
 
         public TimeSpan GetStartTime()
         {
-            return CourseSchedules[0].StartTime; // Index 0 corresponds to start time
+            return CourseSchedules.First().StartTime; // Index 0 corresponds to start time
         }
         public TimeSpan GetEndTime()
         {
-            return CourseSchedules[0].EndTime; // Index 2 corresponds to end time
+            return CourseSchedules.First().EndTime; // Index 2 corresponds to end time
         }
-        public string GetRoom() { return CourseSchedules[0].Location; }
+        public string GetRoom() { return CourseSchedules.First().Location; }
 
         public bool ConflictsWith(CardItem other)
         {

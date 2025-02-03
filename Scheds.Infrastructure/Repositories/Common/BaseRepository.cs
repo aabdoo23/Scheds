@@ -52,9 +52,15 @@ namespace Scheds.Infrastructure.Repositories.Common
                 return await InsertAsync(entity);
             }
 
-            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+            // Detach existing entity
+            _context.Entry(existingEntity).State = EntityState.Detached;
+            
+            // Attach and mark as modified
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            
             await _context.SaveChangesAsync();
-            return existingEntity;
+            return entity;
         }
 
         public virtual async Task<PaginatedEntityDTO<T>> GetPaginatedContentAsync(IQueryable<T> queryable, int pageNumber, int pageSize)

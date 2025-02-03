@@ -157,7 +157,7 @@ namespace Scheds.Infrastructure.Util
             {
                 if (item.CourseSchedules.Count == 0) continue;
 
-                var dayOfWeek = Days.IndexOf(item.CourseSchedules[0].DayOfWeek);
+                var dayOfWeek = Days.IndexOf(item.CourseSchedules.First().DayOfWeek);
 
                 if (!itemsPerDay.TryGetValue(dayOfWeek, out var dayItems))
                 {

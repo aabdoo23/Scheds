@@ -36,7 +36,7 @@ namespace Scheds.Domain.DTOs
             }
             else
             {
-                Day = item.CourseSchedules[0].DayOfWeek;
+                Day = item.CourseSchedules.First().DayOfWeek;
                 StartTime = item.GetStartTime();
                 EndTime = item.GetEndTime();
                 Room = item.GetRoom();
