@@ -13,12 +13,6 @@ namespace Scheds.Infrastructure.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SchedsDbContext).Assembly);
-            
-            modelBuilder.Entity<CourseSchedule>()
-                .HasOne<CardItem>() 
-                .WithMany(c => c.CourseSchedules)  
-                .HasForeignKey(cs => cs.Id);
-
             base.OnModelCreating(modelBuilder);
         }
     }

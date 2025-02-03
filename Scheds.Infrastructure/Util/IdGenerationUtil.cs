@@ -7,7 +7,7 @@ namespace Scheds.Infrastructure.Util
         public static void GenerateCourseScheduleId(CourseSchedule schedule)
         {
             string schedId = "";
-            schedId += schedule.Id;
+            schedId += schedule.CardItemId;
             List<string> days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
             schedId += days.IndexOf(schedule.DayOfWeek).ToString();
             string startTime = schedule.StartTime.Hours.ToString();
