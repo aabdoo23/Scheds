@@ -4,6 +4,9 @@
 
 Scheds is a web application designed to help students at Nile University (NU) in Egypt create personalized class schedules. It allows users to search for courses, customize their schedule preferences, and generate multiple schedule options based on their criteria.
 
+## Scheds is live now!!! 🚀🚀
+Test it here: **https://scheds.runasp.net** ✨
+
 ## Features
 
 *   **Course Search:**
