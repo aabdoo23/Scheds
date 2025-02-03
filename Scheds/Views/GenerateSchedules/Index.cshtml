@@ -89,9 +89,9 @@
                         <div class="inner-box">
                             <div class="line"></div>
                             <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
-                                class="input-range" min="0" max="4" value="0" />
+                                class="input-range" min="0" max="4" value="1" />
                         </div>
-                        <p id="minimumNumberOfItemsPerDayValue" class="number">0</p>
+                        <p id="minimumNumberOfItemsPerDayValue" class="number">1</p>
                     </div>
 
                     <div class="box">
@@ -367,7 +367,7 @@
                     .then(response => response.json())
                     .then(data => {
                         isLoading(false);
-                        updateSearchResults(data);
+						window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error fetching search results:', error);
