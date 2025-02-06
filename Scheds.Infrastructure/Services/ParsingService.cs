@@ -81,14 +81,13 @@ namespace Scheds.Infrastructure.Services
 
                             var singleSchedule = new CourseSchedule
                             {
-                                Id = Guid.NewGuid().ToString(),
                                 CardItemId = cardId,
                                 DayOfWeek = dayOfWeek,
                                 StartTime = startTime,
                                 EndTime = endTime,
                                 Location = location
                             };
-                            
+                            IdGenerationUtil.GenerateCourseScheduleId(singleSchedule);
                             schedule.Add(singleSchedule);
                         }
                     }

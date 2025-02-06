@@ -653,7 +653,8 @@ body {
 
 /* General Styles */
 .Container {
-  padding: 20px;
+    padding: 20px;
+    margin-top: 60px;
 }
 
 /* Search and Cart Section */
@@ -662,9 +663,9 @@ body {
   /* justify-content: space-between; Split the cart and search sections */
   align-items: flex-start;
   width: 100%;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
-  margin-top: 90px;
+/*  margin-top: 0px;*/
   /* Add space between the navbar and the section */
   box-sizing: border-box;
 }

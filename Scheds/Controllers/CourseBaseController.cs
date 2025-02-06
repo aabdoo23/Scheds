@@ -24,8 +24,8 @@ namespace Scheds.MVC.Controllers
         [HttpGet("search/{query}")]
         public async Task<IActionResult> SearchCourses(string query)
         {
-            var courses = await _selfServiceLiveFetchService.FetchCourseBases(query);
-            return Ok(courses);
+            await _selfServiceLiveFetchService.FetchCourseBases(query);
+            return Ok();
         }
 
         [HttpGet("getCourseBaseByCourseCode")]
