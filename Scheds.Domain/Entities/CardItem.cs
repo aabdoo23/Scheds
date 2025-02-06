@@ -42,15 +42,7 @@ namespace Scheds.Domain.Entities
             // Create new CourseSchedules with new IDs
             foreach (var schedule in item.CourseSchedules)
             {
-                copy.CourseSchedules.Add(new CourseSchedule
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    CardItemId = copy.Id,
-                    DayOfWeek = schedule.DayOfWeek,
-                    StartTime = schedule.StartTime,
-                    EndTime = schedule.EndTime,
-                    Location = schedule.Location
-                });
+                copy.CourseSchedules.Add(schedule);
             }
 
             return copy;

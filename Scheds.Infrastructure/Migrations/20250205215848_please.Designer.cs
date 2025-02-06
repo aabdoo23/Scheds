@@ -12,8 +12,8 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    [Migration("20241119012426_RefactoredShi")]
-    partial class RefactoredShi
+    [Migration("20250205215848_please")]
+    partial class please
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,7 +32,7 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.Property<string>("CourseCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CourseName")
                         .IsRequired()
@@ -48,18 +48,27 @@ namespace Scheds.Infrastructure.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("SeatsLeft")
                         .HasColumnType("int");
 
                     b.Property<string>("Section")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SubType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseCode", "Section")
+                        .IsUnique();
 
                     b.ToTable("CardItems");
                 });
@@ -76,6 +85,12 @@ namespace Scheds.Infrastructure.Migrations
                     b.Property<string>("CourseName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -102,12 +117,21 @@ namespace Scheds.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CardItemId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.ToTable("CourseSchedules");
                 });
@@ -121,6 +145,12 @@ namespace Scheds.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.HasKey("Id");
 
                     b.ToTable("Instructors");
@@ -129,14 +159,8 @@ namespace Scheds.Infrastructure.Migrations
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.CardItem", "CardItem")
-                        .WithMany()
-                        .HasForeignKey("CardItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Scheds.Domain.Entities.CardItem", null)
                         .WithMany("CourseSchedules")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("CardItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

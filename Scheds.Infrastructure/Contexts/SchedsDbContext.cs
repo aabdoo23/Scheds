@@ -13,6 +13,13 @@ namespace Scheds.Infrastructure.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SchedsDbContext).Assembly);
+            modelBuilder.Entity<CardItem>()
+                .HasIndex(c => c.Id)
+                .IsUnique();
+
+            modelBuilder.Entity<CourseSchedule>()
+                .HasIndex(s => s.Id)
+                .IsUnique();
             base.OnModelCreating(modelBuilder);
         }
     }
