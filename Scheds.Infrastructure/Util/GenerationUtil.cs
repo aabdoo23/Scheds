@@ -61,6 +61,8 @@ namespace Scheds.Infrastructure.Util
                     int gap = GetTimeDiffInMins(items[i].GetEndTime(), items[i + 1].GetStartTime());
                     if (gap > (request.LargestAllowedGap + 1) * 60)
                     {
+                        Console.WriteLine("Time gap fail");
+                        Console.WriteLine("Second: "+items[i].GetEndTime() + " first: " +items[i + 1].GetStartTime()+" "+gap + " " + items[i].Section + " " + items[i].CourseCode + " originaltimeGap " + request.LargestAllowedGap);
                         return false;
                     }
                 }
@@ -80,6 +82,7 @@ namespace Scheds.Infrastructure.Util
                     cnt++;
                 }
             }
+            Console.WriteLine("Number of days "+cnt+" numberofdays: "+request.NumberOfDays + " originalNumberOfDays: "+request.NumberOfDays);
             return cnt <= request.NumberOfDays;
         }
 
@@ -110,6 +113,8 @@ namespace Scheds.Infrastructure.Util
                 // Check if the earliest item's start time is earlier than the allowed start time
                 if (items[0].GetStartTime() < dayStart)
                 {
+                    Console.WriteLine("Day start fail");
+                    Console.WriteLine(items[0].GetStartTime()+" " + items[0].Section + " " + items[0].CourseCode+ " originalDayStart: "+dayStart);
                     return false;
                 }
             }
@@ -132,6 +137,8 @@ namespace Scheds.Infrastructure.Util
 
                 if (items[0].GetEndTime() > dayEnd)
                 {
+                    Console.WriteLine("Day end fail");
+                    Console.WriteLine(items[0].GetEndTime() + " " + items[0].Section + " " + items[0].CourseCode + " originalDayEnd: " + dayEnd);
                     return false;
                 }
             }
@@ -143,9 +150,19 @@ namespace Scheds.Infrastructure.Util
 
             foreach (var day in ItemsPerDay)
             {
-                if (day.Value.Count < request.MinimumNumberOfItemsPerDay && day.Value.Count > 0) return false;
+                if (day.Value.Count < request.MinimumNumberOfItemsPerDay && day.Value.Count > 0)
+                {
+                    Console.WriteLine("Number of items per day fail");
+                    Console.WriteLine(day.Value.Count + " " + day.Value[0].Section + " " + day.Value[0].CourseCode + " originalNumberOfItems: "+ request.MinimumNumberOfItemsPerDay);
+                    return false;
+                }
             }
             return true;
+        }
+        private static bool PassesZeroSeatsConstraint(GenerateRequestDTO request, CardItem item)
+        {
+            if(!request.ConsiderZeroSeats) return true;
+            return item.SeatsLeft > 0;
         }
 
         public static Dictionary<int, List<CardItem>> ConstructItemsPerDay(List<CardItem> currentTimetable)
@@ -183,8 +200,8 @@ namespace Scheds.Infrastructure.Util
                 PassesTimeGapConstraint(request, itemsPerDay) &&
                 PassesDayStartConstraint(request, itemsPerDay) &&
                 PassesSpecificDaysConstraint(request, itemsPerDay) &&
-                PassesDayEndConstraint(request, itemsPerDay);
-
+                PassesDayEndConstraint(request, itemsPerDay) &&
+                PassesZeroSeatsConstraint(request,item);
         }
 
         public static void GenerateTimetablesHelper(List<List<CardItem>> courses, int currentIndex,
@@ -222,12 +239,12 @@ namespace Scheds.Infrastructure.Util
             List<CardItem> currentCourse = courses[currentIndex];
             foreach (var mainSection in currentCourse)
             {
-                Console.WriteLine("Processing " + mainSection.ToString());
+                //Console.WriteLine("Processing " + mainSection.ToString());
                 if (!mainSection.IsMainSection()) continue;  // Only process main sections
 
                 if (mainSection.CourseSchedules.Count == 0)  // No schedule
                 {
-                    Console.WriteLine("No schedule for " + mainSection.ToString());
+                    //Console.WriteLine("No schedule for " + mainSection.ToString());
                     if (CardItemPassesConstraints(mainSection, request, currentTimetable))
                     {
                         currentTimetable.Add(mainSection);
@@ -239,7 +256,7 @@ namespace Scheds.Infrastructure.Util
                 {
                     if (HasLabAndTutorial(currentCourse))  // Handle multiple subsections
                     {
-                        Console.WriteLine("Has lab and tutorial for " + mainSection.ToString());
+                        //Console.WriteLine("Has lab and tutorial for " + mainSection.ToString());
                         if (request.IsEngineering)
                         {
                             HandleLabAndTutorialsEngineering(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
@@ -248,19 +265,19 @@ namespace Scheds.Infrastructure.Util
                     }
                     else if (mainSection.HasMultipleSchedules())  // Handle multiple schedules
                     {
-                        Console.WriteLine("Has multiple schedules for " + mainSection.ToString());
+                        //Console.WriteLine("Has multiple schedules for " + mainSection.ToString());
                         HandleMultipleSchedules(mainSection, currentTimetable, courses, currentIndex, timetables, request);
                     }
                     else if (!HasSubsections(currentCourse))  // Electives with no subsections
                     {
-                        Console.WriteLine("No subsections for " + mainSection.ToString());
+                        //Console.WriteLine("No subsections for " + mainSection.ToString());
                         currentTimetable.Add(mainSection);
                         GenerateTimetablesHelper(courses, currentIndex + 1, currentTimetable, timetables, request);
                         currentTimetable.Remove(mainSection);
                     }
                     else  // Handle one subsection per main section
                     {
-                        Console.WriteLine("One subsection for " + mainSection.ToString());
+                        //Console.WriteLine("One subsection for " + mainSection.ToString());
                         HandleMainAndSubSections(currentTimetable, currentCourse, mainSection, currentIndex, timetables, request, courses);
                     }
                 }
@@ -350,7 +367,7 @@ namespace Scheds.Infrastructure.Util
             {
                 var card = CardItem.CopyCardItem(mainSection);
                 card.CourseSchedules = [schedule];
-                Console.WriteLine(card.ToString());
+                //Console.WriteLine(card.ToString());
 
                 mainCourse.Add(card);
             }
@@ -366,7 +383,7 @@ namespace Scheds.Infrastructure.Util
         private static void HandleMainAndSubSections(List<CardItem> currentTimetable, List<CardItem> currentCourse,
             CardItem mainSection, int currentIndex, List<List<ReturnedCardItemDTO>> timetables, GenerateRequestDTO request, List<List<CardItem>> courses)
         {
-            Console.WriteLine("Handling main and subsections for " + mainSection.ToString());
+            //Console.WriteLine("Handling main and subsections for " + mainSection.ToString());
             foreach (var subSection in currentCourse.Where(sub => !sub.IsMainSection() && sub.Section.StartsWith(mainSection.Section) && IsCompatible(currentTimetable, sub)))
             {
                 List<CardItem> subSections = [];
@@ -375,7 +392,7 @@ namespace Scheds.Infrastructure.Util
                     var card = CardItem.CopyCardItem(subSection);
                     card.CourseSchedules = [schedule];
 
-                    Console.WriteLine("subsection: " + card.ToString());
+                    //Console.WriteLine("subsection: " + card.ToString());
                     subSections.Add(card);
                 }
                 if (!subSections.Any(i => CardItemPassesConstraints(i, request, currentTimetable)))

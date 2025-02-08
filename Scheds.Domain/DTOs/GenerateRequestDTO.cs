@@ -12,10 +12,10 @@ namespace Scheds.Domain.DTOs
         public int NumberOfDays { get; set; }
         public int MaxNumberOfGeneratedSchedules { get; set; }
         public bool UseLiveData { get; set; }
+        public bool ConsiderZeroSeats { get; set; }
         public bool IsNumberOfDaysSelected { get; set; }
         public bool IsEngineering { get; set; }
         public List<CourseBase> SelectedItems { get; set; }
         public List<CustomCourseBaseDTO> CustomSelectedItems { get; set; }
     }
-
 }
