@@ -19,23 +19,11 @@
 
     <!-- Generate Schedules Page -->
     <div class="Container">
-        <div class="notification">
-            <div class="notification__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#393a37" d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z"></path></svg>
-            </div>
-            <div class="notification__title">There is a problem with some engineering courses from self-service itself, if you can't find a course or a course is outdated let me know through the facebook page and I'll fix it.</div>
-        </div>
         <div class="success_notification">
             <div class="notification__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#393a37" d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z"></path></svg>
             </div>
-            <div class="notification__title">Scheds is http<strong>s</strong> now, also course loading is now 70% faster, if it's slow it's the self-service not me. 😘</div>
-        </div>
-        <div class="success_notification">
-            <div class="notification__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#393a37" d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z"></path></svg>
-            </div>
-            <div class="notification__title">This project is open-source, don't forget to checkout my <strong><a href="https://github.com/aabdoo23/Scheds" target="_blank" style="color:#000">github repo</a></strong> and star the repo, ولو عجبكوا البتاع دا ادعولي او حاجة. ❤️✨ </div>
+            <div class="notification__title">🚨NEW FEATURE ALERT🚨 New checkbox for considering only sections with seats left, you can enable and disable it as you wish. </div>
         </div>
         <!-- Search and Cart Section -->
         <section class="search-cart">
@@ -141,6 +129,17 @@
                                 For example: if a course needs a lab and a tutorial to be considered together, then when
                                 considering lecture 1, it will consider lab 1A and tutorial 1B together, etc. which is
                                 not normal for cs students for example.</div>
+                        </div>
+                    </div>
+                    <div class="box" style="height: 20px; justify-content:flex-start;">
+                        <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;">
+                            <input type="checkbox" name="isConsiderZeroSeats" checked>Check this if you don't want to consider sections with zero seats.
+                        </label>
+                        <div class="tooltip" style="margin-bottom: 20px;">
+                            <div class="icon">i</div>
+                            <div class="tooltiptext">
+								This will only consider course items where there are available seats. If you don't check this, it will consider all courses regardless of the number of seats left.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -525,6 +524,7 @@
             const maxNumberOfGeneratedSchedules = document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value;
             const sliderElement = document.querySelector('input[name="numberOfDays"]'); // Explicitly select the slider input
             const isEngineering = document.querySelector('input[name="isEngineering"]').checked;
+			const isConsiderZeroSeats = document.querySelector('input[name="isConsiderZeroSeats"]').checked;
             // Define the days of the week in order (starting with Saturday)
             const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
 
@@ -568,6 +568,7 @@
                 customSelectedItems: [],
                 minimumNumberOfItemsPerDay: parseInt(minimumNumberOfItemsPerDay),
                 largestAllowedGap: parseInt(largestAllowedGap),
+                considerZeroSeats: isConsiderZeroSeats,
                 numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0,
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
                 isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
@@ -931,6 +932,7 @@
         border-radius: 8px;
         box-shadow: 0px 0px 5px -3px #111;
         margin-top: 10px;
+        margin-bottom: 10px;
     }
 
     .notification__icon {
