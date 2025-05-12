@@ -6,6 +6,6 @@ namespace Scheds.Domain.Entities
     {
         public string CourseCode { get; set; }
         public string CourseName { get; set; }
-        public DateTime LastUpdate { get; set; }
+        public DateTime? LastUpdate { get; set; }
     }
 }

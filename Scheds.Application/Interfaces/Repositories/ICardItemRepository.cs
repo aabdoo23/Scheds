@@ -6,5 +6,6 @@ namespace Scheds.Application.Interfaces.Repositories
     public interface ICardItemRepository : IBaseRepository<CardItem>
     {
         public Task<List<CardItem>> GetCardItemsByCourseCodeAsync(string courseCode);
+        public Task<List<CardItem>> Search(string query);
     }
 }

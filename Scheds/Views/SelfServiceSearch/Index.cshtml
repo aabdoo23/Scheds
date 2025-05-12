@@ -1,0 +1,398 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheds - Self Service Search</title>
+    <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="~/images/abdo.png">
+</head>
+
+<body>
+    @await Html.PartialAsync("_NavbarPartial")
+    <div class="search-section">
+        <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px;">
+            <h1>Search for Courses</h1>
+        </div>
+        <div class="search-bar" style="margin-right: 10px;">
+            <div class="group">
+                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                    <g>
+                        <path
+                            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                        </path>
+                    </g>
+                </svg>
+                <input id="course-search" placeholder="Search" type="search" class="input">
+                <div id="loading" style="display: none; font-weight: 600;">
+                    <div class="loader"></div>
+                    Loading... Please wait.
+                </div>
+                <button id="search-button" class="btn-primary">Search</button>
+
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: row;">
+            <p style="margin: 0; font-size: 1rem; font-weight: 600; color: var(--light-text);">SelfService might be down, but Scheds is still up :*</p>
+        </div>
+    </div>
+
+    <!-- Schedule Results Section -->
+    <div id="schedule-results" class="schedule-results" style="display: none;">
+        <!-- Add Filter Section -->
+        <div id="filter-section" class="filter-section">
+            <div class="filter-group">
+                <input type="text" id="instructor-filter" class="filter-input" placeholder="Filter by Instructor">
+                <input type="text" id="code-filter" class="filter-input" placeholder="Filter by Course Code">
+                <input type="text" id="name-filter" class="filter-input" placeholder="Filter by Course Name">
+                <select id="subtype-filter" class="filter-input">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="filter-stats">
+                <i class="fas fa-filter"></i>
+                <span id="results-count">0 results</span>
+            </div>
+        </div>
+        <div id="schedule-items" class="schedule-items">
+            <!-- Schedule items will be populated here -->
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+
+        // Add event listener for the Get Schedule button
+        document.getElementById('search-button').addEventListener('click', () => {
+            const query = document.getElementById('course-search').value.trim();
+            if (!query) {
+                alert('Please enter a course code first.');
+                return;
+            }
+            fetchSchedule(query);
+        });
+    });
+    document.getElementById('course-search').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('search-button').click();
+        }
+    });
+
+    function fetchSchedule(query) {
+        if (query.length <= 2) {
+            alert('Please enter a course code first.');
+            return;
+        }
+        fetch(`/api/coursebase/selfSearch?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(results => {
+                if (results.length === 0) {
+                    alert('Course not found. Please try again.');
+                    return;
+                }
+                console.log(results);
+                displayResults(results);
+            })
+            .catch(error => {
+                console.error('Error fetching schedule:', error);
+                alert('Error fetching schedule. Please try again.');
+            });
+    }
+
+    let currentResults = []; // Store current results globally
+
+    function displayResults(cardItems) {
+        if (cardItems.length === 0) {
+            alert('No results found. Please try again.');
+            return;
+        }
+
+        currentResults = cardItems; // Store the results
+        const scheduleResults = document.getElementById('schedule-results');
+        scheduleResults.style.display = 'block';
+
+        // Update subtype filter options
+        const subtypes = [...new Set(cardItems.map(item => item.SubType))];
+        const subtypeFilter = document.getElementById('subtype-filter');
+        subtypeFilter.innerHTML = '<option value="">All Types</option>' +
+            subtypes.map(type => `<option value="${type}">${type}</option>`).join('');
+
+        // Display initial results
+        filterAndDisplayResults();
+
+        // Add filter event listeners
+        ['instructor-filter', 'code-filter', 'name-filter', 'subtype-filter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('input', filterAndDisplayResults);
+        });
+    }
+
+    function filterAndDisplayResults() {
+        const instructorFilter = document.getElementById('instructor-filter').value.toLowerCase();
+        const codeFilter = document.getElementById('code-filter').value.toLowerCase();
+        const nameFilter = document.getElementById('name-filter').value.toLowerCase();
+        const subtypeFilter = document.getElementById('subtype-filter').value;
+
+        const filteredResults = currentResults.filter(item => {
+            return (!instructorFilter || item.InstructorName.toLowerCase().includes(instructorFilter)) &&
+                (!codeFilter || item.CourseCode.toLowerCase().includes(codeFilter)) &&
+                (!nameFilter || item.CourseName.toLowerCase().includes(nameFilter)) &&
+                (!subtypeFilter || item.SubType === subtypeFilter);
+        });
+
+        // Update results count
+        document.getElementById('results-count').textContent = `${filteredResults.length} result${filteredResults.length !== 1 ? 's' : ''}`;
+
+        const scheduleItems = document.getElementById('schedule-items');
+        scheduleItems.innerHTML = '';
+
+        // Define pastel colors for cards (cycle through them)
+        const pastelColors = [
+            'var(--card-blue)',
+            'var(--card-green)',
+            'var(--card-yellow)',
+            'var(--card-purple)',
+            'var(--card-brown)'
+        ];
+        const fontColors = [
+            'var(--font-color)',
+            'var(--font-color)',
+            'var(--font-color-dark)',
+            'var(--font-color)',
+            'var(--font-color-dark)',
+        ];
+
+        filteredResults.forEach((cardItem, idx) => {
+            const cardColor = pastelColors[idx % pastelColors.length];
+            const fontColor = fontColors[idx % fontColors.length];
+            const scheduleItem = document.createElement('div');
+            scheduleItem.classList.add('modern-card');
+            scheduleItem.style.background = cardColor;
+            cardItem.StartTime = formatTime(cardItem.StartTime);
+            cardItem.EndTime = formatTime(cardItem.EndTime);
+            scheduleItem.innerHTML = `
+                <div class="modern-card-content">
+                    <div class="modern-card-title" style="color: ${fontColor};">${cardItem.CourseCode}: ${cardItem.CourseName}</div>
+                    <div class="modern-card-desc" style="color: ${fontColor};">
+                        <i class="fas fa-user-tie"></i> Instructor <b>${cardItem.InstructorName}</b>
+                    </div>
+                    <div class="modern-card-tags">
+                        <span class="modern-tag"><i class="fas fa-hashtag"></i> Section <b>${cardItem.Section}</b></span>
+                        <span class="modern-tag"><i class="fas fa-tag"></i> <b>${cardItem.SubType}</b></span>
+                        <span class="modern-tag"><i class="fas fa-graduation-cap"></i> Credits <b>${cardItem.Credits}</b></span>
+                        <span class="modern-tag"><i class="fas fa-calendar"></i> <b>${cardItem.Day ? cardItem.Day : 'No Day'}</b></span>
+                        <span class="modern-tag"><i class="fas fa-clock"></i> <b>${cardItem.StartTime} - ${cardItem.EndTime}</b></span>
+                        ${cardItem.Room ? `<span class="modern-tag"><i class="fas fa-door-open"></i> Room <b>${cardItem.Room}</b></span>` : ''}
+                    </div>
+                </div>
+            `;
+            scheduleItems.appendChild(scheduleItem);
+        });
+    }
+
+    function formatTime(timeSpan) {
+        // Convert TimeSpan string to readable format
+        const time = new Date(`2000-01-01T${timeSpan}`);
+        return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+</script>
+
+<style>
+    .search-section {
+        margin: 100px auto;
+        margin-bottom: 0px;
+        background-color: var(--lighter-dark);
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        width: 80%;
+        padding: 20px;
+        padding-top: 0px;
+        color: var(--light-text);
+    }
+
+    .search-bar {
+        margin-bottom: 15px;
+    }
+
+    .schedule-results {
+        margin: 80px auto;
+        margin-top: 20px;
+        background-color: var(--lighter-dark);
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        color: var(--light-text);
+        width: 80%;
+    }
+
+    .schedule-results h2 {
+        margin-top: 0;
+        color: var(--light-text);
+        border-bottom: 2px solid var(--dark-text);
+        padding-bottom: 10px;
+    }
+
+    .schedule-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+        margin-top: 32px;
+    }
+
+    .modern-card {
+        border-radius: 18px;
+        box-shadow: 0 4px 8px 0 rgba(60, 60, 60, 0.08);
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 240px;
+        transition: transform 0.15s, box-shadow 0.15s;
+        background: #f5f6fa;
+    }
+
+    .modern-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 32px 0 rgba(60, 60, 60, 0.16);
+    }
+
+    .modern-card-content {
+        padding: 28px 28px 12px 28px;
+    }
+
+    .modern-card-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #eef0eb;
+        margin-bottom: 8px;
+    }
+
+    .modern-card-desc {
+        font-size: 1rem;
+        color: #f4f9e9;
+        margin-bottom: 18px;
+    }
+
+    .modern-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .modern-tag {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        padding: 5px 14px;
+        font-size: 0.95rem;
+        color: #151515;
+        font-weight: 500;
+        box-shadow: 0 1px 2px rgba(185, 211, 221, 0.097);
+    }
+
+    .modern-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 28px 18px 28px;
+        border-top: 1px solid #e0e0e0;
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #222;
+        background: transparent;
+    }
+
+    .modern-arrow {
+        font-size: 1.3rem;
+        margin-left: 8px;
+        transition: margin-left 0.2s;
+    }
+
+    .modern-card-footer:hover .modern-arrow {
+        margin-left: 16px;
+    }
+
+    .filter-section {
+        background: var(--lighter-dark);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+    .filter-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .filter-input {
+        background: var(--dark-text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: var(--light-text);
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .filter-input::placeholder {
+        color: rgba(0, 0, 0, 0.7);
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--light-blue);
+        box-shadow: 0 0 0 2px rgba(var(--light-blue-rgb), 0.1);
+    }
+
+    .filter-input:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    select.filter-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 40px;
+    }
+
+    .filter-stats {
+        color: var(--light-text);
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-align: right;
+        padding-top: 8px;
+    }
+
+    /* Update existing styles to work better with filters */
+    .schedule-items {
+        margin-top: 0;
+    }
+</style>
+
+<style>
+    :root {
+        --card-blue: #16425b;
+        --card-yellow: #ffa600;
+        --card-green: #153243;
+        --card-red: #0d101c;
+        --card-purple: #002d43;
+        --card-brown: #f1bc3e;
+
+        --font-color: #eef0eb;
+        --font-color-dark: #151515;
+    }
+</style>

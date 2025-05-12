@@ -11,6 +11,7 @@
     <title>Scheds - Find Study Rooms</title>
     <link rel="icon" type="image/png" href="~/images/abdo.png">
     <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         .find-study-rooms-container {
@@ -130,8 +131,7 @@
         .results-section h2 {
             font-size: 2rem;
             margin-bottom: 20px;
-            color: var(--light-text)
-            text-align: center;
+            color: var(--light-text) text-align: center;
         }
 
         #results {
@@ -189,8 +189,14 @@
                     <option value="18:30">6:30 PM</option>
                     <option value="20:30">8:30 PM</option>
                 </select>
-
-                <button id="search-button" class="btnn-primary" style="width: 160px;">Search</button>
+                <div style="display: flex; flex-direction: row; gap: 10px;">
+                    <button id="search-button" class="btnn-primary" style="width: 100%; ">Search</button>
+                    <button id="search-now-button" class="btnn-primary" style="width: 100%;">Search for empty rooms
+                        now</button>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; gap: 10px;">
+                <p style="font-size: 1rem; font-weight: 600; color: var(--light-text); margin: 0px; margin-top: 10px;">*Note: This is a beta feature and may not be 100% accurate.</p>
             </div>
         </div>
 
@@ -201,7 +207,71 @@
         </div>
     </div>
 
-    <script src="~/js/find-study-rooms.js"></script>
+    <script>
+        document.getElementById('search-button').addEventListener('click', function () {
+            const day = document.getElementById('day-select').value;
+            const time = document.getElementById('time-select').value;
+
+            // Construct the URL with query parameters, ensuring special characters are encoded
+            const url = `/api/room?dayOfWeek=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}`;
+
+            fetchRooms(url);
+        });
+
+        document.getElementById('search-now-button').addEventListener('click', function () {
+            const currentTime = new Date();
+            // Get the day name and capitalize first letter
+            const currentDay = currentTime.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+            const currentHour = currentTime.getHours();
+            const currentMinute = currentTime.getMinutes();
+
+            // Format minutes to always be two digits
+            const formattedMinutes = currentMinute.toString().padStart(2, '0');
+
+            // Format time as HH:MM
+            const formattedTime = `${currentHour}:${formattedMinutes}`;
+
+            const url = `/api/room?dayOfWeek=${encodeURIComponent(currentDay)}&time=${encodeURIComponent(formattedTime)}`;
+            fetchRooms(url);
+        });
+
+        // Separate the fetch logic to avoid code duplication
+        function fetchRooms(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '';
+
+                    if (data.length === 0) {
+                        resultsDiv.innerHTML = '<p>No available rooms found for the selected day and time.</p>';
+                    } else {
+                        data.forEach(room => {
+                            // Create the room card div
+                            const roomCard = document.createElement('div');
+                            roomCard.classList.add('room-card');
+
+                            // Create an h3 element for the room number
+                            const roomTitle = document.createElement('h3');
+                            roomTitle.textContent = `Room: ${room}`;
+
+                            // Append the room title to the room card
+                            roomCard.appendChild(roomTitle);
+
+                            // Append the room card to the results div
+                            resultsDiv.appendChild(roomCard);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching room data:', error);
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '<p>Error fetching room data. Please try again.</p>';
+                });
+        }
+
+
+    </script>
     <script>
 
         const rootElement = document.documentElement;

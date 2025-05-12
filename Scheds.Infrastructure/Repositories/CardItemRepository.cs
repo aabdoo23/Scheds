@@ -18,5 +18,15 @@ namespace Scheds.Infrastructure.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public async Task<List<CardItem>> Search(string query)
+        {
+            return await _context.CardItems.Include(c => c.CourseSchedules)
+                .Where(cardItem => cardItem.CourseCode.Contains(query) 
+                || cardItem.CourseName.Contains(query) 
+                || cardItem.Instructor.Contains(query))
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

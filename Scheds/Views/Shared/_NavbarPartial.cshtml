@@ -45,12 +45,22 @@
                                                                         color: transparent;">
                                                                         Mirror
                                                                     </a>
-                                                                </li>
+        </li>
         <li><a href="/GenerateSchedules">Generate Schedules</a></li>
+        <li><a href="/SelfServiceSearch">Self Service Search</a></li>
         <li><a href="/FindStudyRooms">Find Study Rooms</a></li>
-        <li><a href="https://forms.gle/2qJ84eaXxJh3r5TD8" target="_blank">Support Form</a></li>
-        <li><a href="https://www.facebook.com/profile.php?id=61566138420193&mibextid=LQQJ4d"
-                target="_blank">Facebook</a></li>
+        <li>
+            <a href="https://forms.gle/2qJ84eaXxJh3r5TD8" target="_blank" class="icon-link">
+                <i class="fas fa-question-circle"></i>
+                <span class="icon-tooltip">Support Form</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/profile.php?id=61566138420193&mibextid=LQQJ4d" target="_blank" class="icon-link">
+                <i class="fab fa-facebook"></i>
+                <span class="icon-tooltip">Facebook Page</span>
+            </a>
+        </li>
     </ul>
 </nav>
 
@@ -139,7 +149,7 @@
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -182,4 +192,64 @@
   }
 }
 
+.icon-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem !important;
+    width: 24px;
+    height: 24px;
+}
+
+.icon-link i {
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.icon-link:hover i {
+    transform: scale(1.1);
+}
+
+.icon-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: var(--light-text);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
+
+.icon-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 5px 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--dark) transparent;
+}
+
+.icon-link:hover .icon-tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: -35px;
+}
+
+/* Update existing nav-links styles to better accommodate icons */
+.nav-links li a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 </style>
