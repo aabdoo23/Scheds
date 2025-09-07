@@ -1,0 +1,132 @@
+@model Scheds.Domain.ViewModels.AnalyticsViewModel
+@{
+    ViewData["Title"] = "Detailed Analytics";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Detailed Analytics</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Analytics</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Most Selected Courses</h5>
+                </div>
+                <div class="card-body">
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        @if (Model.MostSelectedCourses != null && Model.MostSelectedCourses.Any())
+                        {
+                            <ol class="list-group list-group-numbered">
+                                @foreach (var course in Model.MostSelectedCourses)
+                                {
+                                    <li class="list-group-item">@course</li>
+                                }
+                            </ol>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No data available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Most Used Customizations</h5>
+                </div>
+                <div class="card-body">
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        @if (Model.MostSelectedCustomizations != null && Model.MostSelectedCustomizations.Any())
+                        {
+                            <ul class="list-group">
+                                @foreach (var customization in Model.MostSelectedCustomizations)
+                                {
+                                    <li class="list-group-item">@customization</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No customizations data available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Daily Generation Statistics (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.DailyStats != null && Model.DailyStats.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Generations Count</th>
+                                        <th>Total Schedules Generated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var stat in Model.DailyStats)
+                                    {
+                                        <tr>
+                                            <td>@stat.Date.ToString("yyyy-MM-dd")</td>
+                                            <td>@stat.Count</td>
+                                            <td>@stat.TotalSchedulesGenerated</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No daily statistics available</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Usage Statistics Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var stat in Model.UsageStatistics)
+                        {
+                            <div class="col-md-3 mb-3">
+                                <div class="border p-3 text-center">
+                                    <h4 class="text-primary">@stat.Value</h4>
+                                    <p class="mb-0">@stat.Key</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

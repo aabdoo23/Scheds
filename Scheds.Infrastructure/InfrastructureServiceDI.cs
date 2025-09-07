@@ -14,6 +14,7 @@ namespace Scheds.Infrastructure
             services.AddScoped<ICourseBaseRepository, CourseBaseRepository>();
             services.AddScoped<ICourseScheduleRepository, CourseScheduleRepository>();
             services.AddScoped<IInstructorRepository, InstructorRepository>();
+            services.AddScoped<IScheduleGenerationRepository, ScheduleGenerationRepository>();
 
             return services;
         }
