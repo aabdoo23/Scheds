@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
 
@@ -23,6 +24,9 @@ namespace Scheds.MVC
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
             });
+
+            // Configure admin settings
+            builder.Services.Configure<AdminSettings>(builder.Configuration.GetSection("AdminSettings"));
 
             builder.Services.AddServices();
             builder.Services.AddRepositories();

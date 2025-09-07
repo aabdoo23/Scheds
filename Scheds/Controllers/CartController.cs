@@ -83,7 +83,24 @@ namespace Scheds.MVC.Controllers
             if (string.IsNullOrEmpty(generateRequestJson))
             {
                 Console.WriteLine("GenerateRequest is empty");
-                return new GenerateRequestDTO();
+                var newGenerateRequest = new GenerateRequestDTO
+                {
+                    MinimumNumberOfItemsPerDay = 0,
+                    LargestAllowedGap = 0,
+                    MaxNumberOfGeneratedSchedules = 15,
+                    NumberOfDays = 5,
+                    DaysStart = "10:30",
+                    DaysEnd = "18:30",
+                    IsNumberOfDaysSelected = true,
+                    IsEngineering = false,
+                    UseLiveData = false,
+                    ConsiderZeroSeats = false,
+                    SelectedDays = new List<bool>(),
+                    SelectedItems = new List<CourseBase>(),
+                    CustomSelectedItems = new List<CustomCourseBaseDTO>()
+                };
+                SaveGenerateRequestToCookies(newGenerateRequest);
+                return newGenerateRequest;
             }
             return JsonConvert.DeserializeObject<GenerateRequestDTO>(generateRequestJson);
         }

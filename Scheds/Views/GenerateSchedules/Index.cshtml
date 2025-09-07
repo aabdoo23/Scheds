@@ -24,18 +24,18 @@
             <div class="notification__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#393a37" d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z"></path></svg>
             </div>
-            <div class="notification__title">🚨NEW FEATURE ALERT🚨 If you can't find your courses on SelfService, you can now search for courses in Self Service using the <a href="/SelfServiceSearch" style="color:var(--light-text); font-weight: 600;">Self Service Search</a> page. </div>
+            <div class="notification__title">🚨NEW Announcement🚨 Scheds is now live for the 2025-2026 season, up and running for 3 years now, love you guys :* </div>
         </div>
         <!-- Search and Cart Section -->
         <section class="search-cart">
             <div class="search-section">
                 <div style="display: flex; flex-direction: row; vertical-align:middle; gap: 10px;">
-                    <h1>Search for Courses</h1>
+                    <h2>Search for Courses</h2>
                     <label style="margin-top: 5px; font-weight: 600; color:var(--dark-text)"><input type="checkbox"
                             name="isLiveData" checked>
                         Use Live Data in course selection</label>
                     <div class="tooltip" style="margin-top: 5px;">
-                        <div class="icon">i</div>
+                        <i class="fas fa-info-circle"></i>
                         <div class="tooltiptext">Fetches data for each course on selection from Self Service to
                             <strong>ensure data is updated and all sections are there.</strong> Small delay.
                         </div>
@@ -60,8 +60,8 @@
                     </div>
 
                     <button id="add-to-cart" class="btn-primary">Search Live</button>
-                    <div class="tooltip" style="margin-bottom: 20px;">
-                        <div class="icon">i</div>
+                    <div class="tooltip" style="margin-left: 10px;">
+                        <i class="fas fa-info-circle"></i>
                         <div class="tooltiptext">If you can't find the course you're searching for in the autocomplete,
                             click this button.</div>
                     </div>
@@ -84,139 +84,237 @@
 
 
         <section class="customization">
-            <div class="top-section">
-                <h2 class="top-section-text">Customize Your Schedule</h2>
+            <div class="customization-header">
+                <h2>Customize Your Schedule</h2>
+                <p class="subtitle">Fine-tune your preferences to generate the perfect schedule</p>
             </div>
 
-            <div class="customization-layout">
-                <!-- Sliders Section -->
-                <div class="sliders">
-                    <div class="box">
-                        <label class="slider-label">Minimum Slots per Day</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
-                                class="input-range" min="0" max="4" value="1" />
-                        </div>
-                        <p id="minimumNumberOfItemsPerDayValue" class="number">1</p>
+            <div class="customization-grid">
+                <!-- Schedule Parameters Card -->
+                <div class="customization-card">
+                    <div class="card-header">
+                        <i class="fas fa-sliders-h"></i>
+                        <h3>Schedule Parameters</h3>
                     </div>
-
-                    <div class="box">
-                        <label class="slider-label">Maximum Gap Period (hours)</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input type="range" name="largestAllowedGap" class="input-range" min="0" max="6"
-                                value="4" />
-                        </div>
-                        <p id="largestAllowedGapValue" class="number">4</p>
-                    </div>
-
-                    <div class="box">
-                        <label class="slider-label">Maximum Number of Schedules</label>
-                        <div class="inner-box">
-                            <div class="line"></div>
-                            <input type="range" name="maxNumberOfGeneratedSchedules" class="input-range" min="1"
-                                max="30" value="20" />
-                        </div>
-                        <p id="maxNumberOfGeneratedSchedulesValue" class="number">20</p>
-                    </div>
-                    <div class="box" style="height: 20px; justify-content:flex-start;">
-                        <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;"><input
-                                type="checkbox" name="isEngineering">Check this if you're an Engineering
-                            student.</label>
-                        <div class="tooltip" style="margin-bottom: 20px;">
-                            <div class="icon">i</div>
-                            <div class="tooltiptext">This considers different sections of labs and tutorials together.
-                                For example: if a course needs a lab and a tutorial to be considered together, then when
-                                considering lecture 1, it will consider lab 1A and tutorial 1B together, etc. which is
-                                not normal for cs students for example.</div>
-                        </div>
-                    </div>
-                    <div class="box" style="height: 20px; justify-content:flex-start;">
-                        <label style="font-weight: 600; color:var(--light-text); margin-left: 0px;">
-                            <input type="checkbox" name="isConsiderZeroSeats" checked>Check this if you don't want to consider sections with zero seats.
-                        </label>
-                        <div class="tooltip" style="margin-bottom: 20px;">
-                            <div class="icon">i</div>
-                            <div class="tooltiptext">
-								This will only consider course items where there are available seats. If you don't check this, it will consider all courses regardless of the number of seats left.
+                    <div class="card-content">
+                        <div class="slider-control">
+                            <label class="control-label">Minimum Slots per Day</label>
+                            <div class="slider-wrapper">
+                                <input id="minimumNumberOfItemsPerDay" type="range" name="minimumNumberOfItemsPerDay"
+                                    class="modern-slider" min="0" max="5" value="0" />
+                                <span class="slider-value" id="minimumNumberOfItemsPerDayValue">0</span>
                             </div>
+                            <div class="control-hint">0 = No minimum (recommended for flexibility)</div>
+                        </div>
+
+                        <div class="slider-control">
+                            <label class="control-label">Maximum Gap Period (hours)</label>
+                            <div class="slider-wrapper">
+                                <input type="range" name="largestAllowedGap" class="modern-slider" min="0" max="8" value="0" />
+                                <span class="slider-value" id="largestAllowedGapValue">0</span>
+                            </div>
+                            <div class="control-hint">0 = No minimum (recommended for flexibility)</div>
+                        </div>
+
+                        <div class="slider-control">
+                            <label class="control-label">Maximum Number of Schedules</label>
+                            <div class="slider-wrapper">
+                                <input type="range" name="maxNumberOfGeneratedSchedules" class="modern-slider" min="5" max="50" value="15" />
+                                <span class="slider-value" id="maxNumberOfGeneratedSchedulesValue">15</span>
+                            </div>
+                            <div class="control-hint">15 schedules provide good variety without overwhelming</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="right-section">
-                    <!-- Checkboxes Section -->
-                    <div class="checkboxes right-section-header" style="margin-top: 10px;">
-                        <div class="customization-method" style="font-weight: 700;">
-                            <h3>Pick your day customization method</h3>
-                            <label>
-                                <input type="radio" name="scheduleMethod" value="maxDays" checked> Pick max number of
-                                days
-                            </label>
-                            <label>
-                                <input type="radio" name="scheduleMethod" value="selectDays"> Select Specific Days
-                            </label>
-                        </div>
-
-                        <div class="sliders" id="slider-section">
-                            <div class="box" style="margin: 0;">
-                                <label class="slider-label">Maximum Days on Campus</label>
-                                <div class="inner-box">
-                                    <div class="line"></div>
-                                    <input type="range" id="numberOfDaysRange" name="numberOfDays" class="input-range"
-                                        min="0" max="6" value="6" />
+                <!-- Student Options Card -->
+                <div class="customization-card">
+                    <div class="card-header">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Student Options</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="checkbox-control">
+                            <label class="modern-checkbox">
+                                <input type="checkbox" name="isEngineering">
+                                <span class="checkmark"></span>
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Engineering Student</span>
+                                    <span class="checkbox-desc">Consider lab and tutorial sections together</span>
                                 </div>
-                                <p id="numberOfDaysValue" class="number">6</p>
+                            </label>
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="tooltiptext">This considers different sections of labs and tutorials together. For example: if a course needs a lab and a tutorial to be considered together, then when considering lecture 1, it will consider lab 1A and tutorial 1B together, etc.</div>
                             </div>
                         </div>
-                        <script>
-                            const rangeInput = document.getElementById('numberOfDaysRange');
-                            const valueDisplay = document.getElementById('numberOfDaysValue');
 
-                            rangeInput.addEventListener('input', function () {
-                                valueDisplay.textContent = this.value;
-                            });
-                        </script>
-
-                        <!-- Checkboxes Section -->
-                        <div class="checkboxes" id="checkbox-section"
-                            style="display: none; width: 90%; margin: 0; box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);">
-                            <div class="checkbox-group">
-                                <h3>Select Days on Campus</h3>
-                                <label><input type="checkbox" name="selectedDays" value="all" id="all-days"> All
-                                    Week</label>
-                                <label><input type="checkbox" name="selectedDays" value="Saturday"> Saturday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Sunday"> Sunday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Monday"> Monday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Tuesday"> Tuesday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Wednesday"> Wednesday</label>
-                                <label><input type="checkbox" name="selectedDays" value="Thursday"> Thursday</label>
+                        <div class="checkbox-control">
+                            <label class="modern-checkbox">
+                                <input type="checkbox" name="isConsiderZeroSeats" checked>
+                                <span class="checkmark"></span>
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Only Available Seats</span>
+                                    <span class="checkbox-desc">Exclude sections with zero available seats</span>
+                                </div>
+                            </label>
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="tooltiptext">This will only consider course items where there are available seats. If you don't check this, it will consider all courses regardless of the number of seats left.</div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="checkboxes" style="margin-top: 0;">
-                        <div class="checkbox-group">
-                            <h3>Select First Slot Start Time</h3>
-                            <label><input type="radio" name="daysStart" value="08:30" checked> 8:30 AM</label>
-                            <label><input type="radio" name="daysStart" value="10:30"> 10:30 AM</label>
-                            <label><input type="radio" name="daysStart" value="12:30"> 12:30 PM</label>
-                            <label><input type="radio" name="daysStart" value="14:30"> 2:30 PM</label>
-                            <label><input type="radio" name="daysStart" value="16:30"> 4:30 PM</label>
-                        </div>
-
-                        <div class="checkbox-group">
-                            <h3>Select Last Slot End Time</h3>
-                            <label><input type="radio" name="daysEnd" value="12:30"> 12:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="14:30"> 2:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="16:30"> 4:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="18:30"> 6:30 PM</label>
-                            <label><input type="radio" name="daysEnd" value="20:30" checked> 8:30 PM</label>
                         </div>
                     </div>
                 </div>
 
+                <!-- Days Configuration Card -->
+                <div class="customization-card">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-week"></i>
+                        <h3>Days Configuration</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="radio-group">
+                            <h4>Day Selection Method</h4>
+                            <div class="radio-options">
+                                <label class="modern-radio">
+                                    <input type="radio" name="scheduleMethod" value="maxDays" checked>
+                                    <span class="radio-mark"></span>
+                                    <span>Maximum Days</span>
+                                </label>
+                                <label class="modern-radio">
+                                    <input type="radio" name="scheduleMethod" value="selectDays">
+                                    <span class="radio-mark"></span>
+                                    <span>Specific Days</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="slider-section" class="method-content">
+                            <div class="slider-control">
+                                <label class="control-label">Maximum Days on Campus</label>
+                                <div class="slider-wrapper">
+                                    <input type="range" id="numberOfDaysRange" name="numberOfDays" class="modern-slider" min="1" max="6" value="5" />
+                                    <span class="slider-value" id="numberOfDaysValue">5</span>
+                                </div>
+                                <div class="control-hint">5 days allows weekday-only schedules (recommended)</div>
+                            </div>
+                        </div>
+
+                        <div id="checkbox-section" class="method-content" style="display: none;">
+                            <h4>Select Days on Campus</h4>
+                            <div class="days-grid">
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="all" id="all-days">
+                                    <span class="day-mark"></span>
+                                    <span>All Week</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Saturday">
+                                    <span class="day-mark"></span>
+                                    <span>Saturday</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Sunday">
+                                    <span class="day-mark"></span>
+                                    <span>Sunday</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Monday">
+                                    <span class="day-mark"></span>
+                                    <span>Monday</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Tuesday">
+                                    <span class="day-mark"></span>
+                                    <span>Tuesday</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Wednesday">
+                                    <span class="day-mark"></span>
+                                    <span>Wednesday</span>
+                                </label>
+                                <label class="day-checkbox">
+                                    <input type="checkbox" name="selectedDays" value="Thursday">
+                                    <span class="day-mark"></span>
+                                    <span>Thursday</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Preferences Card -->
+                <div class="customization-card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>Time Preferences</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="time-section">
+                            <h4>First Slot Start Time</h4>
+                            <div class="time-options">
+                                <label class="time-radio">
+                                    <input type="radio" name="daysStart" value="08:30">
+                                    <span class="time-mark"></span>
+                                    <span>8:30 AM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysStart" value="10:30" checked>
+                                    <span class="time-mark"></span>
+                                    <span>10:30 AM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysStart" value="12:30">
+                                    <span class="time-mark"></span>
+                                    <span>12:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysStart" value="14:30">
+                                    <span class="time-mark"></span>
+                                    <span>2:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysStart" value="16:30">
+                                    <span class="time-mark"></span>
+                                    <span>4:30 PM</span>
+                                </label>
+                            </div>
+                            <div class="time-hint">10:30 AM avoids early morning classes</div>
+                        </div>
+
+                        <div class="time-section">
+                            <h4>Last Slot End Time</h4>
+                            <div class="time-options">
+                                <label class="time-radio">
+                                    <input type="radio" name="daysEnd" value="12:30">
+                                    <span class="time-mark"></span>
+                                    <span>12:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysEnd" value="14:30">
+                                    <span class="time-mark"></span>
+                                    <span>2:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysEnd" value="16:30">
+                                    <span class="time-mark"></span>
+                                    <span>4:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysEnd" value="18:30" checked>
+                                    <span class="time-mark"></span>
+                                    <span>6:30 PM</span>
+                                </label>
+                                <label class="time-radio">
+                                    <input type="radio" name="daysEnd" value="20:30">
+                                    <span class="time-mark"></span>
+                                    <span>8:30 PM</span>
+                                </label>
+                            </div>
+                            <div class="time-hint">6:30 PM allows reasonable work/life balance</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button id="generate-schedule" class="btn-primary"
                 style="width: 100%; background-color:var(--light-blue); font-size: 20px; padding: 15px;">
@@ -234,7 +332,7 @@
             <div style="display: flex; flex-direction: row;">
                 <h2>Generated Schedules</h2>
                 <div class="tooltip" style="margin-bottom: 0px;">
-                    <div class="icon">i</div>
+                    <i class="fas fa-info-circle"></i>
                     <div class="tooltiptext">If you can't see a course selected above, then it probably has no schedule.
                         If not sure, search for the course using the Search live button and try again. If all fails,
                         report it in the form in the main page, bottom right.</div>
@@ -256,8 +354,6 @@
             const scheduleMethodRadios = document.querySelectorAll('input[name="scheduleMethod"]');
             const allDaysCheckbox = document.getElementById('all-days');
             const dayCheckboxes = document.querySelectorAll('input[name="selectedDays"]:not(#all-days)');
-            const rangeInput = document.querySelector('input[type="range"]');
-            const numberDisplay = document.querySelector('.number');
 
             // Function to toggle between slider and checkbox sections
             scheduleMethodRadios.forEach(radio => {
@@ -270,11 +366,6 @@
                         checkboxSection.style.display = 'block'; // Show checkboxes
                     }
                 });
-            });
-
-            // Update the display for the number of days when using the slider
-            rangeInput.addEventListener('input', function () {
-                numberDisplay.textContent = this.value;
             });
 
             // Function to handle the "All Week" checkbox behavior
@@ -614,19 +705,25 @@
 
 
     <script>
-        document.querySelectorAll('.box').forEach(box => {
-            const input_range = box.querySelector('.input-range');
-            const number = box.querySelector('.number');
-            const line = box.querySelector('.line');
-            const max_value = input_range.max;
-
-            input_range.addEventListener('input', () => {
-                const value = input_range.value;
-                number.innerHTML = value;
-                line.style.width = (value / max_value) * 100 + '%';
+        // Modern slider functionality for all sliders
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle all modern sliders
+            document.querySelectorAll('.modern-slider').forEach(slider => {
+                const valueDisplay = slider.parentElement.querySelector('.slider-value');
+                
+                // Update value display on input
+                slider.addEventListener('input', () => {
+                    if (valueDisplay) {
+                        valueDisplay.textContent = slider.value;
+                    }
+                });
+                
+                // Initialize display value
+                if (valueDisplay) {
+                    valueDisplay.textContent = slider.value;
+                }
             });
         });
-
     </script>
 </body>
 
@@ -635,12 +732,6 @@
 <style>
     .pp {
         padding: 30px;
-    }
-
-    .top-section-text {
-        display: flex;
-        margin-bottom: 20px;
-        color: var(--light-text);
     }
 
     .search-section {
@@ -769,6 +860,528 @@
         /* Same border radius */
     }
 
+    /* New Customization Section Styles */
+    .customization {
+        margin: 30px 0;
+    }
+
+    .customization-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .customization-header h2 {
+        color: var(--light-text);
+        font-size: 1.7rem;
+        margin: 0 0 10px 0;
+        font-weight: 600;
+    }
+
+    .customization-header .subtitle {
+        color: var(--dark-text);
+        font-size: 1.1rem;
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .customization-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .customization-card {
+        background: var(--lighter-dark);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .customization-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-header i {
+        color: var(--light-blue);
+        font-size: 1.3rem;
+    }
+
+    .card-header h3 {
+        color: var(--light-text);
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Modern Slider Styles */
+    .slider-control {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .control-label {
+        color: var(--light-text);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .slider-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .modern-slider {
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--dark);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .modern-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--light-blue);
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .modern-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        background: var(--dark-blue);
+    }
+
+    .modern-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--light-blue);
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-value {
+        background: var(--light-blue);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    /* Hint text styles */
+    .control-hint, .time-hint {
+        color: var(--dark-text);
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    /* Recommendation Card Styles */
+    .recommendation-card {
+        background: linear-gradient(135deg, var(--lighter-dark) 0%, rgba(52, 152, 219, 0.1) 100%);
+        border: 2px solid var(--light-blue);
+    }
+
+    .recommendation-card .card-header {
+        border-bottom-color: var(--light-blue);
+    }
+
+    .recommendation-card .card-header i {
+        color: #f39c12;
+    }
+
+    .recommendation-item {
+        padding: 12px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        border-left: 3px solid var(--light-blue);
+    }
+
+    .recommendation-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .rec-title {
+        color: var(--light-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .rec-desc {
+        color: var(--dark-text);
+        font-size: 0.8rem;
+        line-height: 1.4;
+        opacity: 0.9;
+    }
+
+    /* Modern Checkbox Styles */
+    .checkbox-control {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .modern-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .modern-checkbox input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        background: var(--dark);
+        border: 2px solid var(--dark-text);
+        border-radius: 4px;
+        position: relative;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .modern-checkbox input[type="checkbox"]:checked + .checkmark {
+        background: var(--light-blue);
+        border-color: var(--light-blue);
+    }
+
+    .modern-checkbox input[type="checkbox"]:checked + .checkmark::after {
+        content: "✓";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .checkbox-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .checkbox-title {
+        color: var(--light-text);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .checkbox-desc {
+        color: var(--dark-text);
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+
+    /* Radio Button Styles */
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .radio-group h4 {
+        color: var(--light-text);
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .radio-options {
+        display: flex;
+        gap: 20px;
+    }
+
+    .modern-radio {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: var(--light-text);
+        font-size: 0.95rem;
+    }
+
+    .modern-radio input[type="radio"] {
+        display: none;
+    }
+
+    .radio-mark {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--dark-text);
+        border-radius: 50%;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .modern-radio input[type="radio"]:checked + .radio-mark {
+        border-color: var(--light-blue);
+    }
+
+    .modern-radio input[type="radio"]:checked + .radio-mark::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        background: var(--light-blue);
+        border-radius: 50%;
+    }
+
+    /* Method Content */
+    .method-content {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    /* Days Grid */
+    .days-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .day-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: var(--light-text);
+        font-size: 0.9rem;
+        padding: 8px;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .day-checkbox:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .day-checkbox input[type="checkbox"] {
+        display: none;
+    }
+
+    .day-mark {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--dark-text);
+        border-radius: 3px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .day-checkbox input[type="checkbox"]:checked + .day-mark {
+        background: var(--light-blue);
+        border-color: var(--light-blue);
+    }
+
+    .day-checkbox input[type="checkbox"]:checked + .day-mark::after {
+        content: "✓";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    /* Time Section */
+    .time-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .time-section h4 {
+        color: var(--light-text);
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .time-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .time-radio {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: var(--light-text);
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--dark-text);
+        transition: all 0.2s ease;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .time-radio:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--light-blue);
+    }
+
+    .time-radio input[type="radio"] {
+        display: none;
+    }
+
+    .time-mark {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--dark-text);
+        border-radius: 50%;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .time-radio input[type="radio"]:checked + .time-mark {
+        border-color: var(--light-blue);
+        background: var(--light-blue);
+    }
+
+    .time-radio input[type="radio"]:checked + .time-mark::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+    }
+
+    .time-radio input[type="radio"]:checked {
+        + .time-mark + span {
+            color: var(--light-blue);
+            font-weight: 600;
+        }
+    }
+
+    /* Improved Tooltip */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip i {
+        color: var(--dark-text);
+        font-size: 1rem;
+        transition: color 0.2s ease;
+    }
+
+    .tooltip:hover i {
+        color: var(--light-blue);
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .tooltiptext {
+        visibility: hidden;
+        width: 250px;
+        background-color: var(--dark);
+        color: var(--light-text);
+        text-align: left;
+        border-radius: 8px;
+        padding: 12px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -125px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: var(--dark) transparent transparent transparent;
+    }
+
+    /* Responsive Design */
+    @* @media (max-width: 768px) {
+        .customization-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .radio-options {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .time-options {
+            grid-template-columns: 1fr;
+        }
+        
+        .days-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    } *@
+
     .right-section {
         display: flex;
         flex-direction: column;
@@ -779,59 +1392,10 @@
     @*gap:10px;*@
     }
 
-    /* From Uiverse.io by SmookyDev */
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-        font-family: "Arial", sans-serif;
-    }
-
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    .tooltiptext {
-        visibility: hidden;
-        width: 200px;
-        background-color: var(--lighter);
-        color: var(--light-text);
-        text-align: center;
-        border-radius: 5px;
-        padding: 10px;
-        position: absolute;
-        z-index: 1;
-        font-weight: 500;
-    @*top:80%;*@@*left:200%;*@margin-left: 50px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .tooltip .icon {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-color: var(--dark-text);
-        color: var(--light-text);
-        border-radius: 50%;
-        text-align: center;
-        line-height: 20px;
-    }
-
     .top-section {
         margin-top: 5px;
         display: flex;
         gap: 20px;
-
-    }
-
-    .right-section-header {
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-        gap: 10px;
-        width: 100%;
     }
 
     .clear-cart-btn {
