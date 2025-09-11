@@ -19,7 +19,7 @@
         public string instructorId = "";
         public string meeting = "";
         public string nonTradProgram = "";
-        public string period = "2025/SPRG";
+        public string period = "2025/FALL";
         public string population = "";
         public string program = "";
         public string registrationtype = "";
