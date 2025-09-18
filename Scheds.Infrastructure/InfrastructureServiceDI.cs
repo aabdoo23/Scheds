@@ -25,6 +25,7 @@ namespace Scheds.Infrastructure
             services.AddScoped<IParsingService, ParsingService>();
             services.AddScoped<ISelfServiceLiveFetchService, SelfServiceLiveFetchService>();
             services.AddScoped<IEmptyRoomsService, EmptyRoomsService>();
+            services.AddScoped<ISeatModerationService, SeatModerationService>();
 
             return services;
         }

@@ -7,8 +7,8 @@ using System.Text;
 
 namespace Scheds.Infrastructure.Services
 {
-    public class SelfServiceLiveFetchService(IParsingService parsingService, 
-        ICardItemService cardItemService, 
+    public class SelfServiceLiveFetchService(IParsingService parsingService,
+        ICardItemService cardItemService,
         ICourseBaseRepository courseBaseRepository,
         ICardItemRepository cardItemRepository) : ISelfServiceLiveFetchService
     {
@@ -21,15 +21,13 @@ namespace Scheds.Infrastructure.Services
         {
             var existingCourse = await _courseBaseRepository.GetByIdAsync(CourseCode);
 
-            // Return cached data if recent
-            if(existingCourse != null)Console.WriteLine(DateTime.Now - existingCourse.LastUpdate);
+            if (existingCourse != null) Console.WriteLine(DateTime.Now - existingCourse.LastUpdate);
             if (existingCourse != null && DateTime.Now - existingCourse.LastUpdate <= TimeSpan.FromMinutes(10))
             {
                 Console.WriteLine("returning cached");
                 return await _cardItemRepository.GetCardItemsByCourseCodeAsync(CourseCode);
             }
 
-            // Fetch from API and update cache
             var cards = await FetchFromAPI(CourseCode);
             foreach (var card in cards)
             {
@@ -38,6 +36,32 @@ namespace Scheds.Infrastructure.Services
             return cards;
         }
         
+
+
+        public async Task<List<CardItem>> FetchCardsSeatModeration(List<string> CourseCodes, List<string> sections)
+        {
+            var allCards = new List<CardItem>();
+            
+            foreach (var courseCode in CourseCodes)
+            {
+                var cards = await FetchFromAPI(courseCode);
+                allCards.AddRange(cards);
+            }
+            
+            var filteredCards = allCards.Where(card => 
+                CourseCodes.Any(courseCode => card.CourseCode.Equals(courseCode, StringComparison.OrdinalIgnoreCase)) &&
+                sections.Any(section => card.Section.Equals(section, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+            
+            Console.WriteLine($"Found {filteredCards.Count} cards matching requested course codes and sections:");
+            foreach (var card in filteredCards)
+            {
+                Console.WriteLine($"Course: {card.CourseCode}, Name: {card.CourseName}, Section: {card.Section}, Seats Left: {card.SeatsLeft}");
+            }
+            
+            return filteredCards;
+        }
+
         public async Task FetchCourseBases(string CourseCode)
         {
             try
@@ -84,7 +108,7 @@ namespace Scheds.Infrastructure.Services
                 }
                 var responseContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(responseContent);
-                var cards = await _parsingService.ParseSelfServiceResponse(responseContent);
+                                var cards = await _parsingService.ParseSelfServiceResponse(responseContent);
                 return cards;
             }
         }
