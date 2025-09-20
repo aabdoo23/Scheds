@@ -5,8 +5,7 @@ using Scheds.Domain.DTOs;
 
 namespace Scheds.MVC.Controllers
 {
-    [Route("api/[controller]")]
-    public class SeatModerationController : ControllerBase
+    public class SeatModerationController : Controller
     {
         private readonly ISeatModerationService _seatModerationService;
 
@@ -15,14 +14,20 @@ namespace Scheds.MVC.Controllers
             _seatModerationService = seatModerationService;
         }
 
-        [HttpPost("check-seats")]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Route("api/SeatModeration/check-seats")]
         public async Task<IActionResult> CheckSeats([FromBody] CourseDataRequestSeatModeration request)
         {
             try
             {
                 var results = await _seatModerationService.FetchAndProcessCourseData(request.CourseCode, request.Sections);
 
-                return Ok(new 
+                var response = new 
                 { 
                     Success = true,
                     Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -35,9 +40,12 @@ namespace Scheds.MVC.Controllers
                         Section = c.Section,
                         HasSeats = c.SeatsLeft > 0,
                         SeatsLeft = c.SeatsLeft,
-                        LastUpdate = c.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss")
+                        LastUpdate = c.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Instructor = c.Instructor
                     })
-                });
+                };
+                
+                return Ok(response);
             }
             catch (Exception ex)
             {
