@@ -31,24 +31,55 @@
             <div class="search-section">
                 <h2>Add Courses to Monitor</h2>
                 <div class="search-bar" style="margin-right: 20px;">
-                    <div class="course-input-group">
-                        <div class="input-row">
-                            <div class="group course-input">
-                                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                                    <g>
-                                        <path d="m21.53 20.47-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                                    </g>
-                                </svg>
-                                <input id="courseCodeInput" placeholder="Course Code (e.g. ENGL201)" type="text" class="input" required>
-                            </div>
-                            <div class="group section-input">
-                                <input id="sectionInput" placeholder="Section (e.g. 01)" type="text" class="input" required>
-                            </div>
-                            <button id="addCourseBtn" class="btn-primary add-btn">
-                                <i class="fas fa-plus"></i> Add Course
-                            </button>
+                    <div class="group">
+                        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                            <g>
+                                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                            </g>
+                        </svg>
+                        <input id="course-search" placeholder="Search courses..." type="search" class="input">
+                        <div id="loading" style="display: none; font-weight: 600;">
+                            <div class="loader"></div>
+                            Loading... Please wait.
                         </div>
                     </div>
+                </div>
+                <div id="search-results" class="search-results">
+                </div>
+
+                <!-- Section Selection -->
+                <div id="section-selection" class="section-selection" style="display: none; margin-top: 15px;">
+                    <h3 style="color: var(--light-text); margin: 0 0 10px 0; font-size: 1rem;">
+                        <i class="fas fa-list" style="color: var(--light-blue); margin-right: 8px;"></i>
+                        Select Section for <span id="selected-course-name"></span>
+                    </h3>
+                    <div class="section-dropdown-container">
+                        <select id="section-dropdown" class="section-dropdown" disabled>
+                            <option value="">Loading sections...</option>
+                        </select>
+                        <button id="add-course-btn" class="btn-primary" disabled style="margin-left: 10px;">
+                            <i class="fas fa-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Email Notification Section -->
+                <div class="email-notification-section" style="margin-top: 15px;">
+                    <h3 style="color: var(--light-text); margin: 0 0 10px 0; font-size: 1rem;">
+                        <i class="fas fa-envelope" style="color: var(--light-blue); margin-right: 8px;"></i>
+                        Email Notifications (Optional)
+                    </h3>
+                    <div class="email-input-container">
+                        <div class="group" style="flex: 1;">
+                            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                            <input id="email-input" placeholder="Enter your email for notifications..." type="email" class="input">
+                        </div>
+                    </div>
+                    <small style="color: var(--dark-text); font-size: 0.85rem; margin-top: 5px; display: block;">
+                        Get notified when seats become available, even if you close the tab
+                    </small>
                 </div>
 
                 <!-- Controls and Info Section -->
@@ -77,8 +108,11 @@
                             <div>
                                 <strong style="color: var(--light-text);">How to use:</strong><br>
                                 <span style="color: var(--dark-text);">
-                                    • Enter both course code AND section number<br>
-                                    • You can add multiple sections for the same course<br>
+                                    • Search for a course using the search bar<br>
+                                    • Click on a course to see its available sections<br>
+                                    • Select a section from the dropdown and add to cart<br>
+                                    • (Optional) Enter your email to get notifications when seats become available<br>
+                                    • Click "Start Monitoring" to begin tracking seat availability<br>
                                     • Each course-section combination will be monitored separately
                                 </span>
                             </div>
@@ -125,9 +159,21 @@
 let selectedCourses = [];
 let pollingInterval = null;
 let isMonitoring = false;
-const courseCodeInput = document.getElementById('courseCodeInput');
-const sectionInput = document.getElementById('sectionInput');
-const addCourseBtn = document.getElementById('addCourseBtn');
+let searchTimeout = null;
+let selectedCourse = null; // Store the currently selected course
+
+// Search-related elements
+const searchInput = document.getElementById('course-search');
+const sectionSelection = document.getElementById('section-selection');
+const selectedCourseName = document.getElementById('selected-course-name');
+const sectionDropdown = document.getElementById('section-dropdown');
+const addCourseBtn = document.getElementById('add-course-btn');
+
+// Email notification elements
+const emailInput = document.getElementById('email-input');
+let userEmail = localStorage.getItem('seatModerationEmail') || '';
+
+// UI elements
 const selectedCoursesList = document.getElementById('selectedCoursesList');
 const noCourses = document.getElementById('noCourses');
 const startBtn = document.getElementById('startBtn');
@@ -135,44 +181,215 @@ const stopBtn = document.getElementById('stopBtn');
 const statusText = document.getElementById('statusText');
 const resultsContainer = document.getElementById('resultsContainer');
 
+// Initialize email input on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (userEmail) {
+        emailInput.value = userEmail;
+        updateEmailStatus(true);
+    }
+});
+
+// Email functionality - auto-save on input
+emailInput.addEventListener('input', function() {
+    const email = this.value.trim();
+    
+    if (email === '') {
+        // Clear email if input is empty
+        userEmail = '';
+        localStorage.removeItem('seatModerationEmail');
+        updateEmailStatus(false);
+        return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+    if (emailRegex.test(email)) {
+        // Valid email - save it
+        userEmail = email;
+        localStorage.setItem('seatModerationEmail', email);
+        updateEmailStatus(true);
+    } else {
+        // Invalid email - show as invalid but don't save
+        updateEmailStatus(false);
+    }
+});
+
+function updateEmailStatus(isValid) {
+    if (isValid && userEmail) {
+        emailInput.style.borderColor = '#28a745';
+        emailInput.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+    } else {
+        emailInput.style.borderColor = '';
+        emailInput.style.backgroundColor = '';
+    }
+}
+
+// Search functionality
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+    
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+    
+    if (!query || query.length <= 1) {
+        updateSearchResults([]);
+        return;
+    }
+    
+    searchTimeout = setTimeout(() => {
+        fetch(`/api/coursebase/get-filtered-courses?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(courses => {
+                updateSearchResults(courses);
+            })
+            .catch(error => {
+                console.error('Error fetching filtered courses:', error);
+                updateSearchResults([]);
+            });
+    }, 500);
+});
+
+function updateSearchResults(courses) {
+    const resultsContainer = document.getElementById('search-results');
+    resultsContainer.innerHTML = '';
+
+    courses.forEach(course => {
+        const resultItem = document.createElement('div');
+        resultItem.classList.add('search-result-item');
+
+        resultItem.innerHTML = `<p><strong>${course.courseCode}: ${course.courseName}</strong></p>`;
+
+        resultItem.addEventListener('click', () => {
+            selectCourse(course);
+        });
+
+        resultsContainer.appendChild(resultItem);
+    });
+}
+
+function selectCourse(course) {
+    selectedCourse = course;
+    selectedCourseName.textContent = `${course.courseCode}: ${course.courseName}`;
+    
+    // Show section selection UI
+    sectionSelection.style.display = 'block';
+    
+    // Reset and disable dropdown while loading
+    sectionDropdown.innerHTML = '<option value="">Loading sections...</option>';
+    sectionDropdown.disabled = true;
+    addCourseBtn.disabled = true;
+    
+    // Clear search results
+    updateSearchResults([]);
+    searchInput.value = '';
+    
+    // Fetch sections for this course using the new dedicated endpoint
+    fetch(`/api/coursebase/get-course-sections`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            courseCode: course.courseCode
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            populateSectionDropdown(data);
+        })
+        .catch(error => {
+            console.error('Error fetching course sections:', error);
+            sectionDropdown.innerHTML = '<option value="">Error loading sections</option>';
+        });
+}
+
+function populateSectionDropdown(sections) {
+    sectionDropdown.innerHTML = '';
+    
+    // Check if sections is a valid array
+    if (!sections || !Array.isArray(sections) || sections.length === 0) {
+        sectionDropdown.innerHTML = '<option value="">No sections available</option>';
+        return;
+    }
+    
+    // Add default option
+    sectionDropdown.innerHTML = '<option value="">Select a section...</option>';
+    
+    // Add sections - backend returns List<string>, so each item is just a section number
+    sections.forEach(sectionNumber => {
+        const option = document.createElement('option');
+        option.value = sectionNumber;
+        option.textContent = `Section ${sectionNumber}`;
+        sectionDropdown.appendChild(option);
+    });
+    
+    // Enable dropdown
+    sectionDropdown.disabled = false;
+}
+
+// Handle section dropdown change
+sectionDropdown.addEventListener('change', function() {
+    if (this.value) {
+        addCourseBtn.disabled = false;
+    } else {
+        addCourseBtn.disabled = true;
+    }
+});
+
+// Handle add course button click
 addCourseBtn.addEventListener('click', function() {
-    const courseCode = courseCodeInput.value.trim().toUpperCase();
-    const section = sectionInput.value.trim();
-    
-    if (!courseCode) {
-        alert('Please enter a course code');
+    if (!selectedCourse || !sectionDropdown.value) {
         return;
     }
     
-    if (!section) {
-        alert('Please enter a section number (e.g., 01, 02, 03)');
-        return;
-    }
-    
-    const courseKey = `${courseCode}_${section}`;
+    const courseCode = selectedCourse.courseCode.toUpperCase();
+    const sectionNum = sectionDropdown.value;
+    const courseKey = `${courseCode}_${sectionNum}`;
     
     // Check if this exact course-section combination already exists
     if (selectedCourses.some(c => `${c.courseCode}_${c.section}` === courseKey)) {
-        alert(`${courseCode} Section ${section} is already added`);
+        alert(`${courseCode} Section ${sectionNum} is already added`);
         return;
     }
     
     selectedCourses.push({ 
         courseCode: courseCode, 
-        section: section,
-        displayName: `${courseCode} - Section ${section}`
+        section: sectionNum,
+        displayName: `${courseCode} - Section ${sectionNum}`
     });
     
-    courseCodeInput.value = '';
-    sectionInput.value = '';
+    // Hide section selection and reset
+    sectionSelection.style.display = 'none';
+    selectedCourse = null;
+    sectionDropdown.innerHTML = '<option value="">Select a section...</option>';
+    sectionDropdown.disabled = true;
+    addCourseBtn.disabled = true;
+    
+    // Update courses list
     updateCoursesList();
 });
 
-// Function to disable/enable course input during monitoring
+function isLoading(state) {
+    const loading = document.getElementById('loading');
+    if (state) {
+        loading.style.display = 'flex';
+        searchInput.disabled = true;
+    } else {
+        loading.style.display = 'none';
+        searchInput.disabled = false;
+    }
+}
+
 function toggleCourseInput(disabled) {
-    courseCodeInput.disabled = disabled;
-    sectionInput.disabled = disabled;
-    addCourseBtn.disabled = disabled;
+    searchInput.disabled = disabled;
+    sectionDropdown.disabled = disabled || !selectedCourse;
+    addCourseBtn.disabled = disabled || !selectedCourse || !sectionDropdown.value;
     document.getElementById('clear-cart').disabled = disabled;
     
     // Visual feedback
@@ -249,7 +466,12 @@ startBtn.addEventListener('click', function() {
     stopBtn.disabled = false;
     stopBtn.style.pointerEvents = 'auto';
     stopBtn.style.opacity = '1';
-    statusText.textContent = 'Monitoring active...';
+    
+    let statusMessage = 'Monitoring active...';
+    if (userEmail) {
+        statusMessage += ` (Email notifications enabled for ${userEmail})`;
+    }
+    statusText.textContent = statusMessage;
     
     // Disable course input during monitoring
     toggleCourseInput(true);
@@ -288,16 +510,23 @@ async function pollSeats() {
         const courseCodes = selectedCourses.map(course => course.courseCode);
         const sections = selectedCourses.map(course => course.section);
         
+        // Prepare request body
+        const requestBody = {
+            CourseCode: courseCodes,
+            Sections: sections
+        };
+        
+        // Add email if available
+        if (userEmail) {
+            requestBody.Email = userEmail;
+        }
         
         const response = await fetch('/api/SeatModeration/check-seats', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                CourseCode: courseCodes,
-                Sections: sections
-            })
+            body: JSON.stringify(requestBody)
         });
         
         
@@ -308,7 +537,13 @@ async function pollSeats() {
         const data = await response.json();
         
         displayResults(data);
-        statusText.textContent = `Last checked: ${new Date().toLocaleTimeString()} - Found ${data.Results?.length || 0} results`;
+        
+        // Update status with email notification info
+        let statusMessage = `Last checked: ${new Date().toLocaleTimeString()} - Found ${data.Results?.length || 0} results`;
+        if (userEmail) {
+            statusMessage += ` (Email notifications enabled)`;
+        }
+        statusText.textContent = statusMessage;
         
     } catch (error) {
         console.error('Polling error:', error);
@@ -461,24 +696,13 @@ function displayResults(data) {
     resultsContainer.innerHTML = html;
 }
 
-courseCodeInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addCourseBtn.click();
-    }
-});
-
-sectionInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addCourseBtn.click();
-    }
-});
 </script>
 
 <style>
-    /* Inherit all styles from GenerateSchedules page */
     .search-section {
         background-color: var(--lighter-dark);
-        height: 400px;
+        min-height: 400px;
+        max-height: none;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         position: relative;
@@ -486,10 +710,180 @@ sectionInput.addEventListener('keypress', function(e) {
         margin-right: 20px;
         padding: 20px;
         color: var(--light-text);
+        overflow: visible;
     }
 
     .search-section h1, h2 {
         margin-top: 0;
+    }
+
+    .search-bar {
+        margin-bottom: 15px;
+    }
+
+    .search-results {
+        background-color: var(--lighter-dark);
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .search-result-item {
+        background-color: var(--dark-text);
+        color: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+        cursor: pointer;
+        box-sizing: border-box;
+        font-size: 1.1rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .search-result-item p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .search-result-item:hover {
+        background-color: var(--dark-blue);
+    }
+
+    .search-results::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .search-results::-webkit-scrollbar-thumb {
+        background-color: var(--dark-text);
+        border-radius: 10px;
+    }
+
+    /* Section Selection Styles */
+    .section-selection {
+        background-color: rgba(74, 144, 226, 0.1);
+        border: 1px solid rgba(74, 144, 226, 0.3);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .section-selection h3 {
+        display: flex;
+        align-items: center;
+        color: var(--light-text);
+        margin: 0 0 15px 0;
+        font-size: 1rem;
+    }
+
+    .section-dropdown-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .section-dropdown {
+        background-color: var(--dark);
+        color: var(--light-text);
+        border: 2px solid var(--dark-text);
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 1rem;
+        min-width: 200px;
+        flex: 1;
+        transition: border-color 0.3s ease;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .section-dropdown:focus {
+        outline: none;
+        border-color: var(--light-blue);
+        background-color: var(--lighter-dark);
+    }
+
+    .section-dropdown:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: var(--dark-text);
+    }
+
+    .section-dropdown option {
+        background-color: var(--dark);
+        color: var(--light-text);
+        padding: 8px;
+        max-height: 40px;
+    }
+
+    /* Custom scrollbar for dropdown */
+    .section-dropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .section-dropdown::-webkit-scrollbar-track {
+        background: var(--dark);
+        border-radius: 4px;
+    }
+
+    .section-dropdown::-webkit-scrollbar-thumb {
+        background: var(--dark-text);
+        border-radius: 4px;
+    }
+
+    .section-dropdown::-webkit-scrollbar-thumb:hover {
+        background: var(--light-blue);
+    }
+
+    /* Email Notification Styles */
+    .email-notification-section {
+        background-color: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .email-notification-section h3 {
+        display: flex;
+        align-items: center;
+        color: var(--light-text);
+        margin: 0 0 15px 0;
+        font-size: 1rem;
+    }
+
+    .email-input-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* Loading animation */
+    .loader {
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid var(--light-blue);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    #loading {
+        color: var(--light-text);
+        font-size: 0.9rem;
+        padding: 10px;
+        display: flex;
+        align-items: center;
     }
 
     .search-bar {
@@ -680,34 +1074,6 @@ sectionInput.addEventListener('keypress', function(e) {
     }
 
     /* Input Styles */
-    .course-input-group {
-        width: 100%;
-    }
-
-    .input-row {
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
-        width: 100%;
-    }
-
-    .course-input {
-        flex: 2;
-    }
-
-    .section-input {
-        flex: 1;
-    }
-
-    .add-btn {
-        flex-shrink: 0;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-    }
-
     .group {
         display: flex;
         line-height: 28px;
@@ -729,10 +1095,6 @@ sectionInput.addEventListener('keypress', function(e) {
         color: var(--light-text);
         transition: .3s ease;
         box-sizing: border-box;
-    }
-
-    .section-input .input {
-        padding-left: 1rem; /* No icon for section input */
     }
 
     .input::placeholder {

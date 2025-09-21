@@ -28,6 +28,13 @@ namespace Scheds.MVC.Controllers
             return Ok(courses);
         }
 
+        [HttpPost("get-course-sections")]
+        public async Task<IActionResult> GetCourseSections([FromBody] CourseSectionsRequestDTO request)
+        {
+            var sections = await _courseBaseService.GetCourseSections(request.CourseCode);
+            return Ok(sections);
+        }
+
         [HttpGet("search/{query}")]
         public async Task<IActionResult> SearchCourses(string query)
         {
