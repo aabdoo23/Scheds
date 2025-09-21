@@ -22,6 +22,7 @@ namespace Scheds.Infrastructure
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICardItemService, CardItemService>();
+            services.AddScoped<ICourseBaseService, CourseBaseService>();
             services.AddScoped<IParsingService, ParsingService>();
             services.AddScoped<ISelfServiceLiveFetchService, SelfServiceLiveFetchService>();
             services.AddScoped<IEmptyRoomsService, EmptyRoomsService>();

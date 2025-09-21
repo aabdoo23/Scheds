@@ -68,7 +68,7 @@ namespace Scheds.Infrastructure.Services
                     return courseMatch && sectionMatch;
                 });
             }).ToList();
-            
+            // s
             
             
             return filteredCards;

@@ -9,8 +9,11 @@ namespace Scheds.MVC.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CourseBaseController(ICourseBaseRepository courseBaseRepository, ICardItemRepository cardItemRepository, ISelfServiceLiveFetchService selfServiceLiveFetchService) : Controller
+    public class CourseBaseController(ICourseBaseRepository courseBaseRepository, ICardItemRepository cardItemRepository, ISelfServiceLiveFetchService selfServiceLiveFetchService ,ICourseBaseService courseBaseService) : Controller
     {
+
+        private readonly ICourseBaseService _courseBaseService = courseBaseService
+            ?? throw new ArgumentNullException(nameof(courseBaseService));
         private readonly ICourseBaseRepository _courseBaseRepository = courseBaseRepository
             ?? throw new ArgumentNullException(nameof(courseBaseRepository));
         private readonly ICardItemRepository _cardItemRepository = cardItemRepository
@@ -18,10 +21,10 @@ namespace Scheds.MVC.Controllers
         private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService
             ?? throw new ArgumentNullException(nameof(selfServiceLiveFetchService));
 
-        [HttpGet("getAllCourses")]
-        public async Task<IActionResult> GetAllCourses()
+        [HttpGet("get-filtered-courses")]
+        public async Task<IActionResult> GetAllCourses([FromQuery] string query = "")
         {
-            var courses = await _courseBaseRepository.GetAllAsync();
+            var courses = await _courseBaseService.GetFilteredCourses(query);
             return Ok(courses);
         }
 
