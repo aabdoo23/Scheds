@@ -11,10 +11,12 @@ namespace Scheds.Infrastructure.Services
     public class CourseBaseService : ICourseBaseService
     {
         private readonly ICourseBaseRepository _courseBaseRepository;
+        private readonly ICardItemRepository _cardItemRepository;
 
-        public CourseBaseService(ICourseBaseRepository courseBaseRepository)
+        public CourseBaseService(ICourseBaseRepository courseBaseRepository, ICardItemRepository cardItemRepository)
         {
             _courseBaseRepository = courseBaseRepository ?? throw new ArgumentNullException(nameof(courseBaseRepository));
+            _cardItemRepository = cardItemRepository ?? throw new ArgumentNullException(nameof(cardItemRepository));
         }
 
         public async Task<List<CourseBase>> GetFilteredCourses(string searchTerm = "")
@@ -26,6 +28,25 @@ namespace Scheds.Infrastructure.Services
                            (!string.IsNullOrWhiteSpace(c.CourseCode) && c.CourseCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
             return filteredCourses;
+        }
+
+        public async Task<List<string>> GetCourseSections(string courseCode)
+        {
+            if (string.IsNullOrWhiteSpace(courseCode))
+            {
+                return new List<string>();
+            }
+
+            // Get all CardItems (which contain section info) for the specified course code
+            var cardItems = await _cardItemRepository.GetCardItemsByCourseCodeAsync(courseCode);
+            var courseSections = cardItems
+                .Where(item => !string.IsNullOrWhiteSpace(item.Section))
+                .Select(item => item.Section)
+                .Distinct()
+                .OrderBy(section => section)
+                .ToList();
+                
+            return courseSections;
         }
     }
 }
