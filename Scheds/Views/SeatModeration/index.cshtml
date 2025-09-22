@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Seat Moderation";
     Layout = null;
+    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +30,21 @@
         <!-- Search and Cart Section -->
         <section class="search-cart">
             <div class="search-section">
+                @if (!isAuthenticated)
+                {
+                    <div id="auth-lock-overlay" class="auth-lock-overlay">
+                        <div class="lock-card">
+                            <i class="fas fa-lock lock-icon"></i>
+                            <div class="lock-text">
+                                <strong>Authorized access required</strong>
+                                <div style="font-size: 0.9rem; color: var(--dark-text); margin-top:6px;">Sign in with Google to access Seat Moderation features.</div>
+                                <div style="margin-top:10px;">
+                                    <a asp-controller="Account" asp-action="Login" class="auth-btn auth-login auth-highlight no-glogo">Sign in with Google</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
                 <h2>Add Courses to Monitor</h2>
                 <div class="search-bar" style="margin-right: 20px;">
                     <div class="group">
@@ -63,25 +79,6 @@
                     </div>
                 </div>
 
-                <!-- Email Notification Section -->
-                <div class="email-notification-section" style="margin-top: 15px;">
-                    <h3 style="color: var(--light-text); margin: 0 0 10px 0; font-size: 1rem;">
-                        <i class="fas fa-envelope" style="color: var(--light-blue); margin-right: 8px;"></i>
-                        Email Notifications (Optional)
-                    </h3>
-                    <div class="email-input-container">
-                        <div class="group" style="flex: 1;">
-                            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                            </svg>
-                            <input id="email-input" placeholder="Enter your email for notifications..." type="email" class="input">
-                        </div>
-                    </div>
-                    <small style="color: var(--dark-text); font-size: 0.85rem; margin-top: 5px; display: block;">
-                        Get notified when seats become available, even if you close the tab
-                    </small>
-                </div>
-
                 <!-- Controls and Info Section -->
                 <div style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
                     <!-- Monitoring Controls -->
@@ -111,9 +108,10 @@
                                     • Search for a course using the search bar<br>
                                     • Click on a course to see its available sections<br>
                                     • Select a section from the dropdown and add to cart<br>
-                                    • (Optional) Enter your email to get notifications when seats become available<br>
                                     • Click "Start Monitoring" to begin tracking seat availability<br>
-                                    • Each course-section combination will be monitored separately
+                                    • We automatically use your Google email for notifications<br>
+                                    • You'll get notified both in this tab and via email when seats become available<br>
+                                    • You can close this tab anytime - email notifications will continue working
                                 </span>
                             </div>
                         </div>
@@ -698,6 +696,24 @@ function displayResults(data) {
 
 </script>
 
+<script>
+    // Highlight the Sign in with Google button if the user is not authenticated
+    (function() {
+        const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+        if (!isAuthenticated) {
+            const loginBtn = document.querySelector('.auth-login');
+            if (loginBtn) {
+                loginBtn.style.boxShadow = '0 4px 12px rgba(66, 133, 244, 0.35)';
+                loginBtn.style.border = '2px solid #4285F4';
+                loginBtn.style.backgroundColor = '#4285F4';
+                loginBtn.style.color = '#fff';
+                loginBtn.style.padding = '8px 12px';
+                loginBtn.style.borderRadius = '6px';
+            }
+        }
+    })();
+</script>
+
 <style>
     .search-section {
         background-color: var(--lighter-dark);
@@ -797,6 +813,103 @@ function displayResults(data) {
         transition: border-color 0.3s ease;
         max-height: 200px;
         overflow-y: auto;
+    }
+
+    /* Auth lock overlay */
+    .auth-lock-overlay {
+        position: fixed; /* cover the whole viewport */
+        inset: 0; /* top:0; right:0; bottom:0; left:0 */
+        z-index: 3000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(2,6,12,0.60); /* stronger backdrop */
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        padding: 24px;
+        pointer-events: auto; /* catch clicks so underlying controls remain inert */
+    }
+
+    .lock-card {
+        pointer-events: auto;
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        padding: 24px 28px;
+        border-radius: 16px;
+        /* Fully opaque dark background for strong contrast */
+        background: linear-gradient(180deg, #0a1118 0%, #071018 100%);
+        box-shadow: 0 25px 60px rgba(2,6,23,0.8), 0 4px 12px rgba(0,0,0,0.5) inset;
+        border: 2px solid rgba(255,255,255,0.08);
+        color: #ffffff;
+    }
+
+    .lock-icon {
+        font-size: 2.4rem;
+        color: #ff4757; /* bright vibrant red for maximum visibility */
+        background: rgba(255,71,87,0.15);
+        padding: 10px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: 0 0 8px rgba(255,71,87,0.4);
+    }
+
+    .lock-text {
+        color: #ffffff;
+        flex: 1;
+    }
+
+    .lock-text strong { 
+        font-size: 1.25rem; 
+        display: block; 
+        font-weight: 700;
+        color: #f8f9fa; /* bright white for maximum readability */
+        margin-bottom: 8px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .lock-text div { 
+        color: #f1f3f4; /* very bright light gray, almost white */
+        margin-top: 8px; 
+        font-size: 1.05rem; 
+        line-height: 1.4;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .auth-highlight {
+        background-color: #4285f4; /* bright Google blue */
+        color: #ffffff;
+        border: 0;
+        padding: 12px 18px;
+        border-radius: 12px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        box-shadow: 0 16px 40px rgba(66,133,244,0.35), 0 0 20px rgba(66,133,244,0.2);
+        transition: transform 160ms ease, box-shadow 160ms ease, background-color 120ms ease;
+        cursor: pointer;
+        animation: pulse 2.4s infinite;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .auth-highlight:hover {
+        transform: translateY(-3px);
+        background-color: #3367d6;
+        box-shadow: 0 20px 50px rgba(66,133,244,0.4), 0 0 25px rgba(66,133,244,0.3);
+    }
+
+    @@keyframes pulse {
+        0% { transform: translateY(0); box-shadow: 0 8px 20px rgba(43,111,216,0.18); }
+        50% { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(43,111,216,0.22); }
+        100% { transform: translateY(0); box-shadow: 0 8px 20px rgba(43,111,216,0.18); }
     }
 
     .section-dropdown:focus {
@@ -1747,6 +1860,36 @@ function displayResults(data) {
         }
     }
 </style>
+
+<script>
+    // Disable interactive controls when not authenticated
+    (function() {
+        const isAuthenticated = @((isAuthenticated).ToString().ToLower());
+        if (!isAuthenticated) {
+            // Disable input elements and buttons related to monitoring
+            const selectors = ['#course-search', '#section-dropdown', '#add-course-btn', '#startBtn', '#stopBtn', '#clear-cart', '#email-input'];
+            selectors.forEach(s => {
+                const el = document.querySelector(s);
+                if (el) {
+                    el.disabled = true;
+                    el.classList.add('disabled-by-auth');
+                }
+            });
+
+            // Dim the search section to indicate locked state
+            const searchSection = document.querySelector('.search-section');
+            if (searchSection) {
+                searchSection.style.opacity = '0.5';
+            }
+
+            // Overlay already present; ensure it is visible
+            const overlay = document.getElementById('auth-lock-overlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+        }
+    })();
+</script>
 
 <script>
     const rootElement = document.documentElement;

@@ -33,6 +33,27 @@ namespace Scheds.MVC
 
             builder.Services.AddHttpClient();
 
+            // Add authentication with Google
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "Google";
+            })
+            .AddCookie("Cookies", options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+            })
+            .AddGoogle("Google", options =>
+            {
+                var google = builder.Configuration.GetSection("Authentication:Google");
+                options.ClientId = google["ClientId"] ?? string.Empty;
+                options.ClientSecret = google["ClientSecret"] ?? string.Empty;
+                options.CallbackPath = google["CallbackPath"] ?? "/signin-google";
+                options.Scope.Add("profile");
+                options.Scope.Add("email");
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -49,6 +70,7 @@ namespace Scheds.MVC
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

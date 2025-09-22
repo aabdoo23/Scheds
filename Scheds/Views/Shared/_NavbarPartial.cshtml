@@ -62,6 +62,9 @@
                 <span class="icon-tooltip">Facebook Page</span>
             </a>
         </li>
+    <li class="login-partial">
+      @await Html.PartialAsync("_LoginPartial")
+    </li>
     </ul>
 </nav>
 
@@ -253,4 +256,37 @@
     align-items: center;
     gap: 0.5rem;
 }
+
+/* Auth button styles */
+.login-partial { display: flex; align-items: center; }
+.auth-container { display: flex; align-items: center; gap: 8px; }
+.auth-username { color: var(--light-text); font-weight: 600; font-size: 0.95rem; }
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+.auth-login {
+  background: linear-gradient(90deg, #4285F4, #357AE8);
+  color: white;
+}
+.auth-login:hover { filter: brightness(0.95); }
+.auth-logout {
+  background: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+.auth-logout:hover { 
+  background: #c82333; 
+  border-color: #c82333;
+  transform: translateY(-1px);
+}
+.auth-logout-form { display: inline; margin: 0; padding: 0; }
 </style>
