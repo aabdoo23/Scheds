@@ -154,7 +154,7 @@
 
     <script>
 
-let selectedCourses = [];
+let cartCourses = []; // Will store cart items from API
 let pollingInterval = null;
 let isMonitoring = false;
 let searchTimeout = null;
@@ -179,12 +179,127 @@ const stopBtn = document.getElementById('stopBtn');
 const statusText = document.getElementById('statusText');
 const resultsContainer = document.getElementById('resultsContainer');
 
-// Initialize email input on page load
+// Search functionality
+searchInput.addEventListener('input', () => {
+    console.log('Search input event fired');
+    const query = searchInput.value.trim();
+    console.log('Query:', query);
+    
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+    
+    if (!query || query.length <= 1) {
+        console.log('Query too short, clearing results');
+        updateSearchResults([]);
+        return;
+    }
+    
+    console.log('Setting timeout for search');
+    searchTimeout = setTimeout(() => {
+        console.log('Making API call to:', `/api/coursebase/get-filtered-courses?query=${encodeURIComponent(query)}`);
+        fetch(`/api/coursebase/get-filtered-courses?query=${encodeURIComponent(query)}`)
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(courses => {
+                console.log('Received courses:', courses);
+                updateSearchResults(courses);
+            })
+            .catch(error => {
+                console.error('Error fetching filtered courses:', error);
+                updateSearchResults([]);
+            });
+    }, 500);
+});
+
+// Handle section dropdown change
+sectionDropdown.addEventListener('change', function() {
+    if (this.value) {
+        addCourseBtn.disabled = false;
+    } else {
+        addCourseBtn.disabled = true;
+    }
+});
+
+// Handle add course button click - Add to cart instead of local array
+addCourseBtn.addEventListener('click', async function() {
+    if (!selectedCourse || !sectionDropdown.value) {
+        return;
+    }
+    
+    // Check if user is authenticated before making API call
+    const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+    if (!isAuthenticated) {
+        alert('Please sign in with Google to add courses to your monitoring cart.');
+        return;
+    }
+    
+    const courseCode = selectedCourse.courseCode.toUpperCase();
+    const sectionNum = sectionDropdown.value;
+    const courseKey = `${courseCode}_${sectionNum}`;
+    
+    // Check if this exact course-section combination already exists
+    if (cartCourses.some(c => `${c.courseCode}_${c.section}` === courseKey)) {
+        alert(`${courseCode} Section ${sectionNum} is already added`);
+        return;
+    }
+    
+    // Add to seat moderation cart via API
+    try {
+        console.log('Making API call to add to cart:', { courseCode, sectionNum });
+        const response = await fetch('/api/SeatModeration/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                courseCode: courseCode,
+                section: sectionNum
+            })
+        });
+        
+        console.log('API response status:', response.status);
+        const result = await response.json();
+        console.log('API response:', result);
+        
+        if (response.ok) {
+            // Reload cart items from server
+            await loadCartItems();
+            
+            // Hide section selection and reset
+            sectionSelection.style.display = 'none';
+            selectedCourse = null;
+            sectionDropdown.innerHTML = '<option value="">Select a section...</option>';
+            sectionDropdown.disabled = true;
+            addCourseBtn.disabled = true;
+        } else {
+            if (response.status === 401) {
+                alert('Your session has expired. Please sign in again to add courses to your monitoring cart.');
+            } else {
+                alert(result.Error || 'Error adding course to cart');
+            }
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Error adding course to cart');
+    }
+});
+
+// Initialize email input and load cart on page load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
+    console.log('startBtn element:', startBtn);
+    console.log('startBtn exists:', !!startBtn);
+    
     if (userEmail) {
         emailInput.value = userEmail;
         updateEmailStatus(true);
     }
+    
+    // Load cart items from the cart API
+    loadCartItems();
 });
 
 // Email functionality - auto-save on input
@@ -222,32 +337,6 @@ function updateEmailStatus(isValid) {
     }
 }
 
-// Search functionality
-searchInput.addEventListener('input', () => {
-    const query = searchInput.value.trim();
-    
-    if (searchTimeout) {
-        clearTimeout(searchTimeout);
-    }
-    
-    if (!query || query.length <= 1) {
-        updateSearchResults([]);
-        return;
-    }
-    
-    searchTimeout = setTimeout(() => {
-        fetch(`/api/coursebase/get-filtered-courses?query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(courses => {
-                updateSearchResults(courses);
-            })
-            .catch(error => {
-                console.error('Error fetching filtered courses:', error);
-                updateSearchResults([]);
-            });
-    }, 500);
-});
-
 function updateSearchResults(courses) {
     const resultsContainer = document.getElementById('search-results');
     resultsContainer.innerHTML = '';
@@ -280,7 +369,7 @@ function selectCourse(course) {
     
     // Clear search results
     updateSearchResults([]);
-    searchInput.value = '';
+    searchInput.value = `${course.courseCode}: ${course.courseName}`;
     
     // Fetch sections for this course using the new dedicated endpoint
     fetch(`/api/coursebase/get-course-sections`, {
@@ -331,47 +420,40 @@ function populateSectionDropdown(sections) {
     sectionDropdown.disabled = false;
 }
 
-// Handle section dropdown change
-sectionDropdown.addEventListener('change', function() {
-    if (this.value) {
-        addCourseBtn.disabled = false;
-    } else {
-        addCourseBtn.disabled = true;
+// Load cart items from the seat moderation cart API
+async function loadCartItems() {
+    try {
+        console.log('Loading cart items...');
+        const response = await fetch('/api/SeatModeration/cart/get');
+        console.log('Cart get response status:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Cart get response:', result);
+            if (result.success && result.cartItems) {
+                // Transform cart items to match our expected format
+                cartCourses = result.cartItems.map(item => ({
+                    courseCode: item.courseCode,
+                    section: item.section,
+                    displayName: `${item.courseCode} - Section ${item.section}`,
+                    cartId: item.id
+                }));
+                updateCoursesList();
+            }
+        } else if (response.status === 401) {
+            console.log('User not authenticated, cart will be empty');
+            cartCourses = [];
+            updateCoursesList();
+        } else {
+            const errorResult = await response.json();
+            console.error('Failed to load cart items:', errorResult);
+            cartCourses = [];
+            updateCoursesList();
+        }
+    } catch (error) {
+        console.error('Error loading cart items:', error);
     }
-});
-
-// Handle add course button click
-addCourseBtn.addEventListener('click', function() {
-    if (!selectedCourse || !sectionDropdown.value) {
-        return;
-    }
-    
-    const courseCode = selectedCourse.courseCode.toUpperCase();
-    const sectionNum = sectionDropdown.value;
-    const courseKey = `${courseCode}_${sectionNum}`;
-    
-    // Check if this exact course-section combination already exists
-    if (selectedCourses.some(c => `${c.courseCode}_${c.section}` === courseKey)) {
-        alert(`${courseCode} Section ${sectionNum} is already added`);
-        return;
-    }
-    
-    selectedCourses.push({ 
-        courseCode: courseCode, 
-        section: sectionNum,
-        displayName: `${courseCode} - Section ${sectionNum}`
-    });
-    
-    // Hide section selection and reset
-    sectionSelection.style.display = 'none';
-    selectedCourse = null;
-    sectionDropdown.innerHTML = '<option value="">Select a section...</option>';
-    sectionDropdown.disabled = true;
-    addCourseBtn.disabled = true;
-    
-    // Update courses list
-    updateCoursesList();
-});
+}
 
 function isLoading(state) {
     const loading = document.getElementById('loading');
@@ -403,13 +485,17 @@ function toggleCourseInput(disabled) {
 
 // Update courses list display
 function updateCoursesList() {
-    if (selectedCourses.length === 0) {
+    console.log('updateCoursesList called with cartCourses:', cartCourses);
+    
+    if (cartCourses.length === 0) {
+        console.log('No courses in cart, disabling start button');
         noCourses.style.display = 'block';
         selectedCoursesList.innerHTML = '<p class="text-muted mb-0" id="noCourses" style="color: var(--dark-text); padding: 20px; text-align: center;">No courses selected yet.</p>';
         startBtn.disabled = true;
     } else {
+        console.log('Courses found in cart, enabling start button');
         selectedCoursesList.innerHTML = '';
-        selectedCourses.forEach((course, index) => {
+        cartCourses.forEach((course, index) => {
             const cartItem = document.createElement('div');
             cartItem.classList.add('cart-item');
             
@@ -431,6 +517,9 @@ function updateCoursesList() {
             selectedCoursesList.appendChild(cartItem);
         });
         startBtn.disabled = false;
+        // Always re-attach the event listener to the current button
+        startBtn.removeEventListener('click', startMonitoringHandler);
+        startBtn.addEventListener('click', startMonitoringHandler);
         const noCoursesElement = document.getElementById('noCourses');
         if (noCoursesElement) {
             noCoursesElement.style.display = 'none';
@@ -439,22 +528,92 @@ function updateCoursesList() {
 }
 
 // Remove course
-function removeCourse(index) {
-    selectedCourses.splice(index, 1);
-    updateCoursesList();
+async function removeCourse(index) {
+    const courseToRemove = cartCourses[index];
+    
+    // Check if user is authenticated before making API call
+    const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+    if (!isAuthenticated) {
+        alert('Please sign in with Google to manage your monitoring cart.');
+        return;
+    }
+    
+    try {
+        // Remove from seat moderation cart via API
+        const response = await fetch('/api/SeatModeration/cart/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                courseCode: courseToRemove.courseCode,
+                section: courseToRemove.section
+            })
+        });
+        
+        if (response.ok) {
+            // Reload cart items from server
+            await loadCartItems();
+        } else {
+            const result = await response.json();
+            if (response.status === 401) {
+                alert('Your session has expired. Please sign in again to manage your monitoring cart.');
+            } else {
+                alert(result.Error || 'Error removing course from cart');
+            }
+        }
+    } catch (error) {
+        console.error('Error removing from cart:', error);
+        alert('Error removing course from cart');
+    }
 }
 
 // Clear all courses
-document.getElementById('clear-cart').addEventListener('click', function() {
+document.getElementById('clear-cart').addEventListener('click', async function() {
+    // Check if user is authenticated before making API call
+    const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+    if (!isAuthenticated) {
+        alert('Please sign in with Google to manage your monitoring cart.');
+        return;
+    }
+    
     if (confirm('Are you sure you want to clear all selected courses?')) {
-        selectedCourses = [];
-        updateCoursesList();
+        try {
+            const response = await fetch('/api/SeatModeration/cart/clear', {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                // Reload cart items from server
+                await loadCartItems();
+            } else {
+                const result = await response.json();
+                if (response.status === 401) {
+                    alert('Your session has expired. Please sign in again to manage your monitoring cart.');
+                } else {
+                    alert(result.Error || 'Error clearing cart');
+                }
+            }
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            alert('Error clearing cart');
+        }
     }
 });
 
-// Start monitoring
-startBtn.addEventListener('click', function() {
-    if (selectedCourses.length === 0) {
+// --- Start Monitoring Handler ---
+function startMonitoringHandler() {
+    console.log('Start monitoring button clicked');
+    
+    // Check if user is authenticated before starting monitoring
+    const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+    if (!isAuthenticated) {
+        alert('Please sign in with Google to start seat monitoring.');
+        return;
+    }
+    
+    console.log('Cart courses:', cartCourses);
+    if (cartCourses.length === 0) {
         alert('Please add at least one course before starting monitoring');
         return;
     }
@@ -474,10 +633,14 @@ startBtn.addEventListener('click', function() {
     // Disable course input during monitoring
     toggleCourseInput(true);
     
-    // Start polling immediately and then every minute
+    console.log('Starting polling...');
     pollSeats();
     pollingInterval = setInterval(pollSeats, 60000);
-});
+}
+
+// Remove any previous listeners and attach the handler once on DOMContentLoaded
+startBtn.removeEventListener('click', startMonitoringHandler);
+startBtn.addEventListener('click', startMonitoringHandler);
 
 // Stop monitoring
 stopBtn.addEventListener('click', function() {
@@ -497,6 +660,102 @@ stopBtn.addEventListener('click', function() {
     }
 });
 
+// Subscribe to monitoring function - automatically uses cart data
+async function subscribeToMonitoring() {
+    try {
+        console.log('subscribeToMonitoring called');
+        
+        // Check if user is authenticated before making API call
+        const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+        if (!isAuthenticated) {
+            alert('Please sign in with Google to subscribe to seat monitoring.');
+            return;
+        }
+        
+        // Get fresh cart data
+        await loadCartItems();
+        
+        if (cartCourses.length === 0) {
+            alert('No courses in cart to monitor');
+            return;
+        }
+        
+        const courseSections = cartCourses.map(course => `${course.courseCode}_${course.section}`);
+        console.log('Subscribing to course sections:', courseSections);
+        
+        const response = await fetch('/api/SeatModeration/subscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                CourseSections: courseSections
+            })
+        });
+        
+        console.log('Subscribe response status:', response.status);
+        const result = await response.json();
+        console.log('Subscribe response:', result);
+        
+        if (result.Success) {
+            console.log('Successfully subscribed to monitoring for courses:', courseSections);
+        } else {
+            if (response.status === 401) {
+                alert('Your session has expired. Please sign in again to subscribe to seat monitoring.');
+            } else {
+                console.error('Failed to subscribe to monitoring:', result.Error);
+                alert('Failed to save monitoring subscription: ' + result.Error);
+            }
+        }
+    } catch (error) {
+        console.error('Error subscribing to monitoring:', error);
+        alert('Error subscribing to monitoring. Please try again.');
+    }
+}
+
+// Unsubscribe from monitoring function - automatically uses cart data
+async function unsubscribeFromMonitoring() {
+    try {
+        // Check if user is authenticated before making API call
+        const isAuthenticated = @((User?.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+        if (!isAuthenticated) {
+            alert('Please sign in with Google to unsubscribe from seat monitoring.');
+            return;
+        }
+        // Get current cart data
+        const courseSections = cartCourses.map(course => `${course.courseCode}_${course.section}`);
+        
+        if (courseSections.length === 0) {
+            console.log('No courses to unsubscribe from');
+            return;
+        }
+        
+        const response = await fetch('/api/SeatModeration/unsubscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                CourseSections: courseSections
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.Success) {
+            console.log('Successfully unsubscribed from monitoring for courses:', courseSections);
+        } else {
+            if (response.status === 401) {
+                alert('Your session has expired. Please sign in again to unsubscribe from seat monitoring.');
+            } else {
+                console.error('Failed to unsubscribe from monitoring:', result.Error);
+            }
+        }
+    } catch (error) {
+        console.error('Error unsubscribing from monitoring:', error);
+    }
+}
+
 // Poll seats function
 async function pollSeats() {
     if (!isMonitoring) return;
@@ -505,8 +764,8 @@ async function pollSeats() {
         statusText.textContent = 'Checking seats...';
         
         // Prepare arrays for the API call
-        const courseCodes = selectedCourses.map(course => course.courseCode);
-        const sections = selectedCourses.map(course => course.section);
+        const courseCodes = cartCourses.map(course => course.courseCode);
+        const sections = cartCourses.map(course => course.section);
         
         // Prepare request body
         const requestBody = {
@@ -534,10 +793,20 @@ async function pollSeats() {
         
         const data = await response.json();
         
-        displayResults(data);
+        // Handle both array response and object response
+        let results = [];
+        let success = true;
+        if (Array.isArray(data)) {
+            results = data;
+        } else {
+            success = data.success;
+            results = data.results || [];
+        }
+        
+        displayResults({ success, results });
         
         // Update status with email notification info
-        let statusMessage = `Last checked: ${new Date().toLocaleTimeString()} - Found ${data.Results?.length || 0} results`;
+        let statusMessage = `Last checked: ${new Date().toLocaleTimeString()} - Found ${results.length} results`;
         if (userEmail) {
             statusMessage += ` (Email notifications enabled)`;
         }
@@ -573,7 +842,7 @@ function displayResults(data) {
         return;
     }
     
-    const requestedCount = selectedCourses.length;
+    const requestedCount = cartCourses.length;
     const foundCount = data.results.length;
     
     const groupedResults = {};
@@ -588,7 +857,7 @@ function displayResults(data) {
     });
     
     const missingCourseSections = [];
-    selectedCourses.forEach(course => {
+    cartCourses.forEach(course => {
         const key = `${course.courseCode.toUpperCase()}_${course.section.toUpperCase()}`;
         if (!foundCourseSections.has(key)) {
             missingCourseSections.push(course);
@@ -1867,7 +2136,7 @@ function displayResults(data) {
         const isAuthenticated = @((isAuthenticated).ToString().ToLower());
         if (!isAuthenticated) {
             // Disable input elements and buttons related to monitoring
-            const selectors = ['#course-search', '#section-dropdown', '#add-course-btn', '#startBtn', '#stopBtn', '#clear-cart', '#email-input'];
+            const selectors = ['#section-dropdown', '#add-course-btn', '#startBtn', '#stopBtn', '#clear-cart', '#email-input'];
             selectors.forEach(s => {
                 const el = document.querySelector(s);
                 if (el) {
@@ -1889,29 +2158,6 @@ function displayResults(data) {
             }
         }
     })();
-</script>
-
-<script>
-    const rootElement = document.documentElement;
-    const colorModeCheckbox = document.getElementById('color_mode');
-
-    // Check if user has a mode preference saved in localStorage
-    const currentMode = localStorage.getItem('theme');
-    if (currentMode === 'light') {
-        rootElement.classList.add('light-mode');
-        colorModeCheckbox.checked = true;
-    }
-
-    // Event listener for the checkbox to toggle dark/light mode
-    colorModeCheckbox.addEventListener('change', () => {
-        if (colorModeCheckbox.checked) {
-            rootElement.classList.add('light-mode');
-            localStorage.setItem('theme', 'light');
-        } else {
-            rootElement.classList.remove('light-mode');
-            localStorage.setItem('theme', 'dark');
-        }
-    });
 </script>
 
 </body>

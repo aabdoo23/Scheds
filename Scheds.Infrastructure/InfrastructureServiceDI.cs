@@ -27,6 +27,10 @@ namespace Scheds.Infrastructure
             services.AddScoped<ISelfServiceLiveFetchService, SelfServiceLiveFetchService>();
             services.AddScoped<IEmptyRoomsService, EmptyRoomsService>();
             services.AddScoped<ISeatModerationService, SeatModerationService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            // Register background service for automated seat monitoring
+            services.AddHostedService<SeatMonitoringBackgroundService>();
 
             return services;
         }

@@ -53,6 +53,168 @@ namespace Scheds.MVC.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/SeatModeration/subscribe")]
+        public async Task<IActionResult> SubscribeToMonitoring([FromBody] SubscribeRequest request)
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                await _seatModerationService.SubscribeUserToMonitoring(userEmail, request.CourseSections);
+
+                return Ok(new { Success = true, Message = "Successfully subscribed to seat monitoring" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/SeatModeration/cart/add")]
+        public async Task<IActionResult> AddToSeatModerationCart([FromBody] AddToSeatModerationCartRequest request)
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                await _seatModerationService.AddToSeatModerationCart(userEmail, request.CourseCode, request.Section);
+
+                return Ok(new { Success = true, Message = "Course added to seat moderation cart" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/SeatModeration/cart/remove")]
+        public async Task<IActionResult> RemoveFromSeatModerationCart([FromBody] RemoveFromSeatModerationCartRequest request)
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                await _seatModerationService.RemoveFromSeatModerationCart(userEmail, request.CourseCode, request.Section);
+
+                return Ok(new { Success = true, Message = "Course removed from seat moderation cart" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("api/SeatModeration/cart/get")]
+        public async Task<IActionResult> GetSeatModerationCart()
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                var cartItems = await _seatModerationService.GetSeatModerationCart(userEmail);
+
+                return Ok(new { Success = true, CartItems = cartItems });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/SeatModeration/cart/clear")]
+        public async Task<IActionResult> ClearSeatModerationCart()
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                await _seatModerationService.ClearSeatModerationCart(userEmail);
+
+                return Ok(new { Success = true, Message = "Seat moderation cart cleared" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/SeatModeration/unsubscribe")]
+        public async Task<IActionResult> UnsubscribeFromMonitoring([FromBody] UnsubscribeRequest request)
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    return Unauthorized(new { Success = false, Error = "Authentication required" });
+                }
+
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest(new { Success = false, Error = "User email not found" });
+                }
+
+                await _seatModerationService.UnsubscribeUserFromMonitoring(userEmail, request.CourseSections);
+
+                return Ok(new { Success = true, Message = "Successfully unsubscribed from seat monitoring" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
 
     }
 
