@@ -41,6 +41,7 @@ namespace Scheds.MVC
             })
             .AddCookie("Cookies", options =>
             {
+                
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
