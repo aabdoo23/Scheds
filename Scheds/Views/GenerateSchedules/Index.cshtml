@@ -361,34 +361,30 @@
             const allDaysCheckbox = document.getElementById('all-days');
             const dayCheckboxes = document.querySelectorAll('input[name="selectedDays"]:not(#all-days)');
 
-            // Function to toggle between slider and checkbox sections
             scheduleMethodRadios.forEach(radio => {
                 radio.addEventListener('change', function () {
                     if (this.value === 'maxDays') {
-                        sliderSection.style.display = 'block';  // Show slider
-                        checkboxSection.style.display = 'none'; // Hide checkboxes
+                        sliderSection.style.display = 'block';
+                        checkboxSection.style.display = 'none';
                     } else {
-                        sliderSection.style.display = 'none';  // Hide slider
-                        checkboxSection.style.display = 'block'; // Show checkboxes
+                        sliderSection.style.display = 'none';
+                        checkboxSection.style.display = 'block';
                     }
                 });
             });
 
-            // Function to handle the "All Week" checkbox behavior
             allDaysCheckbox.addEventListener('change', function () {
                 if (this.checked) {
                     dayCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;    // Uncheck other checkboxes
-                        checkbox.disabled = true;    // Disable other checkboxes
+                        checkbox.checked = false;
+                        checkbox.disabled = true;
                     });
                 } else {
                     dayCheckboxes.forEach(checkbox => {
-                        checkbox.disabled = false;   // Enable checkboxes when "All Week" is unchecked
+                        checkbox.disabled = false;
                     });
                 }
             });
-
-            // Initialize the correct visibility based on the initially selected radio button
             if (document.querySelector('input[name="scheduleMethod"]:checked').value === 'maxDays') {
                 sliderSection.style.display = 'block';
                 checkboxSection.style.display = 'none';
@@ -399,7 +395,6 @@
         });
     </script>
     <script>
-        //cookie
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/api/cart/getGenerateRequest')
                 .then(response => response.json())
@@ -438,39 +433,45 @@
     <script>
 
         let cart = [];
-        //dont show any courses if empty
+        let searchTimeout = null;
+        
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/coursebase/getAllCourses')
-                .then(response => response.json())
-                .then(courses => {
-                    const searchInput = document.getElementById('course-search');
-                    searchInput.addEventListener('input', () => {
-                        const query = searchInput.value.toLowerCase();
-                        if (!query || query.length <= 1) {
-                            updateSearchResults([]); // Clear search results
-                            return;
-                        }
-                        const filteredCourses = courses.filter(course =>
-                            course.courseName.toLowerCase().includes(query) ||
-                            course.courseCode.toLowerCase().includes(query)
-                        );
-                        updateSearchResults(filteredCourses);
-                    });
-                })
-                .catch(error => console.error('Error fetching courses:', error));
+            const searchInput = document.getElementById('course-search');
+            
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.trim();
+                
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                }
+                
+                if (!query || query.length <= 1) {
+                    updateSearchResults([]);
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    fetch(`/api/coursebase/get-filtered-courses?query=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(courses => {
+                            updateSearchResults(courses);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching filtered courses:', error);
+                            updateSearchResults([]);
+                        });
+                }, 500); // 500ms debounce
+            });
 
-            // Fetch the cart items from the backend
             fetch('/api/cart/getCartItems')
                 .then(response => response.json())
                 .then(cartItems => {
-        @* console.log(cartItems); *@
-                        cart = cartItems; // Store full course objects in the cart array
+                    cart = cartItems;
                     cart.forEach(course => updateCartUI(course));
                 })
                 .catch(error => console.error('Error fetching cart items:', error));
 
             const searchButton = document.getElementById('add-to-cart');
-            const searchInput = document.getElementById('course-search');
             searchButton.addEventListener('click', () => {
                 const query = searchInput.value.trim();
                 if (!query) {
@@ -491,7 +492,7 @@
                     })
                     .catch(error => {
                         console.error('Error fetching search results:', error);
-                        searchResultsContainer.innerHTML = '<p>Error fetching results</p>';
+                        isLoading(false);
                     });
             });
         });
@@ -523,7 +524,7 @@
 
         function updateSearchResults(courses) {
             const resultsContainer = document.getElementById('search-results');
-            resultsContainer.innerHTML = ''; // Clear previous results
+            resultsContainer.innerHTML = '';
 
             courses.forEach(course => {
                 const resultItem = document.createElement('div');
@@ -547,36 +548,41 @@
                     alert("You can register maximum of 8 courses per semester. متحلوّش");
                     return;
                 }
-                cart.push(course); // Add full course object to cart
+                cart.push(course);
+                
                 if (document.querySelector('input[name="isLiveData"]:checked')) {
                     isLoading(true);
-                        fetch(`/api/coursebase/search/${encodeURIComponent(course.courseCode)}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Search request failed');
-                                }
-                                return response;
-                            })
-                            .then(() => {
-                                isLoading(false);
-                                return fetch('/api/cart/add', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify(course)
-                                });
-                            })
-                            .catch(error => {
-                                console.error('Error fetching search results:', error);
-                                searchResultsContainer.innerHTML = '<p>Error fetching results</p>';
+                    fetch(`/api/coursebase/search/${encodeURIComponent(course.courseCode)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Search request failed');
+                            }
+                            return response;
+                        })
+                        .then(() => {
+                            isLoading(false);
+                            return fetch('/api/cart/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(course)
                             });
-
+                        })
+                        .catch(error => {
+                            console.error('Error fetching search results:', error);
+                            isLoading(false);
+                        });
+                } else {
+                    fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(course)
+                    });
                 }
-                // Call backend to store in C# List
-
-
-                // Update the cart UI
+                
                 updateCartUI(course);
             }
         }
@@ -588,16 +594,15 @@
             cartItem.classList.add('cart-item');
             cartItem.innerHTML = `<p><strong>${course.courseCode}: ${course.courseName}</strong></p>`;
 
-            // Remove from cart on click
             cartItem.addEventListener('click', () => removeFromCart(course, cartItem));
 
             cartItemsContainer.appendChild(cartItem);
         }
 
         function removeFromCart(course, cartItem) {
-            const index = cart.findIndex(c => c.courseCode === course.courseCode); // Match by courseCode
+            const index = cart.findIndex(c => c.courseCode === course.courseCode);
             if (index > -1) {
-                cart.splice(index, 1); // Remove from cart array
+                cart.splice(index, 1);
 
                 fetch('/api/cart/remove', {
                     method: 'POST',
@@ -607,44 +612,37 @@
                     body: JSON.stringify(course)
                 });
 
-                // Remove the cart item from UI
                 cartItem.remove();
             }
         }
 
         document.getElementById('generate-schedule').addEventListener('click', function (event) {
             isGenerating(true);
-            event.preventDefault(); // Prevent the default button behavior
+            event.preventDefault();
 
-            // Capture input values using their selectors
             const minimumNumberOfItemsPerDay = document.querySelector('input[name="minimumNumberOfItemsPerDay"]').value;
             const largestAllowedGap = document.querySelector('input[name="largestAllowedGap"]').value;
             const maxNumberOfGeneratedSchedules = document.querySelector('input[name="maxNumberOfGeneratedSchedules"]').value;
-            const sliderElement = document.querySelector('input[name="numberOfDays"]'); // Explicitly select the slider input
+            const sliderElement = document.querySelector('input[name="numberOfDays"]');
             const isEngineering = document.querySelector('input[name="isEngineering"]').checked;
 			const isConsiderZeroSeats = document.querySelector('input[name="isConsiderZeroSeats"]').checked;
-            // Define the days of the week in order (starting with Saturday)
             const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
 
-            // Determine whether "Pick max number of days" or "Select specific days" is selected
             const isNumberOfDaysSelected = document.querySelector('input[name="scheduleMethod"]:checked').value === 'maxDays';
 
-            let selectedDaysArray = [false, false, false, false, false, false]; // Default to false for each day
+            let selectedDaysArray = [false, false, false, false, false, false];
 
             if (isNumberOfDaysSelected) {
-                // Max number of days selected, use the slider value
-                const numberOfDays = sliderElement ? sliderElement.value : 0; // Use the slider value or 0
+                const numberOfDays = sliderElement ? sliderElement.value : 0;
                 selectedDaysArray = Array(parseInt(numberOfDays)).fill(true).concat(Array(6 - numberOfDays).fill(false));
             } else {
-                // Specific days selected, use the checkboxes
                 const selectedDaysCheckboxes = Array.from(document.querySelectorAll('input[name="selectedDays"]:checked')).map(el => el.value);
 
                 if (selectedDaysCheckboxes.includes('all')) {
-                    // If "All Week" is selected, set all days to true
                     selectedDaysArray.fill(true);
                 } else {
                     selectedDaysCheckboxes.forEach(day => {
-                        const dayIndex = daysOfWeek.indexOf(day); // Find the index of the selected day
+                        const dayIndex = daysOfWeek.indexOf(day);
                         if (dayIndex !== -1) {
                             selectedDaysArray[dayIndex] = true;
                         }
@@ -652,13 +650,11 @@
                 }
             }
 
-            // Capture additional form data (start time, end time, etc.)
             const daysStart = document.querySelector('input[name="daysStart"]:checked')?.value || '';
             const daysEnd = document.querySelector('input[name="daysEnd"]:checked')?.value || '';
 
-            // Construct the GenerateRequest object
             const generateRequest = {
-                selectedDays: selectedDaysArray, // Boolean array for selected days
+                selectedDays: selectedDaysArray,
                 daysStart,
                 daysEnd,
                 selectedItems: cart,
@@ -669,8 +665,8 @@
                 considerZeroSeats: isConsiderZeroSeats,
                 numberOfDays: isNumberOfDaysSelected ? parseInt(sliderElement.value || 0) : 0,
                 maxNumberOfGeneratedSchedules: parseInt(maxNumberOfGeneratedSchedules),
-                isNumberOfDaysSelected: isNumberOfDaysSelected, // Determines whether we're using max number of days or specific days
-                selectedDaysCheckbox: !isNumberOfDaysSelected ? selectedDaysArray : [] // If specific days are chosen
+                isNumberOfDaysSelected: isNumberOfDaysSelected,
+                selectedDaysCheckbox: !isNumberOfDaysSelected ? selectedDaysArray : []
             };
             fetch('/api/cart/generate', {
                 method: 'POST',
@@ -680,9 +676,6 @@
                 body: JSON.stringify(generateRequest)
             });
 
-        @* console.log(generateRequest); *@
-
-            // URL for the fetch call
             const url = '/api/generate';
             fetch(url, {
                 method: 'POST',
@@ -691,40 +684,32 @@
                 },
                 body: JSON.stringify(generateRequest)
             })
-                .then(response => response.text()) // Expect HTML response
+                .then(response => response.text())
                 .then(html => {
                     isGenerating(false);
-                    // Inject the returned HTML into the page
                     document.getElementById('schedule-container').innerHTML = html;
                 })
                 .catch(error => {
-                    isGenerating(flase);
-
+                    isGenerating(false);
                     console.error('There was a problem with the fetch operation:', error);
                 });
         });
-
-
 
 
     </script>
 
 
     <script>
-        // Modern slider functionality for all sliders
         document.addEventListener('DOMContentLoaded', function () {
-            // Handle all modern sliders
             document.querySelectorAll('.modern-slider').forEach(slider => {
                 const valueDisplay = slider.parentElement.querySelector('.slider-value');
                 
-                // Update value display on input
                 slider.addEventListener('input', () => {
                     if (valueDisplay) {
                         valueDisplay.textContent = slider.value;
                     }
                 });
                 
-                // Initialize display value
                 if (valueDisplay) {
                     valueDisplay.textContent = slider.value;
                 }
@@ -777,7 +762,6 @@
         border-radius: 5px;
         width: 100%;
         cursor: pointer;
-        /* Full width */
         box-sizing: border-box;
         font-size: 1.1rem;
     }
@@ -1529,11 +1513,10 @@
     const rootElement = document.documentElement;
     const colorModeCheckbox = document.getElementById('color_mode');
 
-    // Check if user has a mode preference saved in localStorage
     const currentMode = localStorage.getItem('theme');
     if (currentMode === 'light') {
         rootElement.classList.add('light-mode');
-        colorModeCheckbox.checked = true;  // Ensure the checkbox reflects the current mode
+        colorModeCheckbox.checked = true;
     }
 
     // Event listener for the checkbox to toggle dark/light mode

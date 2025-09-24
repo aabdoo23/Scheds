@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Scheds.Infrastructure.Contexts;
 
@@ -11,9 +12,11 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    partial class SchedsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250918130008_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,35 +72,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("CardItems");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CourseCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Section")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CartSeatModerations");
-                });
-
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CourseBase", b =>
                 {
                     b.Property<string>("Id")
@@ -241,19 +215,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("ScheduleGenerations");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Scheds.Domain.Entities.SeatModeration", b =>
-                {
-                    b.Property<string>("CourseCode_Section")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("CourseCode_Section");
-
-                    b.ToTable("SeatModerations");
-                });
-
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.SelectedCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -322,52 +283,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("SelectedCustomCourses");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Scheds.Domain.Entities.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("SeatModerationUser", b =>
-                {
-                    b.Property<string>("SeatModerationsCourseCode_Section")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SeatModerationsCourseCode_Section", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("UserSeatModerations", (string)null);
-                });
-
-            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
-                {
-                    b.HasOne("Scheds.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.CardItem", "CardItem")
@@ -401,24 +316,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.Navigation("ScheduleGeneration");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("SeatModerationUser", b =>
-                {
-                    b.HasOne("Scheds.Domain.Entities.SeatModeration", null)
-                        .WithMany()
-                        .HasForeignKey("SeatModerationsCourseCode_Section")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Scheds.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CardItem", b =>
                 {
                     b.Navigation("CourseSchedules");

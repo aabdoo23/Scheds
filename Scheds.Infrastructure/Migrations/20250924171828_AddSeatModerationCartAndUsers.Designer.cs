@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Scheds.Infrastructure.Contexts;
 
@@ -11,9 +12,11 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    partial class SchedsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250924171828_AddSeatModerationCartAndUsers")]
+    partial class AddSeatModerationCartAndUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,7 +72,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("CardItems");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
                 {
                     b.Property<int>("Id")
@@ -96,8 +98,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("CartSeatModerations");
                 });
 
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CourseBase", b =>
                 {
                     b.Property<string>("Id")
@@ -241,7 +241,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("ScheduleGenerations");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Scheds.Domain.Entities.SeatModeration", b =>
                 {
                     b.Property<string>("CourseCode_Section")
@@ -252,8 +251,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("SeatModerations");
                 });
 
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.SelectedCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -322,7 +319,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("SelectedCustomCourses");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Scheds.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -366,8 +362,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.CardItem", "CardItem")
@@ -401,7 +395,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.Navigation("ScheduleGeneration");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("SeatModerationUser", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.SeatModeration", null)
@@ -417,8 +410,6 @@ namespace Scheds.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
             modelBuilder.Entity("Scheds.Domain.Entities.CardItem", b =>
                 {
                     b.Navigation("CourseSchedules");
