@@ -91,17 +91,29 @@ namespace Scheds.Infrastructure.Services
 
                     if (matchingCard != null && matchingCard.SeatsLeft > 0)
                     {
-                        Console.WriteLine($"[MONITOR] 🎉 Seats available for {courseCode} Section {section}: {matchingCard.SeatsLeft} seats");
+                        var minutesSinceLastEmail = (DateTime.UtcNow - seatModeration.LastUpdated).TotalMinutes;
+                        var cooldownPeriod = 15;
 
-                        foreach (var user in seatModeration.Users)
+                        if (minutesSinceLastEmail >= cooldownPeriod)
                         {
-                            var email = user.Email?.Trim();
-                            if (!string.IsNullOrWhiteSpace(email))
+
+                            foreach (var user in seatModeration.Users)
                             {
-                                if (!userNotifications.ContainsKey(email))
-                                    userNotifications[email] = new List<(string, string, int)>();
-                                userNotifications[email].Add((courseCode, section, matchingCard.SeatsLeft));
+                                var email = user.Email?.Trim();
+                                if (!string.IsNullOrWhiteSpace(email))
+                                {
+                                    if (!userNotifications.ContainsKey(email))
+                                        userNotifications[email] = new List<(string, string, int)>();
+                                    userNotifications[email].Add((courseCode, section, matchingCard.SeatsLeft));
+                                }
                             }
+
+                            seatModeration.LastUpdated = DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            var remainingCooldown = cooldownPeriod - minutesSinceLastEmail;
+                            Console.WriteLine($"[MONITOR] 🕒 Seats available for {courseCode} Section {section} but cooldown active (remaining: {remainingCooldown:F1} min)");
                         }
                     }
                     else if (matchingCard != null)
@@ -133,6 +145,13 @@ namespace Scheds.Infrastructure.Services
                     {
                         Console.WriteLine($"[EMAIL] ❌ Failed to send summary to {email}: {ex.Message}");
                     }
+                }
+
+                // Save changes to persist updated LastUpdated timestamps for cooldown tracking
+                if (userNotifications.Any())
+                {
+                    await _context.SaveChangesAsync(cancellationToken);
+                    Console.WriteLine($"[MONITOR] ✅ Updated cooldown timestamps for {userNotifications.Count} notification(s)");
                 }
 
                 Console.WriteLine("[MONITOR] Seat monitoring cycle completed");
@@ -172,7 +191,8 @@ namespace Scheds.Infrastructure.Services
                     {
                         seatModeration = new SeatModeration(courseSection)
                         { 
-                            Users = new List<User>()
+                            Users = new List<User>(),
+                            LastUpdated = DateTime.UtcNow.AddMinutes(-20) // Set to 20 minutes ago to allow immediate email sending
                         };
                         _context.SeatModerations.Add(seatModeration);
                     }

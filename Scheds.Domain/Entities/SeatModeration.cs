@@ -7,8 +7,7 @@ namespace Scheds.Domain.Entities
     public class SeatModeration : BaseEntity
     {
         public virtual ICollection<User> Users { get; set; } = new List<User>();
-        
-        // Constructor to set the Id to CourseCode_Section format
+        public DateTime LastUpdated { get; set; }
         public SeatModeration()
         {
         }
