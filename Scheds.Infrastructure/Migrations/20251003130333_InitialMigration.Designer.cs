@@ -12,8 +12,8 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    [Migration("20250923035841_SeatModeration_Cart_Update")]
-    partial class SeatModeration_Cart_Update
+    [Migration("20251003130333_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,11 +48,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.Property<int>("SeatsLeft")
                         .HasColumnType("int");
 
@@ -72,6 +67,30 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("CardItems");
                 });
 
+            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CartSeatModerations");
+                });
+
             modelBuilder.Entity("Scheds.Domain.Entities.CourseBase", b =>
                 {
                     b.Property<string>("Id")
@@ -87,11 +106,6 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.Property<DateTime?>("LastUpdate")
                         .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -118,11 +132,6 @@ namespace Scheds.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
@@ -144,11 +153,6 @@ namespace Scheds.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -217,10 +221,10 @@ namespace Scheds.Infrastructure.Migrations
 
             modelBuilder.Entity("Scheds.Domain.Entities.SeatModeration", b =>
                 {
-                    b.Property<string>("CourseCode_Section")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("CourseCode_Section");
+                    b.HasKey("Id");
 
                     b.ToTable("SeatModerations");
                 });
@@ -295,11 +299,8 @@ namespace Scheds.Infrastructure.Migrations
 
             modelBuilder.Entity("Scheds.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -307,22 +308,33 @@ namespace Scheds.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("UserSeatModeration", b =>
+            modelBuilder.Entity("UserSeatModerations", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SeatModerationId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("UserId", "SeatModerationId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("SeatModerationId");
+                    b.HasKey("SeatModerationId", "UserId");
 
-                    b.ToTable("UserSeatModerations", (string)null);
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSeatModerations");
+                });
+
+            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
+                {
+                    b.HasOne("Scheds.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
@@ -358,7 +370,7 @@ namespace Scheds.Infrastructure.Migrations
                     b.Navigation("ScheduleGeneration");
                 });
 
-            modelBuilder.Entity("UserSeatModeration", b =>
+            modelBuilder.Entity("UserSeatModerations", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.SeatModeration", null)
                         .WithMany()

@@ -42,7 +42,7 @@ namespace Scheds.Infrastructure.Contexts
 
             // Configure SeatModeration entity
             modelBuilder.Entity<SeatModeration>()
-                .HasKey(sm => sm.CourseCode_Section);
+                .HasKey(sm => sm.Id);
 
             // Configure many-to-many relationship between User and SeatModeration
             modelBuilder.Entity<User>()

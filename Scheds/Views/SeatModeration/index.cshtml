@@ -424,7 +424,7 @@ function populateSectionDropdown(sections) {
 async function loadCartItems() {
     try {
         console.log('Loading cart items...');
-        const response = await fetch('/api/SeatModeration/cart/get');
+        const response = await fetch('/api/SeatModeration/cart');
         console.log('Cart get response status:', response.status);
         
         if (response.ok) {

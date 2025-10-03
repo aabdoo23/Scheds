@@ -1,13 +1,21 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-
+using Scheds.Domain.Entities.Common;
 
 namespace Scheds.Domain.Entities
 {
-    public class SeatModeration
+    public class SeatModeration : BaseEntity
     {
-        [Key] 
-        public string CourseCode_Section { get; set; } = string.Empty;
         public virtual ICollection<User> Users { get; set; } = new List<User>();
+        
+        // Constructor to set the Id to CourseCode_Section format
+        public SeatModeration()
+        {
+        }
+        
+        public SeatModeration(string courseCodeSection)
+        {
+            Id = courseCodeSection;
+        }
     }
 }

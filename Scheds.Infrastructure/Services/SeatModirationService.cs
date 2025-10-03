@@ -55,7 +55,7 @@ namespace Scheds.Infrastructure.Services
 
 
                 var courseCodeSectionPairs = seatModerations
-                    .Select(sm => sm.CourseCode_Section.Split('_'))
+                    .Select(sm => sm.Id.Split('_'))
                     .Where(parts => parts.Length == 2)
                     .Select(parts => new { CourseCode = parts[0], Section = parts[1] })
                     .ToList();
@@ -79,7 +79,7 @@ namespace Scheds.Infrastructure.Services
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var parts = seatModeration.CourseCode_Section.Split('_');
+                    var parts = seatModeration.Id.Split('_');
                     if (parts.Length != 2) continue;
 
                     var courseCode = parts[0];
@@ -166,13 +166,12 @@ namespace Scheds.Infrastructure.Services
                 {
                     var seatModeration = await _context.SeatModerations
                         .Include(sm => sm.Users)
-                        .FirstOrDefaultAsync(sm => sm.CourseCode_Section == courseSection);
+                        .FirstOrDefaultAsync(sm => sm.Id == courseSection);
 
                     if (seatModeration == null)
                     {
-                        seatModeration = new SeatModeration 
+                        seatModeration = new SeatModeration(courseSection)
                         { 
-                            CourseCode_Section = courseSection,
                             Users = new List<User>()
                         };
                         _context.SeatModerations.Add(seatModeration);
@@ -209,7 +208,7 @@ namespace Scheds.Infrastructure.Services
                 {
                     var seatModeration = await _context.SeatModerations
                         .Include(sm => sm.Users)
-                        .FirstOrDefaultAsync(sm => sm.CourseCode_Section == courseSection);
+                        .FirstOrDefaultAsync(sm => sm.Id == courseSection);
 
                     if (seatModeration != null)
                     {

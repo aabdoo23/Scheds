@@ -5,28 +5,41 @@ using Scheds.Domain.DTOs;
 
 namespace Scheds.MVC.Controllers
 {
-    public class SeatModerationController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SeatModerationController : ControllerBase
     {
         private readonly ISeatModerationService _seatModerationService;
 
         public SeatModerationController(ISeatModerationService seatModerationService)
         {
-            _seatModerationService = seatModerationService;
+            _seatModerationService = seatModerationService ?? throw new ArgumentNullException(nameof(seatModerationService));
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            return Ok("SeatModeration API is running");
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/check-seats")]
-        public async Task<IActionResult> CheckSeats([FromBody] CourseDataRequestSeatModeration request)
+        // Separate route for serving the view (outside of the API routes)
+        [HttpGet("~/SeatModeration")]
+        [IgnoreAntiforgeryToken]
+        public IActionResult ViewIndex()
+        {
+            // Return the view directly using the file path
+            return new ViewResult
+            {
+                ViewName = "~/Views/SeatModeration/Index.cshtml"
+            };
+        }
+
+        [HttpPost("check-seats")]
+        public async Task<IActionResult> CheckSeats([FromBody] CourseDataRequestSeatModerationDTO request)
         {
             try
             {
                 var results = await _seatModerationService.FetchAndProcessCourseData(request.CourseCode, request.Sections);
-
                 var response = new 
                 { 
                     Success = true,
@@ -44,7 +57,6 @@ namespace Scheds.MVC.Controllers
                         Instructor = c.Instructor
                     })
                 };
-                
                 return Ok(response);
             }
             catch (Exception ex)
@@ -53,25 +65,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/subscribe")]
-        public async Task<IActionResult> SubscribeToMonitoring([FromBody] SubscribeRequest request)
+        [HttpPost("subscribe")]
+        public async Task<IActionResult> SubscribeToMonitoring([FromBody] SubscribeRequestDTO request)
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 await _seatModerationService.SubscribeUserToMonitoring(userEmail, request.CourseSections);
-
                 return Ok(new { Success = true, Message = "Successfully subscribed to seat monitoring" });
             }
             catch (Exception ex)
@@ -80,25 +83,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/cart/add")]
-        public async Task<IActionResult> AddToSeatModerationCart([FromBody] AddToSeatModerationCartRequest request)
+        [HttpPost("cart/add")]
+        public async Task<IActionResult> AddToSeatModerationCart([FromBody] AddToSeatModerationCartRequestDTO request)
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 await _seatModerationService.AddToSeatModerationCart(userEmail, request.CourseCode, request.Section);
-
                 return Ok(new { Success = true, Message = "Course added to seat moderation cart" });
             }
             catch (Exception ex)
@@ -107,25 +101,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/cart/remove")]
-        public async Task<IActionResult> RemoveFromSeatModerationCart([FromBody] RemoveFromSeatModerationCartRequest request)
+        [HttpPost("cart/remove")]
+        public async Task<IActionResult> RemoveFromSeatModerationCart([FromBody] RemoveFromSeatModerationCartRequestDTO request)
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 await _seatModerationService.RemoveFromSeatModerationCart(userEmail, request.CourseCode, request.Section);
-
                 return Ok(new { Success = true, Message = "Course removed from seat moderation cart" });
             }
             catch (Exception ex)
@@ -134,25 +119,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/SeatModeration/cart/get")]
+        [HttpGet("cart")]
         public async Task<IActionResult> GetSeatModerationCart()
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 var cartItems = await _seatModerationService.GetSeatModerationCart(userEmail);
-
                 return Ok(new { Success = true, CartItems = cartItems });
             }
             catch (Exception ex)
@@ -161,25 +137,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/cart/clear")]
+        [HttpPost("cart/clear")]
         public async Task<IActionResult> ClearSeatModerationCart()
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 await _seatModerationService.ClearSeatModerationCart(userEmail);
-
                 return Ok(new { Success = true, Message = "Seat moderation cart cleared" });
             }
             catch (Exception ex)
@@ -188,25 +155,16 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/SeatModeration/unsubscribe")]
-        public async Task<IActionResult> UnsubscribeFromMonitoring([FromBody] UnsubscribeRequest request)
+        [HttpPost("unsubscribe")]
+        public async Task<IActionResult> UnsubscribeFromMonitoring([FromBody] SubscribeRequestDTO request)
         {
             try
             {
-                if (User?.Identity?.IsAuthenticated != true)
-                {
-                    return Unauthorized(new { Success = false, Error = "Authentication required" });
-                }
-
-                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest(new { Success = false, Error = "User email not found" });
-                }
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
 
                 await _seatModerationService.UnsubscribeUserFromMonitoring(userEmail, request.CourseSections);
-
                 return Ok(new { Success = true, Message = "Successfully unsubscribed from seat monitoring" });
             }
             catch (Exception ex)
@@ -215,7 +173,12 @@ namespace Scheds.MVC.Controllers
             }
         }
 
-
+        private string? GetUserEmail()
+        {
+            if (User?.Identity?.IsAuthenticated != true)
+                return null;
+            
+            return User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        }
     }
-
 }

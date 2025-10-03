@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
+using Scheds.MVC.Extensions;
 
 namespace Scheds.MVC
 {
@@ -33,32 +34,9 @@ namespace Scheds.MVC
 
             builder.Services.AddHttpClient();
 
-            // Add authentication with Google
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "Cookies";
-                options.DefaultChallengeScheme = "Google";
-            })
-            .AddCookie("Cookies", options =>
-            {
-                
-                
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
-                options.SlidingExpiration = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-            })
-            .AddGoogle("Google", options =>
-            {
-                var google = builder.Configuration.GetSection("Authentication:Google");
-                options.ClientId = google["ClientId"] ?? string.Empty;
-                options.ClientSecret = google["ClientSecret"] ?? string.Empty;
-                options.CallbackPath = google["CallbackPath"] ?? "/signin-google";
-                options.Scope.Add("profile");
-                options.Scope.Add("email");
-            });
+            // Add authentication
+            builder.Services.AddCookieAuthentication()
+                .AddGoogleAuthentication(builder.Configuration);
 
             var app = builder.Build();
 

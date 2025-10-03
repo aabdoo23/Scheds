@@ -1,4 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Infrastructure.Repositories;
@@ -27,15 +31,30 @@ namespace Scheds.Infrastructure
             services.AddScoped<ISelfServiceLiveFetchService, SelfServiceLiveFetchService>();
             services.AddScoped<IEmptyRoomsService, EmptyRoomsService>();
             services.AddScoped<ISeatModerationService, SeatModerationService>();
-<<<<<<< HEAD
             services.AddScoped<IEmailService, EmailService>();
 
             // Register background service for automated seat monitoring
             services.AddHostedService<SeatMonitoringBackgroundService>();
-=======
->>>>>>> 9c15f3fe2b3f3e98c65acbf62bc8c668d8165f59
 
             return services;
+        }
+
+        public static AuthenticationBuilder AddCookieAuthentication(this IServiceCollection services)
+        {
+            return services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "Google";
+            })
+            .AddCookie("Cookies", options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
         }
     }
 }
