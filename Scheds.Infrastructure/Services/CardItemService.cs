@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Scheds.Application.Interfaces.Repositories;
+﻿using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.Entities;
 using Scheds.Infrastructure.Contexts;

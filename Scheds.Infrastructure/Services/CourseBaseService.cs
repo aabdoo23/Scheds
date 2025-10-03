@@ -1,29 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.Entities;
 
 namespace Scheds.Infrastructure.Services
 {
-    public class CourseBaseService : ICourseBaseService
+    public class CourseBaseService(ICourseBaseRepository courseBaseRepository, ICardItemRepository cardItemRepository) : ICourseBaseService
     {
-        private readonly ICourseBaseRepository _courseBaseRepository;
-        private readonly ICardItemRepository _cardItemRepository;
-
-        public CourseBaseService(ICourseBaseRepository courseBaseRepository, ICardItemRepository cardItemRepository)
-        {
-            _courseBaseRepository = courseBaseRepository ?? throw new ArgumentNullException(nameof(courseBaseRepository));
-            _cardItemRepository = cardItemRepository ?? throw new ArgumentNullException(nameof(cardItemRepository));
-        }
+        private readonly ICourseBaseRepository _courseBaseRepository = courseBaseRepository ?? throw new ArgumentNullException(nameof(courseBaseRepository));
+        private readonly ICardItemRepository _cardItemRepository = cardItemRepository ?? throw new ArgumentNullException(nameof(cardItemRepository));
 
         public async Task<List<CourseBase>> GetFilteredCourses(string searchTerm = "")
         {
             var allCourses = await _courseBaseRepository.GetAllAsync();
             var filteredCourses = allCourses
-                .Where(c => (string.IsNullOrWhiteSpace(searchTerm)) ||
+                .Where(c => string.IsNullOrWhiteSpace(searchTerm) ||
                            (!string.IsNullOrWhiteSpace(c.CourseName) && c.CourseName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                            (!string.IsNullOrWhiteSpace(c.CourseCode) && c.CourseCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                 .ToList();

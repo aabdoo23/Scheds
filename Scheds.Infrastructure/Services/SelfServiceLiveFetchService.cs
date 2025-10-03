@@ -35,8 +35,6 @@ namespace Scheds.Infrastructure.Services
             }
             return cards;
         }
-        
-
 
         public async Task<List<CardItem>> FetchCardsSeatModeration(List<string> CourseCodes, List<string> sections)
         {
@@ -68,8 +66,6 @@ namespace Scheds.Infrastructure.Services
                     return courseMatch && sectionMatch;
                 });
             }).ToList();
-            // s
-            
             
             return filteredCards;
         }

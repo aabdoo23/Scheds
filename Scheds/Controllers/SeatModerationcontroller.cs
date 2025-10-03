@@ -102,7 +102,7 @@ namespace Scheds.MVC.Controllers
         }
 
         [HttpPost("cart/remove")]
-        public async Task<IActionResult> RemoveFromSeatModerationCart([FromBody] RemoveFromSeatModerationCartRequestDTO request)
+        public async Task<IActionResult> RemoveFromSeatModerationCart([FromBody] CartItemDTO request)
         {
             try
             {
@@ -166,6 +166,41 @@ namespace Scheds.MVC.Controllers
 
                 await _seatModerationService.UnsubscribeUserFromMonitoring(userEmail, request.CourseSections);
                 return Ok(new { Success = true, Message = "Successfully unsubscribed from seat monitoring" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Error = ex.Message });
+            }
+        }
+
+        [HttpGet("active-jobs")]
+        public async Task<IActionResult> GetActiveMonitoringJobs()
+        {
+            try
+            {
+                var userEmail = GetUserEmail();
+                if (userEmail == null)
+                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
+
+                var activeJobs = await _seatModerationService.GetUserActiveMonitoringJobs(userEmail);
+                
+                var response = new 
+                { 
+                    Success = true,
+                    Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    ActiveJobs = activeJobs.Select(c => new 
+                    {
+                        Course = c.CourseCode,
+                        CourseName = c.CourseName,
+                        Section = c.Section,
+                        HasSeats = c.SeatsLeft > 0,
+                        SeatsLeft = c.SeatsLeft,
+                        LastUpdate = c.LastUpdate.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Instructor = c.Instructor
+                    }).ToList()
+                };
+                
+                return Ok(response);
             }
             catch (Exception ex)
             {

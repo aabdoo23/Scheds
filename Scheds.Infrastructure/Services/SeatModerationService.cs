@@ -1,19 +1,24 @@
-using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
+using Scheds.Application.Interfaces.Repositories;
 using Scheds.Domain.Entities;
-using Scheds.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace Scheds.Infrastructure.Services
 {
     public class SeatModerationService(ISelfServiceLiveFetchService selfServiceLiveFetchService,
-        SchedsDbContext context,
+        ISeatModerationRepository seatModerationRepository,
+        ICartSeatModerationRepository cartSeatModerationRepository,
+        IUserRepository userRepository,
         IEmailService emailService) : ISeatModerationService
     {
         private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService
             ?? throw new ArgumentNullException(nameof(selfServiceLiveFetchService));
-        private readonly SchedsDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly ISeatModerationRepository _seatModerationRepository = seatModerationRepository
+            ?? throw new ArgumentNullException(nameof(seatModerationRepository));
+        private readonly ICartSeatModerationRepository _cartSeatModerationRepository = cartSeatModerationRepository
+            ?? throw new ArgumentNullException(nameof(cartSeatModerationRepository));
+        private readonly IUserRepository _userRepository = userRepository
+            ?? throw new ArgumentNullException(nameof(userRepository));
         private readonly IEmailService _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
 
         public async Task<List<CardItem>> FetchAndProcessCourseData(List<string> courseCodes, List<string> sections)
@@ -25,7 +30,7 @@ namespace Scheds.Infrastructure.Services
                 Console.WriteLine($"[API] Fetched {fetchedCards.Count} courses for frontend");
                 foreach (var card in fetchedCards)
                 {
-                    var status = card.SeatsLeft > 0 ? "🎉 AVAILABLE" : "❌ NO SEATS";
+                    var status = card.SeatsLeft > 0 ? "AVAILABLE" : "NO SEATS";
                     Console.WriteLine($"[API] {card.CourseCode} Section {card.Section}: {card.SeatsLeft} seats - {status}");
                 }
                 
@@ -38,14 +43,12 @@ namespace Scheds.Infrastructure.Services
             }
         }
 
-        public async Task MoniterAllCourses(CancellationToken cancellationToken)
+        public async Task MonitorAllCourses(CancellationToken cancellationToken)
         {
             try
             {
 
-                var seatModerations = await _context.Set<SeatModeration>()
-                    .Include(sm => sm.Users)
-                    .ToListAsync(cancellationToken);
+                var seatModerations = await _seatModerationRepository.GetAllWithUsersAsync();
 
                 if (!seatModerations.Any())
                 {
@@ -113,7 +116,7 @@ namespace Scheds.Infrastructure.Services
                         else
                         {
                             var remainingCooldown = cooldownPeriod - minutesSinceLastEmail;
-                            Console.WriteLine($"[MONITOR] 🕒 Seats available for {courseCode} Section {section} but cooldown active (remaining: {remainingCooldown:F1} min)");
+                            Console.WriteLine($"[MONITOR] Seats available for {courseCode} Section {section} but cooldown active (remaining: {remainingCooldown:F1} min)");
                         }
                     }
                     else if (matchingCard != null)
@@ -122,7 +125,7 @@ namespace Scheds.Infrastructure.Services
                     }
                     else
                     {
-                        Console.WriteLine($"[MONITOR] ⚠️ No data found for {courseCode} Section {section}");
+                        Console.WriteLine($"[MONITOR] WARNING: No data found for {courseCode} Section {section}");
                     }
                 }
                 foreach (var kvp in userNotifications)
@@ -139,19 +142,22 @@ namespace Scheds.Infrastructure.Services
                     try
                     {
                         await _emailService.SendEmailAsync(email, subject, htmlBody);
-                        Console.WriteLine($"[EMAIL] ✅ Sent summary to {email}");
+                        Console.WriteLine($"[EMAIL] Sent summary to {email}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[EMAIL] ❌ Failed to send summary to {email}: {ex.Message}");
+                        Console.WriteLine($"[EMAIL] Failed to send summary to {email}: {ex.Message}");
                     }
                 }
 
-                // Save changes to persist updated LastUpdated timestamps for cooldown tracking
+                // Update timestamps for seat moderations that sent notifications
                 if (userNotifications.Any())
                 {
-                    await _context.SaveChangesAsync(cancellationToken);
-                    Console.WriteLine($"[MONITOR] ✅ Updated cooldown timestamps for {userNotifications.Count} notification(s)");
+                    foreach (var seatMod in seatModerations.Where(sm => sm.LastUpdated > DateTime.UtcNow.AddMinutes(-1)))
+                    {
+                        await _seatModerationRepository.UpdateAsync(seatMod);
+                    }
+                    Console.WriteLine($"[MONITOR] Updated cooldown timestamps for {userNotifications.Count} notification(s)");
                 }
 
                 Console.WriteLine("[MONITOR] Seat monitoring cycle completed");
@@ -173,19 +179,11 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-                if (user == null)
-                {
-                    user = new User { Email = userEmail };
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-                }
+                var user = await _userRepository.GetOrCreateUserAsync(userEmail);
 
                 foreach (var courseSection in courseSections)
                 {
-                    var seatModeration = await _context.SeatModerations
-                        .Include(sm => sm.Users)
-                        .FirstOrDefaultAsync(sm => sm.Id == courseSection);
+                    var seatModeration = await _seatModerationRepository.GetByIdWithUsersAsync(courseSection);
 
                     if (seatModeration == null)
                     {
@@ -194,16 +192,16 @@ namespace Scheds.Infrastructure.Services
                             Users = new List<User>(),
                             LastUpdated = DateTime.UtcNow.AddMinutes(-20) // Set to 20 minutes ago to allow immediate email sending
                         };
-                        _context.SeatModerations.Add(seatModeration);
+                        await _seatModerationRepository.InsertAsync(seatModeration);
                     }
 
                     if (!seatModeration.Users.Any(u => u.Email == userEmail))
                     {
                         seatModeration.Users.Add(user);
+                        await _seatModerationRepository.UpdateAsync(seatModeration);
                     }
                 }
 
-                await _context.SaveChangesAsync();
                 Console.WriteLine($"[SUBSCRIPTION] User {userEmail} subscribed to monitoring for {courseSections.Count} course sections");
             }
             catch (Exception ex)
@@ -217,7 +215,7 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var user = await _userRepository.GetByEmailAsync(userEmail);
                 if (user == null)
                 {
                     Console.WriteLine($"[UNSUBSCRIPTION] User {userEmail} not found");
@@ -226,9 +224,7 @@ namespace Scheds.Infrastructure.Services
 
                 foreach (var courseSection in courseSections)
                 {
-                    var seatModeration = await _context.SeatModerations
-                        .Include(sm => sm.Users)
-                        .FirstOrDefaultAsync(sm => sm.Id == courseSection);
+                    var seatModeration = await _seatModerationRepository.GetByIdWithUsersAsync(courseSection);
 
                     if (seatModeration != null)
                     {
@@ -240,12 +236,15 @@ namespace Scheds.Infrastructure.Services
 
                         if (!seatModeration.Users.Any())
                         {
-                            _context.SeatModerations.Remove(seatModeration);
+                            await _seatModerationRepository.DeleteAsync(seatModeration.Id);
+                        }
+                        else
+                        {
+                            await _seatModerationRepository.UpdateAsync(seatModeration);
                         }
                     }
                 }
 
-                await _context.SaveChangesAsync();
                 Console.WriteLine($"[UNSUBSCRIPTION] User {userEmail} unsubscribed from monitoring for {courseSections.Count} course sections");
             }
             catch (Exception ex)
@@ -259,29 +258,22 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-                if (user == null)
-                {
-                    user = new User { Email = userEmail };
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-                }
+                var user = await _userRepository.GetOrCreateUserAsync(userEmail);
 
-                var existingCartItem = await _context.CartSeatModerations
-                    .FirstOrDefaultAsync(c => c.UserId == user.Id && c.CourseCode == courseCode && c.Section == section);
+                var existingCartItem = await _cartSeatModerationRepository.GetByUserAndCourseAsync(user.Id, courseCode, section);
 
                 if (existingCartItem == null)
                 {
                     var cartItem = new CartSeatModeration
                     {
+                        Id = $"{user.Id}_{courseCode}_{section}", // Set unique composite key
                         UserId = user.Id,
                         CourseCode = courseCode,
                         Section = section,
                         User = user
                     };
 
-                    _context.CartSeatModerations.Add(cartItem);
-                    await _context.SaveChangesAsync();
+                    await _cartSeatModerationRepository.InsertAsync(cartItem);
                     
                     var courseSection = $"{courseCode}_{section}";
                     await SubscribeUserToMonitoring(userEmail, new List<string> { courseSection });
@@ -300,16 +292,14 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var user = await _userRepository.GetByEmailAsync(userEmail);
                 if (user == null) return;
 
-                var cartItem = await _context.CartSeatModerations
-                    .FirstOrDefaultAsync(c => c.UserId == user.Id && c.CourseCode == courseCode && c.Section == section);
+                var cartItem = await _cartSeatModerationRepository.GetByUserAndCourseAsync(user.Id, courseCode, section);
 
                 if (cartItem != null)
                 {
-                    _context.CartSeatModerations.Remove(cartItem);
-                    await _context.SaveChangesAsync();
+                    await _cartSeatModerationRepository.DeleteAsync(cartItem.Id);
                     
                     var courseSection = $"{courseCode}_{section}";
                     await UnsubscribeUserFromMonitoring(userEmail, new List<string> { courseSection });
@@ -328,13 +318,10 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var user = await _userRepository.GetByEmailAsync(userEmail);
                 if (user == null) return new List<CartSeatModeration>();
 
-                var cartItems = await _context.CartSeatModerations
-                    .Where(c => c.UserId == user.Id)
-                    .Include(c => c.User)
-                    .ToListAsync();
+                var cartItems = await _cartSeatModerationRepository.GetUserCartItemsAsync(user.Id);
 
                 return cartItems;
             }
@@ -349,12 +336,10 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var user = await _userRepository.GetByEmailAsync(userEmail);
                 if (user == null) return;
 
-                var cartItems = await _context.CartSeatModerations
-                    .Where(c => c.UserId == user.Id)
-                    .ToListAsync();
+                var cartItems = await _cartSeatModerationRepository.GetUserCartItemsAsync(user.Id);
 
                 if (cartItems.Any())
                 {
@@ -362,8 +347,7 @@ namespace Scheds.Infrastructure.Services
                         .Select(c => $"{c.CourseCode}_{c.Section}")
                         .ToList();
                     
-                    _context.CartSeatModerations.RemoveRange(cartItems);
-                    await _context.SaveChangesAsync();
+                    await _cartSeatModerationRepository.ClearUserCartAsync(user.Id);
                     
                     await UnsubscribeUserFromMonitoring(userEmail, courseSections);
                     
@@ -373,6 +357,65 @@ namespace Scheds.Infrastructure.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[CART] Error clearing cart: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<CardItem>> GetUserActiveMonitoringJobs(string userEmail)
+        {
+            try
+            {
+                var user = await _userRepository.GetByEmailAsync(userEmail);
+                if (user == null) 
+                {
+                    Console.WriteLine($"[MONITORING_JOBS] User {userEmail} not found");
+                    return new List<CardItem>();
+                }
+
+                // Get all seat moderations where this user is subscribed
+                var userSeatModerations = await _seatModerationRepository.GetUserSeatModerationsAsync(userEmail);
+
+                if (!userSeatModerations.Any())
+                {
+                    Console.WriteLine($"[MONITORING_JOBS] No active monitoring jobs found for user {userEmail}");
+                    return new List<CardItem>();
+                }
+
+                // Extract course codes and sections from the monitoring jobs
+                var courseCodeSectionPairs = userSeatModerations
+                    .Select(sm => sm.Id.Split('_'))
+                    .Where(parts => parts.Length == 2)
+                    .Select(parts => new { CourseCode = parts[0], Section = parts[1] })
+                    .ToList();
+
+                var uniqueCourseCodes = courseCodeSectionPairs
+                    .Select(pair => pair.CourseCode)
+                    .Distinct()
+                    .ToList();
+
+                var allSections = courseCodeSectionPairs
+                    .Select(pair => pair.Section)
+                    .Distinct()
+                    .ToList();
+
+                // Fetch current seat data for these courses
+                var currentSeatData = await FetchAndProcessCourseData(uniqueCourseCodes, allSections);
+
+                // Filter to only include the exact course-section combinations the user is monitoring
+                var userMonitoredCourses = currentSeatData.Where(card =>
+                    courseCodeSectionPairs.Any(pair =>
+                        card.CourseCode.Equals(pair.CourseCode, StringComparison.OrdinalIgnoreCase) &&
+                        card.Section.PadLeft(2, '0').Equals(pair.Section.PadLeft(2, '0'), StringComparison.OrdinalIgnoreCase)
+                    )
+                ).ToList();
+
+                Console.WriteLine($"[MONITORING_JOBS] Found {userMonitoredCourses.Count} active monitoring jobs for user {userEmail}");
+                
+                return userMonitoredCourses;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MONITORING_JOBS] Error getting user active monitoring jobs: {ex.Message}");
                 throw;
             }
         }

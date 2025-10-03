@@ -36,5 +36,14 @@ namespace Scheds.Infrastructure.Repositories
                     t < schedule.EndTime)
                 .Select(schedule => schedule.Location).ToListAsync();
         }
+
+        public async Task<List<CourseSchedule>> GetSchedulesForDayWithCardItemsAsync(string dayOfWeek)
+        {
+            return await _context.CourseSchedules
+                .Include(cs => cs.CardItem)
+                .Where(cs => cs.DayOfWeek.ToLower() == dayOfWeek.ToLower())
+                .OrderBy(cs => cs.StartTime)
+                .ToListAsync();
+        }
     }
 }

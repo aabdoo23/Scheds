@@ -3,20 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Scheds.Application.Interfaces.Services;
-using Scheds.Infrastructure.Contexts;
 
 namespace Scheds.Infrastructure.Services
 {
-    public class SeatMonitoringBackgroundService : BackgroundService
+    public class SeatMonitoringBackgroundService(ILogger<SeatMonitoringBackgroundService> logger, IServiceProvider serviceProvider) : BackgroundService
     {
-        private readonly ILogger<SeatMonitoringBackgroundService> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
-        public SeatMonitoringBackgroundService(ILogger<SeatMonitoringBackgroundService> logger, IServiceProvider serviceProvider)
-        {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-        }
+        private readonly ILogger<SeatMonitoringBackgroundService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -32,7 +25,7 @@ namespace Scheds.Infrastructure.Services
                     
                     var seatModerationService = scope.ServiceProvider.GetRequiredService<ISeatModerationService>();
                     
-                    await seatModerationService.MoniterAllCourses(stoppingToken);
+                    await seatModerationService.MonitorAllCourses(stoppingToken);
                     
                     _logger.LogInformation("Seat monitoring check completed at: {time}", DateTimeOffset.Now);
                 }

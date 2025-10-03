@@ -1,1 +1,0 @@
-﻿# Ignore Visual Studio temporary files\n*.user\n*.suo\n\n# Ignore appsettings local dev secrets\nappsettings.Development.json

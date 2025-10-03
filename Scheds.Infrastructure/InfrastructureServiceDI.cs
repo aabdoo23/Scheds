@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
@@ -19,6 +17,9 @@ namespace Scheds.Infrastructure
             services.AddScoped<ICourseScheduleRepository, CourseScheduleRepository>();
             services.AddScoped<IInstructorRepository, InstructorRepository>();
             services.AddScoped<IScheduleGenerationRepository, ScheduleGenerationRepository>();
+            services.AddScoped<ISeatModerationRepository, SeatModerationRepository>();
+            services.AddScoped<ICartSeatModerationRepository, CartSeatModerationRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

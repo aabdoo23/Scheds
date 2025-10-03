@@ -8,5 +8,6 @@ namespace Scheds.Application.Interfaces.Repositories
         public Task<List<CourseSchedule>> GetCourseSchedulesByCardIdAsync(string cardId);
         public Task<List<string>> GetAllRoomsAsync();
         public Task<List<string>> GetOccupiedRoomsAtDayTimeAsync(string dayOfWeek, string time);
+        public Task<List<CourseSchedule>> GetSchedulesForDayWithCardItemsAsync(string dayOfWeek);
     }
 }
