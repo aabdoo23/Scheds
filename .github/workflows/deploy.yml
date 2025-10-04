@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - main  # Change this to your production branch
+      - master
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
