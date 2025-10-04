@@ -22,5 +22,24 @@ namespace Scheds.MVC.Controllers
 
             return Ok(emptyRooms);
         }
+
+        [HttpGet("availability")]
+        public async Task<IActionResult> GetRoomAvailability(string dayOfWeek, string? time = null, int minimumMinutes = 0)
+        {
+            TimeSpan? currentTime = null;
+            if (!string.IsNullOrEmpty(time) && TimeSpan.TryParse(time, out var parsedTime))
+            {
+                currentTime = parsedTime;
+            }
+
+            var roomAvailability = await _emptyRoomsService.GetRoomAvailabilityForDay(dayOfWeek, currentTime, minimumMinutes);
+
+            if (roomAvailability.Count == 0)
+            {
+                return NotFound("No rooms available matching the criteria.");
+            }
+
+            return Ok(roomAvailability);
+        }
     }
 }

@@ -12,15 +12,15 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    [Migration("20250907173053_AddScheduleGenerationAnalytics")]
-    partial class AddScheduleGenerationAnalytics
+    [Migration("20251003135230_RemoveUnusedAuditColumns")]
+    partial class RemoveUnusedAuditColumns
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -70,6 +70,35 @@ namespace Scheds.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("CardItems");
+                });
+
+            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CourseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CartSeatModerations");
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CourseBase", b =>
@@ -215,6 +244,21 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("ScheduleGenerations");
                 });
 
+            modelBuilder.Entity("Scheds.Domain.Entities.SeatModeration", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeatModerations");
+                });
+
             modelBuilder.Entity("Scheds.Domain.Entities.SelectedCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -283,6 +327,51 @@ namespace Scheds.Infrastructure.Migrations
                     b.ToTable("SelectedCustomCourses");
                 });
 
+            modelBuilder.Entity("Scheds.Domain.Entities.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UserSeatModerations", b =>
+                {
+                    b.Property<string>("SeatModerationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("SeatModerationId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSeatModerations");
+                });
+
+            modelBuilder.Entity("Scheds.Domain.Entities.CartSeatModeration", b =>
+                {
+                    b.HasOne("Scheds.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Scheds.Domain.Entities.CourseSchedule", b =>
                 {
                     b.HasOne("Scheds.Domain.Entities.CardItem", "CardItem")
@@ -314,6 +403,21 @@ namespace Scheds.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ScheduleGeneration");
+                });
+
+            modelBuilder.Entity("UserSeatModerations", b =>
+                {
+                    b.HasOne("Scheds.Domain.Entities.SeatModeration", null)
+                        .WithMany()
+                        .HasForeignKey("SeatModerationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Scheds.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Scheds.Domain.Entities.CardItem", b =>

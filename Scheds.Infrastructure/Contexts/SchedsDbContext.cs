@@ -12,6 +12,9 @@ namespace Scheds.Infrastructure.Contexts
         public DbSet<ScheduleGeneration> ScheduleGenerations { get; set; }
         public DbSet<SelectedCourse> SelectedCourses { get; set; }
         public DbSet<SelectedCustomCourse> SelectedCustomCourses { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<SeatModeration> SeatModerations { get; set; }
+        public DbSet<CartSeatModeration> CartSeatModerations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +39,19 @@ namespace Scheds.Infrastructure.Contexts
                 .WithMany(sg => sg.SelectedCustomCourses)
                 .HasForeignKey(scc => scc.ScheduleGenerationId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure SeatModeration entity
+            modelBuilder.Entity<SeatModeration>()
+                .HasKey(sm => sm.Id);
+
+            // Configure many-to-many relationship between User and SeatModeration
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.SeatModerations)
+                .WithMany(sm => sm.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserSeatModerations",
+                    j => j.HasOne<SeatModeration>().WithMany().HasForeignKey("SeatModerationId"),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId"));
                 
             base.OnModelCreating(modelBuilder);
         }

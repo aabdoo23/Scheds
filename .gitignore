@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /Scheds/appsettings.json
 /Scheds/appsettings.json
 Scheds/appsettings.Development.json
+.publishSettings/
+publish-output/
+.ftp-config

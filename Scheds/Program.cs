@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
+using Scheds.MVC.Extensions;
 
 namespace Scheds.MVC
 {
@@ -33,6 +34,10 @@ namespace Scheds.MVC
 
             builder.Services.AddHttpClient();
 
+            // Add authentication
+            builder.Services.AddCookieAuthentication()
+                .AddGoogleAuthentication(builder.Configuration);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -49,6 +54,7 @@ namespace Scheds.MVC
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
