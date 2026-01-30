@@ -315,7 +315,6 @@ namespace Scheds.Infrastructure.Util
             
             // Chain remaining constraints with short-circuit evaluation
             return PassesNumberOfDaysConstraint(request, itemsPerDay) &&
-                PassesNumberOfItemsPerDayConstraint(request, itemsPerDay) &&
                 PassesTimeGapConstraint(request, itemsPerDay) &&
                 PassesDayStartConstraint(request, itemsPerDay) &&
                 PassesSpecificDaysConstraint(request, itemsPerDay) &&
