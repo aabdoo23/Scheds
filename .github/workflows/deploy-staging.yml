@@ -76,9 +76,9 @@ jobs:
             <PublishProvider>AzureWebSite</PublishProvider>
             <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
             <LastUsedPlatform>Any CPU</LastUsedPlatform>
-            <SiteUrlToLaunchAfterPublish>https://notscheds.runasp.net//</SiteUrlToLaunchAfterPublish>
-            <MSDeployServiceURL>site8803.siteasp.net</MSDeployServiceURL>
-            <DeployIisAppPath>site8803</DeployIisAppPath>
+            <SiteUrlToLaunchAfterPublish>http://scheds-staging.runasp.net/</SiteUrlToLaunchAfterPublish>
+            <MSDeployServiceURL>site52819.siteasp.net</MSDeployServiceURL>
+            <DeployIisAppPath>site52819</DeployIisAppPath>
             <SkipExtraFilesOnServer>False</SkipExtraFilesOnServer>
             <MSDeployPublishMethod>WMSVC</MSDeployPublishMethod>
             <EnableMSDeployBackup>True</EnableMSDeployBackup>
