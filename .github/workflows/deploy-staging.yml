@@ -91,7 +91,8 @@ jobs:
         "@ | Out-File -FilePath Scheds/Properties/PublishProfiles/Staging.pubxml -Encoding UTF8
 
     - name: Deploy to Staging
-      run: dotnet publish Scheds/Scheds.MVC.csproj -c Release /p:PublishProfile=Staging /p:Password="${{ secrets.STAGING_DEPLOY_PASSWORD }}"
+      shell: pwsh
       env:
-        DEPLOY_USERNAME: ${{ secrets.STAGING_DEPLOY_USERNAME }}
         DEPLOY_PASSWORD: ${{ secrets.STAGING_DEPLOY_PASSWORD }}
+      run: |
+        dotnet publish Scheds/Scheds.MVC.csproj -c Release /p:PublishProfile=Staging /p:Password="$env:DEPLOY_PASSWORD"
