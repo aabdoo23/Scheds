@@ -367,3 +367,4 @@ Scheds/appsettings.Development.json
 .publishSettings/
 publish-output/
 .ftp-config
+deploy.sh

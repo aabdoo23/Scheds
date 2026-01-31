@@ -6,6 +6,14 @@ namespace Scheds.MVC.Controllers
 {
     public class AccountController : Controller
     {
+        [HttpGet("api/account/me")]
+        public IActionResult Me()
+        {
+            if (User?.Identity?.IsAuthenticated != true)
+                return Unauthorized();
+            return Ok(new { name = User.Identity!.Name });
+        }
+
         [HttpGet]
         public IActionResult Login(string returnUrl = "/")
         {

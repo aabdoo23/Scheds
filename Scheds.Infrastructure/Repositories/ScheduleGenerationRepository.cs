@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scheds.Application.Interfaces.Repositories;
+using Scheds.Domain.DTOs.Admin;
 using Scheds.Domain.Entities;
 using Scheds.Domain.ViewModels;
 using Scheds.Infrastructure.Contexts;
@@ -100,6 +101,63 @@ namespace Scheds.Infrastructure.Repositories
             return professors.Select(p => $"{p.Type}: {p.Value} ({p.Count} times)")
                 .Concat(tas.Select(t => $"{t.Type}: {t.Value} ({t.Count} times)"))
                 .Concat(sections.Select(s => $"{s.Type}: {s.Value} ({s.Count} times)"));
+        }
+
+        public async Task<IEnumerable<CourseWithCountDTO>> GetMostSelectedCoursesWithCountsAsync(int topCount = 15)
+        {
+            var regularCourses = await _context.SelectedCourses
+                .GroupBy(sc => sc.CourseCode)
+                .Select(g => new { CourseCode = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var customCourses = await _context.SelectedCustomCourses
+                .GroupBy(scc => scc.CourseCode)
+                .Select(g => new { CourseCode = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var merged = regularCourses.Concat(customCourses)
+                .GroupBy(x => x.CourseCode)
+                .Select(g => new CourseWithCountDTO
+                {
+                    Label = g.Key,
+                    Count = g.Max(x => x.Count)
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(topCount)
+                .ToList();
+
+            return merged;
+        }
+
+        public async Task<IEnumerable<CustomizationWithCountDTO>> GetMostSelectedCustomizationsWithCountsAsync(int topCount = 15)
+        {
+            var professors = await _context.SelectedCustomCourses
+                .Where(scc => !string.IsNullOrEmpty(scc.CustomProfessor))
+                .GroupBy(scc => scc.CustomProfessor)
+                .Select(g => new { Type = "Professor", Value = g.Key!, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(topCount / 3)
+                .ToListAsync();
+
+            var tas = await _context.SelectedCustomCourses
+                .Where(scc => !string.IsNullOrEmpty(scc.CustomTA))
+                .GroupBy(scc => scc.CustomTA)
+                .Select(g => new { Type = "TA", Value = g.Key!, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(topCount / 3)
+                .ToListAsync();
+
+            var sections = await _context.SelectedCustomCourses
+                .Where(scc => !string.IsNullOrEmpty(scc.CustomMainSection))
+                .GroupBy(scc => scc.CustomMainSection)
+                .Select(g => new { Type = "Section", Value = g.Key!, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(topCount / 3)
+                .ToListAsync();
+
+            return professors.Select(p => new CustomizationWithCountDTO { Label = $"{p.Type}: {p.Value}", Count = p.Count })
+                .Concat(tas.Select(t => new CustomizationWithCountDTO { Label = $"{t.Type}: {t.Value}", Count = t.Count }))
+                .Concat(sections.Select(s => new CustomizationWithCountDTO { Label = $"{s.Type}: {s.Value}", Count = s.Count }));
         }
 
         public async Task<IEnumerable<DailyStatsViewModel>> GetGenerationStatsByDateAsync(DateTime fromDate, DateTime toDate)

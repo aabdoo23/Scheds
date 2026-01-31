@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Scheds.Application.Interfaces.Repositories;
+using Scheds.Domain.DTOs;
 using Scheds.Domain.Entities;
 
 namespace Scheds.MVC.Controllers
@@ -29,15 +30,29 @@ namespace Scheds.MVC.Controllers
         }
 
         [HttpGet("{courseCode}")]
-        public async Task<ActionResult<List<CardItem>>> GetCardByCourseCode(string courseCode)
+        public async Task<ActionResult<List<CardItemSummaryDTO>>> GetCardByCourseCode(string courseCode)
         {
             var cardItems = await _repository.GetCardItemsByCourseCodeAsync(courseCode);
             if (cardItems == null)
             {
                 return new NotFoundResult();
             }
-            return cardItems;
+            var summaries = cardItems.Select(c =>
+            {
+                var scheduleDisplay = c.CourseSchedules.Count > 0
+                    ? string.Join(", ", c.CourseSchedules.Select(s =>
+                        $"{s.DayOfWeek[..Math.Min(3, s.DayOfWeek.Length)]} {s.StartTime.ToString(@"hh\:mm")}-{s.EndTime.ToString(@"hh\:mm")}"))
+                    : null;
+                return new CardItemSummaryDTO
+                {
+                    CourseCode = c.CourseCode,
+                    Instructor = c.Instructor,
+                    Section = c.Section,
+                    SubType = c.SubType,
+                    ScheduleDisplay = scheduleDisplay
+                };
+            }).ToList();
+            return summaries;
         }
-
     }
 }

@@ -118,12 +118,6 @@ Test it here: **https://scheds.runasp.net** ✨
 *   `GET /api/card`: Get all card items.
 *   `GET /api/card/byId/{id}`: Get a card item by ID.
 *   `GET /api/card/{courseCode}`: Get card items by course code.
-*   `POST /api/cart/add`: Add a course to the cart.
-*   `POST /api/cart/remove`: Remove a course from the cart.
-*   `GET /api/cart/getCartItems`: Get all cart items.
-*   `POST /api/cart/generate`: Save the generate request to cookies.
-*   `GET /api/cart/getGenerateRequest`: Get the generate request from cookies.
-*   `POST /api/cart/clear`: Clear the cart and generate request cookies.
 *   `GET /api/coursebase/getAllCourses`: Get all course bases.
 *   `GET /api/coursebase/search/{query}`: Search for course bases.
 *   `GET /api/coursebase/getCourseBaseByCourseCode`: Get a course base by course code.

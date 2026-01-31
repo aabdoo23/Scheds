@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.DTOs;
@@ -42,86 +42,47 @@ namespace Scheds.MVC.Controllers
 
                     if (request.UseLiveData)
                     {
-                        cardItems = await _selfServiceLiveFetchService.FetchCards(customCourse.CourseCode);
+                        var liveCards = await _selfServiceLiveFetchService.FetchCards(customCourse.CourseCode);
+                        if (liveCards.Count > 0) cardItems = liveCards;
                     }
 
-                    List<CardItem> customizedCards = [];
+                    var excludedMain = customCourse.EffectiveExcludedMainSections.ToList();
+                    var excludedSub = customCourse.EffectiveExcludedSubSections.ToList();
+                    var excludedProfessors = customCourse.EffectiveExcludedProfessors.ToList();
+                    var excludedTas = customCourse.EffectiveExcludedTAs.ToList();
+                    bool hasAnyFilter = excludedMain.Count > 0 || excludedSub.Count > 0 || excludedProfessors.Count > 0 || excludedTas.Count > 0;
 
-                    // Filter by custom main and sub section
-                    if (!string.IsNullOrEmpty(customCourse.CustomMainSection) || !string.IsNullOrEmpty(customCourse.CustomSubSection))
+                    List<CardItem> customizedCards = hasAnyFilter ? [] : cardItems;
+
+                    if (hasAnyFilter)
                     {
-                        foreach (CardItem card in cardItems)
-                        {
-                            if (card.Section[..2] == customCourse.CustomMainSection ||
-                                card.Section[..2] == customCourse.CustomSubSection[..2])
-                            {
-                                if (!customizedCards.Contains(card)) customizedCards.Add(card);
-                            }
-                        }
-                    }
+                        IEnumerable<CardItem> candidates = cardItems;
 
-                    // Filter by custom TA
-                    if (!string.IsNullOrEmpty(customCourse.CustomTA))
-                    {
-                        HashSet<string> sections = [];
-                        foreach (CardItem card in cardItems)
+                        if (excludedMain.Count > 0)
                         {
-                            if (card.Instructor == customCourse.CustomTA)
-                            {
-                                if (!customizedCards.Contains(card))
-                                {
-                                    customizedCards.Add(card);
-                                    sections.Add(card.Section);
-                                }
-                            }
+                            var excludedMainSet = excludedMain.ToHashSet();
+                            candidates = candidates.Where(c => c.Section == null || c.Section.Length != 2 || !excludedMainSet.Contains(c.Section));
                         }
 
-                        // Add other sections related to the TA
-                        foreach (CardItem card in cardItems)
+                        if (excludedSub.Count > 0)
                         {
-                            if (!customizedCards.Contains(card))
-                            {
-                                foreach (string section in sections)
-                                {
-                                    if (card.Section[..2] == section[..2])
-                                    {
-                                        customizedCards.Add(card);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Filter by custom professor
-                    if (!string.IsNullOrEmpty(customCourse.CustomProfessor))
-                    {
-                        HashSet<string> sections = [];
-                        foreach (CardItem card in cardItems)
-                        {
-                            if (card.Instructor == customCourse.CustomProfessor)
-                            {
-                                if (!customizedCards.Contains(card))
-                                {
-                                    customizedCards.Add(card);
-                                    sections.Add(card.Section);
-                                }
-                            }
+                            var excludedSubSet = excludedSub.ToHashSet();
+                            candidates = candidates.Where(c => c.Section == null || c.Section.Length <= 2 || !excludedSubSet.Contains(c.Section));
                         }
 
-                        // Add other sections related to the professor
-                        foreach (CardItem card in cardItems)
+                        if (excludedProfessors.Count > 0)
                         {
-                            if (!customizedCards.Contains(card))
-                            {
-                                foreach (string section in sections)
-                                {
-                                    if (card.Section[..2] == section)
-                                    {
-                                        customizedCards.Add(card);
-                                    }
-                                }
-                            }
+                            var excludedProfSet = excludedProfessors.ToHashSet();
+                            candidates = candidates.Where(c => c.Instructor == null || !excludedProfSet.Contains(c.Instructor));
                         }
+
+                        if (excludedTas.Count > 0)
+                        {
+                            var excludedTaSet = excludedTas.ToHashSet();
+                            candidates = candidates.Where(c => c.Instructor == null || !excludedTaSet.Contains(c.Instructor));
+                        }
+
+                        customizedCards = candidates.ToList();
                     }
 
                     allCardItemsByCourse.Add(customizedCards);
@@ -137,7 +98,8 @@ namespace Scheds.MVC.Controllers
 
                     if (request.UseLiveData)
                     {
-                        cardItems = await _selfServiceLiveFetchService.FetchCards(course.CourseCode);
+                        var liveCards = await _selfServiceLiveFetchService.FetchCards(course.CourseCode);
+                        if (liveCards.Count > 0) cardItems = liveCards;
                     }
 
                     allCardItemsByCourse.Add(cardItems);
@@ -149,7 +111,7 @@ namespace Scheds.MVC.Controllers
             // Store analytics data
             await StoreAnalyticsAsync(request, generatedSchedules?.Count() ?? 0);
             
-            return ViewComponent("AllSchedulesViewComponent", generatedSchedules);
+            return Ok(generatedSchedules);
         }
 
         private async Task StoreAnalyticsAsync(GenerateRequestDTO request, int numberOfSchedulesGenerated)
@@ -192,14 +154,18 @@ namespace Scheds.MVC.Controllers
             {
                 foreach (var customCourse in request.CustomSelectedItems)
                 {
+                    var excludedMain = customCourse.EffectiveExcludedMainSections.ToList();
+                    var excludedSub = customCourse.EffectiveExcludedSubSections.ToList();
+                    var excludedProfessors = customCourse.EffectiveExcludedProfessors.ToList();
+                    var excludedTas = customCourse.EffectiveExcludedTAs.ToList();
                     scheduleGeneration.SelectedCustomCourses.Add(new SelectedCustomCourse
                     {
                         CourseCode = customCourse.CourseCode,
                         CourseName = customCourse.CourseName,
-                        CustomMainSection = customCourse.CustomMainSection,
-                        CustomSubSection = customCourse.CustomSubSection,
-                        CustomProfessor = customCourse.CustomProfessor,
-                        CustomTA = customCourse.CustomTA
+                        CustomMainSection = excludedMain.Count > 0 ? string.Join(", ", excludedMain) : null,
+                        CustomSubSection = excludedSub.Count > 0 ? string.Join(", ", excludedSub) : null,
+                        CustomProfessor = excludedProfessors.Count > 0 ? string.Join(", ", excludedProfessors) : null,
+                        CustomTA = excludedTas.Count > 0 ? string.Join(", ", excludedTas) : null
                     });
                 }
             }

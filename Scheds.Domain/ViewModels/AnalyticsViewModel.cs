@@ -1,3 +1,5 @@
+using Scheds.Domain.DTOs.Admin;
+
 namespace Scheds.Domain.ViewModels
 {
     public class AdminDashboardViewModel
@@ -15,7 +17,10 @@ namespace Scheds.Domain.ViewModels
         public Dictionary<string, int> UsageStatistics { get; set; }
         public IEnumerable<string> MostSelectedCourses { get; set; }
         public IEnumerable<string> MostSelectedCustomizations { get; set; }
+        public IEnumerable<CourseWithCountDTO> MostSelectedCoursesWithCounts { get; set; }
+        public IEnumerable<CustomizationWithCountDTO> MostSelectedCustomizationsWithCounts { get; set; }
         public IEnumerable<DailyStatsViewModel> DailyStats { get; set; }
+        public MonthlyStatsViewModel MonthlyStats { get; set; }
     }
 
     public class DailyStatsViewModel

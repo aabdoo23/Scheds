@@ -28,11 +28,27 @@ namespace Scheds.MVC
 
             // Configure admin settings
             builder.Services.Configure<AdminSettings>(builder.Configuration.GetSection("AdminSettings"));
+            builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
 
             builder.Services.AddServices();
             builder.Services.AddRepositories();
 
             builder.Services.AddHttpClient();
+
+            var frontendUrl = builder.Configuration["FrontendSettings:Url"]?.TrimEnd('/');
+            if (!string.IsNullOrEmpty(frontendUrl))
+            {
+                builder.Services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(policy =>
+                    {
+                        policy.WithOrigins(frontendUrl)
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+                });
+            }
 
             // Add authentication
             builder.Services.AddCookieAuthentication()
