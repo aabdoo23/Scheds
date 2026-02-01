@@ -47,8 +47,6 @@ jobs:
           Authentication = @{
             Google = @{
               ClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
-              ClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
-              CallbackPath = "/signin-google"
             }
           }
           Smtp = @{
@@ -62,6 +60,12 @@ jobs:
           AllowedHosts = "*"
           ExposeApiErrors = $true
           UseCrossOriginCookies = $true
+          Jwt = @{
+            Key = "${{ secrets.JWT_SECRET_KEY }}"
+            Issuer = "scheds"
+            Audience = "scheds-frontend"
+            ExpirationMinutes = 60
+          }
         }
 
         $stagingSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8

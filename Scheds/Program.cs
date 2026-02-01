@@ -59,9 +59,8 @@ namespace Scheds.MVC
                 });
             }
 
-            // Add authentication
-            builder.Services.AddCookieAuthentication(builder.Configuration)
-                .AddGoogleAuthentication(builder.Configuration);
+            builder.Services.AddAuthentication(options => options.DefaultScheme = "Bearer")
+                .AddJwtBearerScheme(builder.Configuration);
 
             var app = builder.Build();
 

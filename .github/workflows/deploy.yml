@@ -47,8 +47,6 @@ jobs:
           Authentication = @{
             Google = @{
               ClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
-              ClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
-              CallbackPath = "/signin-google"
             }
           }
           Smtp = @{
