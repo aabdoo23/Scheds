@@ -61,6 +61,7 @@ jobs:
           }
           AllowedHosts = "*"
           ExposeApiErrors = $true
+          UseCrossOriginCookies = $true
         }
 
         $stagingSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8

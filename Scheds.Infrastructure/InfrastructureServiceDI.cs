@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Infrastructure.Repositories;
@@ -40,8 +41,9 @@ namespace Scheds.Infrastructure
             return services;
         }
 
-        public static AuthenticationBuilder AddCookieAuthentication(this IServiceCollection services)
+        public static AuthenticationBuilder AddCookieAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            var useCrossOriginCookies = configuration.GetValue<bool>("UseCrossOriginCookies");
             return services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "Cookies";
@@ -53,8 +55,8 @@ namespace Scheds.Infrastructure
                 options.LogoutPath = "/Account/Logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.SameSite = useCrossOriginCookies ? SameSiteMode.None : SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = useCrossOriginCookies ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
             });
         }
     }

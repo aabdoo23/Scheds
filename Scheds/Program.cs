@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Scheds.Domain.Configuration;
@@ -17,11 +19,16 @@ namespace Scheds.MVC
             builder.Services.AddControllersWithViews();
             builder.Services.AddControllers();
             builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "scheds-dataprotection-keys")));
+            var useCrossOriginCookies = builder.Configuration.GetValue<bool>("UseCrossOriginCookies");
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromDays(1);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = useCrossOriginCookies ? SameSiteMode.None : SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = useCrossOriginCookies ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
             });
             builder.Services.AddDbContext<SchedsDbContext>(options =>
             {
@@ -53,7 +60,7 @@ namespace Scheds.MVC
             }
 
             // Add authentication
-            builder.Services.AddCookieAuthentication()
+            builder.Services.AddCookieAuthentication(builder.Configuration)
                 .AddGoogleAuthentication(builder.Configuration);
 
             var app = builder.Build();
