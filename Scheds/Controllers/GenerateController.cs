@@ -108,8 +108,14 @@ namespace Scheds.MVC.Controllers
 
             var generatedSchedules = GenerationUtil.GenerateAllTimetables(allCardItemsByCourse, request);
             
-            // Store analytics data
-            await StoreAnalyticsAsync(request, generatedSchedules?.Count() ?? 0);
+            try
+            {
+                await StoreAnalyticsAsync(request, generatedSchedules?.Count() ?? 0);
+            }
+            catch
+            {
+                // Analytics storage is non-fatal; generation result still returned
+            }
             
             return Ok(generatedSchedules);
         }

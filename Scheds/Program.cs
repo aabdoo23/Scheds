@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
@@ -59,8 +61,34 @@ namespace Scheds.MVC
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        var path = context.Request.Path.Value ?? "";
+                        if (path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var feature = context.Features.Get<IExceptionHandlerPathFeature>();
+                            var ex = feature?.Error;
+                            var env = context.RequestServices.GetRequiredService<IWebHostEnvironment>();
+                            var config = context.RequestServices.GetRequiredService<IConfiguration>();
+                            var exposeErrors = config.GetValue<bool>("ExposeApiErrors");
+                            var msg = (env.IsDevelopment() || exposeErrors) && ex != null ? ex.Message : "An error occurred";
+                            if (frontendUrl != null)
+                            {
+                                context.Response.Headers.Append("Access-Control-Allow-Origin", frontendUrl);
+                                context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
+                            }
+                            context.Response.StatusCode = 500;
+                            context.Response.ContentType = "application/json";
+                            await context.Response.WriteAsJsonAsync(new { error = msg, requestId = context.TraceIdentifier });
+                        }
+                        else
+                        {
+                            context.Response.Redirect("/Home/Error");
+                        }
+                    });
+                });
                 app.UseHsts();
             }
 

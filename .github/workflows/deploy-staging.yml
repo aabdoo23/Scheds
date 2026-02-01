@@ -60,6 +60,7 @@ jobs:
             From = "${{ secrets.SMTP_FROM }}"
           }
           AllowedHosts = "*"
+          ExposeApiErrors = $true
         }
 
         $stagingSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8
