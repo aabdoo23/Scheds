@@ -1,12 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
-using Scheds.MVC.Extensions;
 
 namespace Scheds.MVC
 {
@@ -59,8 +60,28 @@ namespace Scheds.MVC
                 });
             }
 
-            builder.Services.AddAuthentication(options => options.DefaultScheme = "Bearer")
-                .AddJwtBearerScheme(builder.Configuration);
+            var authBuilder = builder.Services.AddAuthentication(options => options.DefaultScheme = "Bearer");
+            var jwtKey = builder.Configuration["Jwt:Key"];
+            if (!string.IsNullOrEmpty(jwtKey))
+            {
+                var keyBytes = Convert.FromBase64String(jwtKey);
+                var issuer = builder.Configuration["Jwt:Issuer"] ?? "scheds";
+                var audience = builder.Configuration["Jwt:Audience"] ?? "scheds-frontend";
+                authBuilder.AddJwtBearer("Bearer", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+                        ValidateIssuer = true,
+                        ValidIssuer = issuer,
+                        ValidateAudience = true,
+                        ValidAudience = audience,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromMinutes(1)
+                    };
+                });
+            }
 
             var app = builder.Build();
 
