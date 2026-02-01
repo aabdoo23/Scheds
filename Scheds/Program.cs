@@ -69,6 +69,7 @@ namespace Scheds.MVC
             app.UseSession();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
