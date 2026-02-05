@@ -70,12 +70,6 @@ jobs:
 
         $stagingSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8
 
-    - name: Install EF Core tools
-      run: dotnet tool install --global dotnet-ef
-
-    - name: Run database migrations
-      run: dotnet ef database update --project Scheds/Scheds.Infrastructure/Scheds.Infrastructure.csproj --startup-project Scheds/Scheds.MVC.csproj
-
     - name: Create publish profile
       shell: pwsh
       run: |

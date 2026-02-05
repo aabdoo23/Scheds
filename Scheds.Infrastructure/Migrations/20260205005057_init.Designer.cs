@@ -12,8 +12,8 @@ using Scheds.Infrastructure.Contexts;
 namespace Scheds.Infrastructure.Migrations
 {
     [DbContext(typeof(SchedsDbContext))]
-    [Migration("20260131010424_AllowNullCustomFieldsInSelectedCustomCourse")]
-    partial class AllowNullCustomFieldsInSelectedCustomCourse
+    [Migration("20260205005057_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
