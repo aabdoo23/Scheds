@@ -4,6 +4,6 @@ namespace Scheds.Domain.Entities
 {
     public class Instructor : BaseEntity
     {
-        public string FullName { get; set; }
+        public string FullName { get; set; } = string.Empty;
     }
 }

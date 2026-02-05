@@ -14,6 +14,7 @@ namespace Scheds.Infrastructure.Services
         public async Task<List<CardItem>> ParseSelfServiceResponse(string response)
         {
             List<CardItem> ParsedContent = [];
+            var instructorNameCache = new Dictionary<string, string>(StringComparer.Ordinal);
             response = System.Text.RegularExpressions.Regex.Unescape(response);
             if (response.StartsWith('\"') && response.EndsWith('\"'))
             {
@@ -44,7 +45,26 @@ namespace Scheds.Infrastructure.Services
                             var fullName = instructor["fullName"]?.ToString();
                             if (id != "0")
                             {
-                                var name = await _instructorsRepository.GetInstructorNameById(id) ?? fullName;
+                                if (!instructorNameCache.TryGetValue(id, out var name))
+                                {
+                                    var dbName = await _instructorsRepository.GetInstructorNameById(id);
+
+                                    if ((string.IsNullOrWhiteSpace(dbName) || string.Equals(dbName, "Pending")) && !string.IsNullOrWhiteSpace(fullName))
+                                    {
+                                        await _instructorsRepository.UpsertAsync(new Instructor
+                                        {
+                                            Id = id,
+                                            FullName = fullName,
+                                        });
+                                    }
+
+                                    name = dbName ?? fullName ?? string.Empty;
+
+                                    if (!string.IsNullOrWhiteSpace(name))
+                                    {
+                                        instructorNameCache[id] = name;
+                                    }
+                                }
 
                                 if (!string.IsNullOrWhiteSpace(name))
                                 {
