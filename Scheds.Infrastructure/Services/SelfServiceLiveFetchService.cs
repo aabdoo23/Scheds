@@ -3,6 +3,7 @@ using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.DTOs.SelfService;
 using Scheds.Domain.Entities;
+using System.Net;
 using System.Text;
 
 namespace Scheds.Infrastructure.Services
@@ -29,6 +30,10 @@ namespace Scheds.Infrastructure.Services
             }
 
             var cards = await FetchFromAPI(CourseCode);
+            if (cards == null || cards.Count == 0)
+            {
+                return cards ?? new List<CardItem>();
+            }
             foreach (var card in cards)
             {
                 await _cardItemService.LiveFetchUpsertAsync(card);
@@ -52,7 +57,17 @@ namespace Scheds.Infrastructure.Services
             foreach (var courseCode in uniqueCourseCodes)
             {
                 var cards = await FetchFromAPI(courseCode);
-                
+
+                if (cards == null || cards.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach (var card in cards)
+                {
+                    await _cardItemService.LiveFetchUpsertAsync(card);
+                }
+
                 allCards.AddRange(cards);
             }
             
@@ -83,6 +98,11 @@ namespace Scheds.Infrastructure.Services
                 }
                 var cards = await FetchFromAPI(CourseCode);
 
+                if (cards == null || cards.Count == 0)
+                {
+                    return;
+                }
+
                 foreach (var card in cards)
                 {
                     await _cardItemService.LiveFetchUpsertAsync(card);
@@ -98,18 +118,53 @@ namespace Scheds.Infrastructure.Services
         {
             try
             {
-                using (var client = new HttpClient())
+                var cookieContainer = new CookieContainer();
+                using var handler = new HttpClientHandler
+                {
+                    UseCookies = true,
+                    CookieContainer = cookieContainer,
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                };
+
+                using (var client = new HttpClient(handler))
                 {
                     client.Timeout = TimeSpan.FromSeconds(30);
-                    
-                    client.DefaultRequestHeaders.Add("Origin", "https://register.nu.edu.eg");
-                    client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Registration/Courses");
+
+                    try
+                    {
+                        using var warmup = new HttpRequestMessage(
+                            HttpMethod.Get,
+                            "https://register.nu.edu.eg/PowerCampusSelfService/Search/Section");
+                        warmup.Headers.TryAddWithoutValidation(
+                            "Accept",
+                            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                        warmup.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
+                        warmup.Headers.TryAddWithoutValidation(
+                            "User-Agent",
+                            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                        await client.SendAsync(warmup);
+                    }
+                    catch
+                    {
+                    }
 
                     var request = new SearchRequest(CourseCode);
                     var jsonRequest = JsonConvert.SerializeObject(request);
                     var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                    
-                    var response = await client.PostAsync("https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search", content);
+
+                    using var postRequest = new HttpRequestMessage(
+                        HttpMethod.Post,
+                        "https://register.nu.edu.eg/PowerCampusSelfService/Sections/Search")
+                    {
+                        Content = content
+                    };
+                    postRequest.Headers.TryAddWithoutValidation("Origin", "https://register.nu.edu.eg");
+                    postRequest.Headers.TryAddWithoutValidation(
+                        "Referer",
+                        "https://register.nu.edu.eg/PowerCampusSelfService/Search/Section");
+                    postRequest.Headers.TryAddWithoutValidation("Accept", "application/json");
+
+                    var response = await client.SendAsync(postRequest);
 
                     if (!response.IsSuccessStatusCode)
                     {

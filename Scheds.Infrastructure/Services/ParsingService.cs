@@ -36,21 +36,23 @@ namespace Scheds.Infrastructure.Services
                     var seats = sectionObj["seatsLeft"]?.ToObject<int>() ?? 0;
                     var instructors = "";
 
-                    if (sectionObj["instructors"] != null && sectionObj["instructors"] is JArray instructorsJson)
+                    if (sectionObj["instructors"] != null && sectionObj["instructors"] is JArray instructorsJson && instructorsJson.Count > 0)
                     {
                         foreach (var instructor in instructorsJson)
                         {
                             var id = instructor["personId"]?.ToString() ?? "0";
+                            var fullName = instructor["fullName"]?.ToString();
                             if (id != "0")
                             {
-                                instructors += await _instructorsRepository.GetInstructorNameById(id) + ", ";
+                                var name = await _instructorsRepository.GetInstructorNameById(id) ?? fullName;
+
+                                if (!string.IsNullOrWhiteSpace(name))
+                                {
+                                    instructors += name + ", ";
+                                }
                             }
                         }
                         instructors = instructors.TrimEnd(',', ' ');
-                    }
-                    else
-                    {
-                        instructors = "Pending";
                     }
 
                     var precredits = sectionObj["credits"]?.ToString() ?? "0.00";
