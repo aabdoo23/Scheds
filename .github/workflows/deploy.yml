@@ -80,6 +80,7 @@ jobs:
             <SkipExtraFilesOnServer>False</SkipExtraFilesOnServer>
             <MSDeployPublishMethod>WMSVC</MSDeployPublishMethod>
             <EnableMSDeployBackup>True</EnableMSDeployBackup>
+            <EnableMSDeployAppOffline>True</EnableMSDeployAppOffline>
             <UserName>${{ secrets.DEPLOY_USERNAME }}</UserName>
             <Password>${{ secrets.DEPLOY_PASSWORD }}</Password>
             <TargetFramework>net9.0</TargetFramework>
