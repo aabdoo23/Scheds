@@ -49,12 +49,6 @@ jobs:
               ClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
             }
           }
-          Jwt = @{
-            Key = "${{ secrets.JWT_SECRET_KEY }}"
-            Issuer = "scheds"
-            Audience = "scheds-frontend"
-            ExpirationMinutes = 60
-          }
           Smtp = @{
             Host = "smtp.gmail.com"
             Port = [int]"${{ secrets.SMTP_PORT }}"
