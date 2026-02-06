@@ -20,10 +20,10 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore Scheds/Scheds.MVC.csproj
+      run: dotnet restore Scheds/Scheds.sln
 
     - name: Build
-      run: dotnet build Scheds/Scheds.MVC.csproj -c Release --no-restore
+      run: dotnet build Scheds/Scheds.sln -c Release --no-restore
 
     - name: Update Staging Configuration
       shell: pwsh

@@ -46,7 +46,7 @@ namespace Scheds.MVC.Controllers
                 return new CardItemSummaryDTO
                 {
                     CourseCode = c.CourseCode,
-                    Instructor = c.Instructor,
+                    Instructor = string.IsNullOrWhiteSpace(c.Instructor) ? "Pending" : c.Instructor,
                     Section = c.Section,
                     SubType = c.SubType,
                     ScheduleDisplay = scheduleDisplay

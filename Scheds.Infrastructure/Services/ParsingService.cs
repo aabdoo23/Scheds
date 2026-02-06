@@ -14,6 +14,7 @@ namespace Scheds.Infrastructure.Services
         public async Task<List<CardItem>> ParseSelfServiceResponse(string response)
         {
             List<CardItem> ParsedContent = [];
+            var instructorNameCache = new Dictionary<string, string>(StringComparer.Ordinal);
             response = System.Text.RegularExpressions.Regex.Unescape(response);
             if (response.StartsWith('\"') && response.EndsWith('\"'))
             {
@@ -36,21 +37,42 @@ namespace Scheds.Infrastructure.Services
                     var seats = sectionObj["seatsLeft"]?.ToObject<int>() ?? 0;
                     var instructors = "";
 
-                    if (sectionObj["instructors"] != null && sectionObj["instructors"] is JArray instructorsJson)
+                    if (sectionObj["instructors"] != null && sectionObj["instructors"] is JArray instructorsJson && instructorsJson.Count > 0)
                     {
                         foreach (var instructor in instructorsJson)
                         {
                             var id = instructor["personId"]?.ToString() ?? "0";
+                            var fullName = instructor["fullName"]?.ToString();
                             if (id != "0")
                             {
-                                instructors += await _instructorsRepository.GetInstructorNameById(id) + ", ";
+                                if (!instructorNameCache.TryGetValue(id, out var name))
+                                {
+                                    var dbName = await _instructorsRepository.GetInstructorNameById(id);
+
+                                    if ((string.IsNullOrWhiteSpace(dbName) || string.Equals(dbName, "Pending")) && !string.IsNullOrWhiteSpace(fullName))
+                                    {
+                                        await _instructorsRepository.UpsertAsync(new Instructor
+                                        {
+                                            Id = id,
+                                            FullName = fullName,
+                                        });
+                                    }
+
+                                    name = dbName ?? fullName ?? string.Empty;
+
+                                    if (!string.IsNullOrWhiteSpace(name))
+                                    {
+                                        instructorNameCache[id] = name;
+                                    }
+                                }
+
+                                if (!string.IsNullOrWhiteSpace(name))
+                                {
+                                    instructors += name + ", ";
+                                }
                             }
                         }
                         instructors = instructors.TrimEnd(',', ' ');
-                    }
-                    else
-                    {
-                        instructors = "Pending";
                     }
 
                     var precredits = sectionObj["credits"]?.ToString() ?? "0.00";

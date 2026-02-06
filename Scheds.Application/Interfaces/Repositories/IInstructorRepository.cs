@@ -5,6 +5,6 @@ namespace Scheds.Application.Interfaces.Repositories
 {
     public interface IInstructorRepository : IBaseRepository<Instructor>
     {
-        public Task<string> GetInstructorNameById(string id);
+        public Task<string?> GetInstructorNameById(string id);
     }
 }
