@@ -44,6 +44,17 @@ namespace Scheds.MVC
             builder.Services.AddRepositories();
 
             builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient("SelfServiceApi", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(60);
+                client.DefaultRequestHeaders.Add("Origin", "https://register.nu.edu.eg");
+                client.DefaultRequestHeaders.Add("Referer", "https://register.nu.edu.eg/PowerCampusSelfService/Registration/Courses");
+            }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseCookies = true,
+                CookieContainer = new System.Net.CookieContainer(),
+                AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+            });
 
             var frontendUrl = builder.Configuration["FrontendSettings:Url"]?.TrimEnd('/');
             if (!string.IsNullOrEmpty(frontendUrl))

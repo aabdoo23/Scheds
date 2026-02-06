@@ -11,7 +11,7 @@ namespace Scheds.Infrastructure.Repositories
         private readonly SchedsDbContext _context = context 
             ?? throw new ArgumentNullException(nameof(context));
 
-        public async Task<string> GetInstructorNameById(string id)
+        public async Task<string?> GetInstructorNameById(string id)
         {
             var instructor = await _context.Instructors
                 .Where(ins => ins.Id == id)

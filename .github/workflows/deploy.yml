@@ -64,6 +64,14 @@ jobs:
             From = "${{ secrets.SMTP_FROM }}"
           }
           AllowedHosts = "*"
+          UseCrossOriginCookies = $true
+          Jwt = @{
+            Key = "${{ secrets.JWT_SECRET_KEY }}"
+            Issuer = "scheds"
+            Audience = "scheds-frontend"
+            ExpirationMinutes = 60
+            RefreshExpirationDays = 7
+          }
         }
         
         $prodSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8

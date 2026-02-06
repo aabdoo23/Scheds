@@ -22,7 +22,7 @@ namespace Scheds.Domain.DTOs
             CardId = item.Id;
             CourseName = item.CourseName;
             CourseCode = item.CourseCode;
-            InstructorName = item.Instructor;
+            InstructorName = string.IsNullOrWhiteSpace(item.Instructor) ? "Pending" : item.Instructor;
             Section = item.Section;
             SubType = item.SubType;
             Credits = item.Credits;
