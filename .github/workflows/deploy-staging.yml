@@ -65,6 +65,7 @@ jobs:
             Issuer = "scheds"
             Audience = "scheds-frontend"
             ExpirationMinutes = 60
+            RefreshExpirationDays = 7
           }
         }
 

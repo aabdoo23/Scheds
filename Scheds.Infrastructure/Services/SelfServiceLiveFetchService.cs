@@ -3,7 +3,6 @@ using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.DTOs.SelfService;
 using Scheds.Domain.Entities;
-using System.Net;
 using System.Text;
 
 namespace Scheds.Infrastructure.Services

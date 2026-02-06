@@ -39,37 +39,19 @@ namespace Scheds.Infrastructure.Services
                         foreach (var instructor in instructorsJson)
                         {
                             var id = instructor["personId"]?.ToString() ?? "0";
+                            if (id == "0") continue;
                             var fullName = instructor["fullName"]?.ToString();
-                            if (id != "0")
+                            if (!instructorNameCache.TryGetValue(id, out var name))
                             {
-                                if (!instructorNameCache.TryGetValue(id, out var name))
-                                {
-                                    var dbName = await _instructorsRepository.GetInstructorNameById(id);
-
-                                    if ((string.IsNullOrWhiteSpace(dbName) || string.Equals(dbName, "Pending")) && !string.IsNullOrWhiteSpace(fullName))
-                                    {
-                                        await _instructorsRepository.UpsertAsync(new Instructor
-                                        {
-                                            Id = id,
-                                            FullName = fullName,
-                                        });
-                                    }
-
-                                    name = dbName ?? fullName ?? string.Empty;
-
-                                    if (!string.IsNullOrWhiteSpace(name))
-                                    {
-                                        instructorNameCache[id] = name;
-                                    }
-                                }
-
+                                var dbName = await _instructorsRepository.GetInstructorNameById(id);
+                                if ((string.IsNullOrWhiteSpace(dbName) || string.Equals(dbName, "Pending", StringComparison.OrdinalIgnoreCase)) && !string.IsNullOrWhiteSpace(fullName))
+                                    await _instructorsRepository.UpsertAsync(new Instructor { Id = id, FullName = fullName });
+                                name = dbName ?? fullName ?? string.Empty;
                                 if (!string.IsNullOrWhiteSpace(name))
-                                {
-                                    instructors += name + ", ";
-                                }
+                                    instructorNameCache[id] = name;
                             }
-                            else
-                                names.Add(await _instructorsRepository.GetInstructorNameById(id) ?? "Unknown Instructor");
+                            if (!string.IsNullOrWhiteSpace(name))
+                                names.Add(name);
                         }
                         instructors = names.Count == 0 ? "Pending" : string.Join(", ", names);
                     }
