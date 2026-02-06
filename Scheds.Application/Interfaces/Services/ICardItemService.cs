@@ -1,10 +1,11 @@
-﻿using Scheds.Application.Interfaces.Repositories;
+using Scheds.Application.Interfaces.Repositories;
 using Scheds.Domain.Entities;
 
 namespace Scheds.Application.Interfaces.Services
 {
     public interface ICardItemService
     {
-        public Task LiveFetchUpsertAsync(CardItem cardItem);
+        Task LiveFetchUpsertAsync(CardItem cardItem);
+        Task LiveFetchRefreshCourseAsync(string courseCode, List<CardItem> cards);
     }
 }

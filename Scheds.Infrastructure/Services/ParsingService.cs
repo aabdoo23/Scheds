@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.Entities;
@@ -10,17 +10,13 @@ namespace Scheds.Infrastructure.Services
     {
         private readonly IInstructorRepository _instructorsRepository = instructorsRepository
             ?? throw new ArgumentNullException(nameof(instructorsRepository));
-        //TODO: Refactor this shit (Divide and conquer)
         public async Task<List<CardItem>> ParseSelfServiceResponse(string response)
         {
             List<CardItem> ParsedContent = [];
             var instructorNameCache = new Dictionary<string, string>(StringComparer.Ordinal);
             response = System.Text.RegularExpressions.Regex.Unescape(response);
             if (response.StartsWith('\"') && response.EndsWith('\"'))
-            {
                 response = response[1..^1];
-            }
-            //Console.WriteLine(response);
             try
             {
                 // Parse the JSON response
@@ -39,6 +35,7 @@ namespace Scheds.Infrastructure.Services
 
                     if (sectionObj["instructors"] != null && sectionObj["instructors"] is JArray instructorsJson && instructorsJson.Count > 0)
                     {
+                        var names = new List<string>();
                         foreach (var instructor in instructorsJson)
                         {
                             var id = instructor["personId"]?.ToString() ?? "0";
@@ -71,8 +68,10 @@ namespace Scheds.Infrastructure.Services
                                     instructors += name + ", ";
                                 }
                             }
+                            else
+                                names.Add(await _instructorsRepository.GetInstructorNameById(id) ?? "Unknown Instructor");
                         }
-                        instructors = instructors.TrimEnd(',', ' ');
+                        instructors = names.Count == 0 ? "Pending" : string.Join(", ", names);
                     }
 
                     var precredits = sectionObj["credits"]?.ToString() ?? "0.00";
@@ -117,9 +116,6 @@ namespace Scheds.Infrastructure.Services
                     var courseName = sectionObj["eventName"]?.ToString();
                     var courseCode = sectionObj["eventId"]?.ToString();
                     var subType = sectionObj["eventSubType"]?.ToString();
-                    var lastUpdated = DateTime.Now;
-
-
                     var cardItem = new CardItem
                     {
                         Id = cardId,
@@ -131,17 +127,12 @@ namespace Scheds.Infrastructure.Services
                         SeatsLeft = seats,
                         SubType = subType,
                         CourseSchedules = schedule,
-                        LastUpdate = lastUpdated
+                        LastUpdate = DateTime.UtcNow
                     };
-                    Console.WriteLine(cardItem.ToString());
-
                     ParsedContent.Add(cardItem);
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            catch { }
             return ParsedContent;
         }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Domain.Entities;
@@ -38,8 +38,8 @@ namespace Scheds.MVC.Controllers
         [HttpGet("search/{query}")]
         public async Task<IActionResult> SearchCourses(string query)
         {
-            await _selfServiceLiveFetchService.FetchCourseBases(query);
-            return Ok();
+            var success = await _selfServiceLiveFetchService.FetchCourseBases(query);
+            return success ? Ok() : StatusCode(503);
         }
 
         [HttpGet("getCourseBaseByCourseCode")]
