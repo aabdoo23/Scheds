@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Scheds.Application.Interfaces.Services;
+using Scheds.Domain.Configuration;
 using Scheds.Domain.Entities;
 using Scheds.Domain.DTOs;
 
@@ -10,10 +12,12 @@ namespace Scheds.MVC.Controllers
     public class SeatModerationController : ControllerBase
     {
         private readonly ISeatModerationService _seatModerationService;
+        private readonly FrontendSettings _frontend;
 
-        public SeatModerationController(ISeatModerationService seatModerationService)
+        public SeatModerationController(ISeatModerationService seatModerationService, IOptions<FrontendSettings> frontend)
         {
             _seatModerationService = seatModerationService ?? throw new ArgumentNullException(nameof(seatModerationService));
+            _frontend = frontend.Value;
         }
 
         [HttpGet]
@@ -22,16 +26,10 @@ namespace Scheds.MVC.Controllers
             return Ok("SeatModeration API is running");
         }
 
-        // Separate route for serving the view (outside of the API routes)
         [HttpGet("~/SeatModeration")]
-        [IgnoreAntiforgeryToken]
         public IActionResult ViewIndex()
         {
-            // Return the view directly using the file path
-            return new ViewResult
-            {
-                ViewName = "~/Views/SeatModeration/Index.cshtml"
-            };
+            return Redirect($"{_frontend.Url.TrimEnd('/')}/seat-moderation");
         }
 
         [HttpPost("check-seats")]
@@ -58,24 +56,6 @@ namespace Scheds.MVC.Controllers
                     })
                 };
                 return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Success = false, Error = ex.Message });
-            }
-        }
-
-        [HttpPost("subscribe")]
-        public async Task<IActionResult> SubscribeToMonitoring([FromBody] SubscribeRequestDTO request)
-        {
-            try
-            {
-                var userEmail = GetUserEmail();
-                if (userEmail == null)
-                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
-
-                await _seatModerationService.SubscribeUserToMonitoring(userEmail, request.CourseSections);
-                return Ok(new { Success = true, Message = "Successfully subscribed to seat monitoring" });
             }
             catch (Exception ex)
             {
@@ -148,24 +128,6 @@ namespace Scheds.MVC.Controllers
 
                 await _seatModerationService.ClearSeatModerationCart(userEmail);
                 return Ok(new { Success = true, Message = "Seat moderation cart cleared" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Success = false, Error = ex.Message });
-            }
-        }
-
-        [HttpPost("unsubscribe")]
-        public async Task<IActionResult> UnsubscribeFromMonitoring([FromBody] SubscribeRequestDTO request)
-        {
-            try
-            {
-                var userEmail = GetUserEmail();
-                if (userEmail == null)
-                    return Unauthorized(new { Success = false, Error = "Authentication required or email not found" });
-
-                await _seatModerationService.UnsubscribeUserFromMonitoring(userEmail, request.CourseSections);
-                return Ok(new { Success = true, Message = "Successfully unsubscribed from seat monitoring" });
             }
             catch (Exception ex)
             {

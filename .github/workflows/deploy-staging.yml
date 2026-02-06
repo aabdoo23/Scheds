@@ -1,39 +1,39 @@
-name: Deploy to Production
+name: Deploy to Staging
 
 on:
   push:
     branches:
-      - master
-  workflow_dispatch:  # Allows manual trigger
+      - staging
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: windows-latest  # Windows has MSDeploy built-in
-    
+    runs-on: windows-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
-    
+
     - name: Restore dependencies
       run: dotnet restore Scheds/Scheds.MVC.csproj
-    
+
     - name: Build
       run: dotnet build Scheds/Scheds.MVC.csproj -c Release --no-restore
-    
-    - name: Update Production Configuration
+
+    - name: Update Staging Configuration
       shell: pwsh
       run: |
-        $prodSettings = @{
+        $stagingSettings = @{
           FrontendSettings = @{
-            Url = "${{ secrets.FRONTEND_URL }}"
+            Url = "${{ secrets.STAGING_FRONTEND_URL }}"
           }
           ConnectionStrings = @{
-            SqlServerConnection = "${{ secrets.PROD_CONNECTION_STRING }}"
+            SqlServerConnection = "${{ secrets.STAGING_CONNECTION_STRING }}"
           }
           AdminSettings = @{
             Password = "${{ secrets.PROD_ADMIN_PASSWORD }}"
@@ -58,10 +58,18 @@ jobs:
             From = "${{ secrets.SMTP_FROM }}"
           }
           AllowedHosts = "*"
+          ExposeApiErrors = $true
+          UseCrossOriginCookies = $true
+          Jwt = @{
+            Key = "${{ secrets.JWT_SECRET_KEY }}"
+            Issuer = "scheds"
+            Audience = "scheds-frontend"
+            ExpirationMinutes = 60
+          }
         }
-        
-        $prodSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8
-    
+
+        $stagingSettings | ConvertTo-Json -Depth 10 | Out-File -FilePath "Scheds/appsettings.json" -Encoding UTF8
+
     - name: Create publish profile
       shell: pwsh
       run: |
@@ -74,22 +82,22 @@ jobs:
             <PublishProvider>AzureWebSite</PublishProvider>
             <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
             <LastUsedPlatform>Any CPU</LastUsedPlatform>
-            <SiteUrlToLaunchAfterPublish>http://scheds.runasp.net/</SiteUrlToLaunchAfterPublish>
-            <MSDeployServiceURL>site8805.siteasp.net</MSDeployServiceURL>
-            <DeployIisAppPath>site8805</DeployIisAppPath>
+            <SiteUrlToLaunchAfterPublish>http://scheds-staging.runasp.net/</SiteUrlToLaunchAfterPublish>
+            <MSDeployServiceURL>site52819.siteasp.net</MSDeployServiceURL>
+            <DeployIisAppPath>site52819</DeployIisAppPath>
             <SkipExtraFilesOnServer>False</SkipExtraFilesOnServer>
             <MSDeployPublishMethod>WMSVC</MSDeployPublishMethod>
             <EnableMSDeployBackup>True</EnableMSDeployBackup>
-            <UserName>${{ secrets.DEPLOY_USERNAME }}</UserName>
-            <Password>${{ secrets.DEPLOY_PASSWORD }}</Password>
+            <UserName>${{ secrets.STAGING_DEPLOY_USERNAME }}</UserName>
+            <Password>${{ secrets.STAGING_DEPLOY_PASSWORD }}</Password>
             <TargetFramework>net9.0</TargetFramework>
             <SelfContained>false</SelfContained>
           </PropertyGroup>
         </Project>
-        "@ | Out-File -FilePath Scheds/Properties/PublishProfiles/Production.pubxml -Encoding UTF8
-    
-    - name: Deploy to Production
-      run: dotnet publish Scheds/Scheds.MVC.csproj -c Release /p:PublishProfile=Production /p:Password="${{ secrets.DEPLOY_PASSWORD }}"
+        "@ | Out-File -FilePath Scheds/Properties/PublishProfiles/Staging.pubxml -Encoding UTF8
+
+    - name: Deploy to Staging
+      run: dotnet publish Scheds/Scheds.MVC.csproj -c Release /p:PublishProfile=Staging /p:Password="${{ secrets.STAGING_DEPLOY_PASSWORD }}"
       env:
-        DEPLOY_USERNAME: ${{ secrets.DEPLOY_USERNAME }}
-        DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+        DEPLOY_USERNAME: ${{ secrets.STAGING_DEPLOY_USERNAME }}
+        DEPLOY_PASSWORD: ${{ secrets.STAGING_DEPLOY_PASSWORD }}

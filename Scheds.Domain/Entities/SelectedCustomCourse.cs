@@ -13,13 +13,13 @@ namespace Scheds.Domain.Entities
         
         public string CourseName { get; set; }
         
-        public string CustomMainSection { get; set; }
+        public string? CustomMainSection { get; set; }
         
-        public string CustomSubSection { get; set; }
+        public string? CustomSubSection { get; set; }
         
-        public string CustomProfessor { get; set; }
+        public string? CustomProfessor { get; set; }
         
-        public string CustomTA { get; set; }
+        public string? CustomTA { get; set; }
         
         // Navigation property
         public virtual ScheduleGeneration ScheduleGeneration { get; set; }

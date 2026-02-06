@@ -1,16 +1,19 @@
+using Microsoft.Extensions.Logging;
 using Scheds.Application.Interfaces.Services;
 using Scheds.Application.Interfaces.Repositories;
 using Scheds.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Scheds.Infrastructure.Services
 {
-    public class SeatModerationService(ISelfServiceLiveFetchService selfServiceLiveFetchService,
+    public class SeatModerationService(
+        ILogger<SeatModerationService> logger,
+        ISelfServiceLiveFetchService selfServiceLiveFetchService,
         ISeatModerationRepository seatModerationRepository,
         ICartSeatModerationRepository cartSeatModerationRepository,
         IUserRepository userRepository,
         IEmailService emailService) : ISeatModerationService
     {
+        private readonly ILogger<SeatModerationService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         private readonly ISelfServiceLiveFetchService _selfServiceLiveFetchService = selfServiceLiveFetchService
             ?? throw new ArgumentNullException(nameof(selfServiceLiveFetchService));
         private readonly ISeatModerationRepository _seatModerationRepository = seatModerationRepository
@@ -26,19 +29,12 @@ namespace Scheds.Infrastructure.Services
             try
             {
                 var fetchedCards = await _selfServiceLiveFetchService.FetchCardsSeatModeration(courseCodes, sections);
-                
-                Console.WriteLine($"[API] Fetched {fetchedCards.Count} courses for frontend");
-                foreach (var card in fetchedCards)
-                {
-                    var status = card.SeatsLeft > 0 ? "AVAILABLE" : "NO SEATS";
-                    Console.WriteLine($"[API] {card.CourseCode} Section {card.Section}: {card.SeatsLeft} seats - {status}");
-                }
-                
+                _logger.LogInformation("Fetched {Count} courses for frontend", fetchedCards.Count);
                 return fetchedCards;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching course data: {ex.Message}");
+                _logger.LogError(ex, "Error fetching course data");
                 throw;
             }
         }
@@ -116,7 +112,7 @@ namespace Scheds.Infrastructure.Services
                         else
                         {
                             var remainingCooldown = cooldownPeriod - minutesSinceLastEmail;
-                            Console.WriteLine($"[MONITOR] Seats available for {courseCode} Section {section} but cooldown active (remaining: {remainingCooldown:F1} min)");
+                            _logger.LogDebug("Seats available for {CourseCode} Section {Section} but cooldown active (remaining: {Remaining:F1} min)", courseCode, section, remainingCooldown);
                         }
                     }
                     else if (matchingCard != null)
@@ -125,7 +121,7 @@ namespace Scheds.Infrastructure.Services
                     }
                     else
                     {
-                        Console.WriteLine($"[MONITOR] WARNING: No data found for {courseCode} Section {section}");
+                        _logger.LogWarning("No data found for {CourseCode} Section {Section}", courseCode, section);
                     }
                 }
                 foreach (var kvp in userNotifications)
@@ -142,11 +138,11 @@ namespace Scheds.Infrastructure.Services
                     try
                     {
                         await _emailService.SendEmailAsync(email, subject, htmlBody);
-                        Console.WriteLine($"[EMAIL] Sent summary to {email}");
+                        _logger.LogInformation("Sent seat availability summary to {Email}", email);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[EMAIL] Failed to send summary to {email}: {ex.Message}");
+                        _logger.LogError(ex, "Failed to send summary to {Email}", email);
                     }
                 }
 
@@ -157,19 +153,19 @@ namespace Scheds.Infrastructure.Services
                     {
                         await _seatModerationRepository.UpdateAsync(seatMod);
                     }
-                    Console.WriteLine($"[MONITOR] Updated cooldown timestamps for {userNotifications.Count} notification(s)");
+                    _logger.LogInformation("Updated cooldown timestamps for {Count} notification(s)", userNotifications.Count);
                 }
 
-                Console.WriteLine("[MONITOR] Seat monitoring cycle completed");
+                _logger.LogDebug("Seat monitoring cycle completed");
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("[MONITOR] Monitoring cycle cancelled");
+                _logger.LogInformation("Monitoring cycle cancelled");
                 throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MONITOR] Error during monitoring cycle: {ex.Message}");
+                _logger.LogError(ex, "Error during monitoring cycle");
                 throw;
             }
         }
@@ -202,11 +198,11 @@ namespace Scheds.Infrastructure.Services
                     }
                 }
 
-                Console.WriteLine($"[SUBSCRIPTION] User {userEmail} subscribed to monitoring for {courseSections.Count} course sections");
+                _logger.LogInformation("User {Email} subscribed to monitoring for {Count} course sections", userEmail, courseSections.Count);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[SUBSCRIPTION] Error subscribing user to monitoring: {ex.Message}");
+                _logger.LogError(ex, "Error subscribing user to monitoring");
                 throw;
             }
         }
@@ -218,7 +214,7 @@ namespace Scheds.Infrastructure.Services
                 var user = await _userRepository.GetByEmailAsync(userEmail);
                 if (user == null)
                 {
-                    Console.WriteLine($"[UNSUBSCRIPTION] User {userEmail} not found");
+                    _logger.LogWarning("User {Email} not found for unsubscription", userEmail);
                     return;
                 }
 
@@ -245,11 +241,11 @@ namespace Scheds.Infrastructure.Services
                     }
                 }
 
-                Console.WriteLine($"[UNSUBSCRIPTION] User {userEmail} unsubscribed from monitoring for {courseSections.Count} course sections");
+                _logger.LogInformation("User {Email} unsubscribed from monitoring for {Count} course sections", userEmail, courseSections.Count);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[UNSUBSCRIPTION] Error unsubscribing user from monitoring: {ex.Message}");
+                _logger.LogError(ex, "Error unsubscribing user from monitoring");
                 throw;
             }
         }
@@ -277,13 +273,12 @@ namespace Scheds.Infrastructure.Services
                     
                     var courseSection = $"{courseCode}_{section}";
                     await SubscribeUserToMonitoring(userEmail, new List<string> { courseSection });
-                    
-                    Console.WriteLine($"[CART] Added {courseCode} Section {section} to cart and auto-monitoring for user {userEmail}");
+                    _logger.LogInformation("Added {CourseCode} Section {Section} to cart for user {Email}", courseCode, section, userEmail);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CART] Error adding to cart: {ex.Message}");
+                _logger.LogError(ex, "Error adding to cart");
                 throw;
             }
         }
@@ -303,13 +298,12 @@ namespace Scheds.Infrastructure.Services
                     
                     var courseSection = $"{courseCode}_{section}";
                     await UnsubscribeUserFromMonitoring(userEmail, new List<string> { courseSection });
-                    
-                    Console.WriteLine($"[CART] Removed {courseCode} Section {section} from cart and auto-monitoring for user {userEmail}");
+                    _logger.LogInformation("Removed {CourseCode} Section {Section} from cart for user {Email}", courseCode, section, userEmail);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CART] Error removing from cart: {ex.Message}");
+                _logger.LogError(ex, "Error removing from cart");
                 throw;
             }
         }
@@ -327,7 +321,7 @@ namespace Scheds.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CART] Error getting cart: {ex.Message}");
+                _logger.LogError(ex, "Error getting cart");
                 throw;
             }
         }
@@ -350,13 +344,12 @@ namespace Scheds.Infrastructure.Services
                     await _cartSeatModerationRepository.ClearUserCartAsync(user.Id);
                     
                     await UnsubscribeUserFromMonitoring(userEmail, courseSections);
-                    
-                    Console.WriteLine($"[CART] Cleared cart and unsubscribed from auto-monitoring for {courseSections.Count} courses for user {userEmail}");
+                    _logger.LogInformation("Cleared cart for user {Email}, unsubscribed from {Count} courses", userEmail, courseSections.Count);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[CART] Error clearing cart: {ex.Message}");
+                _logger.LogError(ex, "Error clearing cart");
                 throw;
             }
         }
@@ -366,18 +359,16 @@ namespace Scheds.Infrastructure.Services
             try
             {
                 var user = await _userRepository.GetByEmailAsync(userEmail);
-                if (user == null) 
+                if (user == null)
                 {
-                    Console.WriteLine($"[MONITORING_JOBS] User {userEmail} not found");
+                    _logger.LogWarning("User {Email} not found for monitoring jobs", userEmail);
                     return new List<CardItem>();
                 }
 
-                // Get all seat moderations where this user is subscribed
                 var userSeatModerations = await _seatModerationRepository.GetUserSeatModerationsAsync(userEmail);
 
                 if (!userSeatModerations.Any())
                 {
-                    Console.WriteLine($"[MONITORING_JOBS] No active monitoring jobs found for user {userEmail}");
                     return new List<CardItem>();
                 }
 
@@ -409,13 +400,11 @@ namespace Scheds.Infrastructure.Services
                     )
                 ).ToList();
 
-                Console.WriteLine($"[MONITORING_JOBS] Found {userMonitoredCourses.Count} active monitoring jobs for user {userEmail}");
-                
                 return userMonitoredCourses;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MONITORING_JOBS] Error getting user active monitoring jobs: {ex.Message}");
+                _logger.LogError(ex, "Error getting user active monitoring jobs");
                 throw;
             }
         }

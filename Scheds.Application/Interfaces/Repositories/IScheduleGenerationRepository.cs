@@ -1,3 +1,4 @@
+using Scheds.Domain.DTOs.Admin;
 using Scheds.Domain.Entities;
 using Scheds.Domain.ViewModels;
 
@@ -11,6 +12,8 @@ namespace Scheds.Application.Interfaces.Repositories
         Task<int> GetTotalGenerationsCountAsync();
         Task<IEnumerable<string>> GetMostSelectedCoursesAsync(int topCount = 10);
         Task<IEnumerable<string>> GetMostSelectedCustomizationsAsync(int topCount = 10);
+        Task<IEnumerable<CourseWithCountDTO>> GetMostSelectedCoursesWithCountsAsync(int topCount = 15);
+        Task<IEnumerable<CustomizationWithCountDTO>> GetMostSelectedCustomizationsWithCountsAsync(int topCount = 15);
         Task<IEnumerable<DailyStatsViewModel>> GetGenerationStatsByDateAsync(DateTime fromDate, DateTime toDate);
         Task<Dictionary<string, int>> GetUsageStatisticsAsync();
         Task<IEnumerable<RecentGenerationViewModel>> GetRecentGenerationsAsync(int count = 10);
