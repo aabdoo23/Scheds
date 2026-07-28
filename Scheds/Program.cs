@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scheds.Domain.Configuration;
 using Scheds.Infrastructure;
 using Scheds.Infrastructure.Contexts;
+using System.Threading.RateLimiting;
 
 namespace Scheds.MVC
 {
@@ -20,6 +22,34 @@ namespace Scheds.MVC
             builder.Services.AddControllersWithViews();
             builder.Services.AddControllers();
             builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                // Partition by signed-in student so one person cannot exhaust everyone's budget,
+                // falling back to remote IP for the anonymous unsubscribe pages.
+                static string PartitionKey(HttpContext context) =>
+                    context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
+
+                void AddFixedWindow(string policy, int permitLimit) =>
+                    options.AddPolicy(policy, context =>
+                        RateLimitPartition.GetFixedWindowLimiter(
+                            $"{policy}:{PartitionKey(context)}",
+                            _ => new FixedWindowRateLimiterOptions
+                            {
+                                PermitLimit = permitLimit,
+                                Window = TimeSpan.FromMinutes(1)
+                            }));
+
+                AddFixedWindow(RateLimitPolicies.SeatAlertsRead, 60);
+                // Tightest: each of these can fan out into fetches against the university's portal.
+                AddFixedWindow(RateLimitPolicies.SeatAlertsLive, 12);
+                AddFixedWindow(RateLimitPolicies.SeatAlertsWrite, 30);
+                AddFixedWindow(RateLimitPolicies.SeatAlertsUnsubscribe, 20);
+            });
             builder.Services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "scheds-dataprotection-keys")));
             var useCrossOriginCookies = builder.Configuration.GetValue<bool>("UseCrossOriginCookies");
@@ -39,6 +69,7 @@ namespace Scheds.MVC
             // Configure admin settings
             builder.Services.Configure<AdminSettings>(builder.Configuration.GetSection("AdminSettings"));
             builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("FrontendSettings"));
+            builder.Services.Configure<SeatAlertSettings>(builder.Configuration.GetSection("SeatAlerts"));
 
             builder.Services.AddServices();
             builder.Services.AddRepositories();
@@ -138,6 +169,10 @@ namespace Scheds.MVC
             app.UseCors();
 
             app.UseAuthentication();
+            // Between authentication and authorization on purpose: the principal is already
+            // resolved, so limits partition per student, while an unauthenticated flood is still
+            // capped instead of being waved through to a free 401 each time.
+            app.UseRateLimiter();
             app.UseAuthorization();
 
             app.MapControllerRoute(

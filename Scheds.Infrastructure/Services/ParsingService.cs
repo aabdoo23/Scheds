@@ -10,22 +10,36 @@ namespace Scheds.Infrastructure.Services
     {
         private readonly IInstructorRepository _instructorsRepository = instructorsRepository
             ?? throw new ArgumentNullException(nameof(instructorsRepository));
+        public int CountSections(string response) => TryGetSections(response)?.Count ?? 0;
+
+        /// <summary>
+        /// Extracts the <c>data.sections</c> array, applying the unescaping the Self-Service
+        /// endpoint needs. Returns null when the payload is unusable.
+        /// </summary>
+        private static JArray? TryGetSections(string response)
+        {
+            try
+            {
+                response = System.Text.RegularExpressions.Regex.Unescape(response);
+                if (response.StartsWith('\"') && response.EndsWith('\"'))
+                    response = response[1..^1];
+
+                return JObject.Parse(response)["data"]?["sections"] as JArray;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<List<CardItem>> ParseSelfServiceResponse(string response)
         {
             List<CardItem> ParsedContent = [];
             var instructorNameCache = new Dictionary<string, string>(StringComparer.Ordinal);
-            response = System.Text.RegularExpressions.Regex.Unescape(response);
-            if (response.StartsWith('\"') && response.EndsWith('\"'))
-                response = response[1..^1];
             try
             {
-                // Parse the JSON response
-                var jsonObject = JObject.Parse(response);
-                var dataObject = jsonObject["data"];
-                if (dataObject == null || dataObject["sections"] == null)
+                if (TryGetSections(response) is not JArray sectionsArray)
                     return ParsedContent; // Return empty list if no sections found
-
-                if (dataObject["sections"] is not JArray sectionsArray) return ParsedContent;
 
                 foreach (var sectionObj in sectionsArray)
                 {

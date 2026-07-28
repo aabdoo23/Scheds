@@ -10,6 +10,8 @@ namespace Scheds.Domain.Entities
     {
         [Required]
         public string Email { get; set; } = string.Empty;
-        public virtual ICollection<SeatModeration> SeatModerations { get; set; } = new List<SeatModeration>();
+
+        public virtual ICollection<SeatAlertSubscription> SeatSubscriptions { get; set; }
+            = new List<SeatAlertSubscription>();
     }
 }

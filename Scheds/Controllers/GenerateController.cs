@@ -106,18 +106,18 @@ namespace Scheds.MVC.Controllers
                 }
             }
 
-            var generatedSchedules = GenerationUtil.GenerateAllTimetables(allCardItemsByCourse, request);
-            
+            var generationResult = GenerationUtil.GenerateAllTimetables(allCardItemsByCourse, request);
+
             try
             {
-                await StoreAnalyticsAsync(request, generatedSchedules?.Count() ?? 0);
+                await StoreAnalyticsAsync(request, generationResult.Schedules.Count);
             }
             catch
             {
                 // Analytics storage is non-fatal; generation result still returned
             }
-            
-            return Ok(generatedSchedules);
+
+            return Ok(generationResult);
         }
 
         private async Task StoreAnalyticsAsync(GenerateRequestDTO request, int numberOfSchedulesGenerated)
@@ -127,7 +127,7 @@ namespace Scheds.MVC.Controllers
                 GeneratedAt = DateTime.UtcNow,
                 NumberOfSchedulesGenerated = numberOfSchedulesGenerated,
                 UsedLiveData = request.UseLiveData,
-                ConsideredZeroSeats = request.ConsiderZeroSeats,
+                ConsideredZeroSeats = request.RequireOpenSeats,
                 IsEngineering = request.IsEngineering,
                 MinimumNumberOfItemsPerDay = request.MinimumNumberOfItemsPerDay,
                 LargestAllowedGap = request.LargestAllowedGap,

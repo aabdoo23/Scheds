@@ -9,6 +9,12 @@ namespace Scheds.Domain.DTOs
         public List<string>? ExcludedProfessors { get; set; }
         public List<string>? ExcludedTAs { get; set; }
 
+        /// <summary>
+        /// Soft preference: lecture instructors the student would like for this course.
+        /// Never filters , schedules taught by one of these rank higher (see ScheduleScoring).
+        /// </summary>
+        public List<string>? PreferredProfessors { get; set; }
+
         public bool HasCustomSelection =>
             (ExcludedMainSections != null && ExcludedMainSections.Count > 0) ||
             (ExcludedSubSections != null && ExcludedSubSections.Count > 0) ||
@@ -22,5 +28,6 @@ namespace Scheds.Domain.DTOs
         public IEnumerable<string> EffectiveExcludedSubSections => FilterEmpty(ExcludedSubSections);
         public IEnumerable<string> EffectiveExcludedProfessors => FilterEmpty(ExcludedProfessors);
         public IEnumerable<string> EffectiveExcludedTAs => FilterEmpty(ExcludedTAs);
+        public IEnumerable<string> EffectivePreferredProfessors => FilterEmpty(PreferredProfessors);
     }
 }

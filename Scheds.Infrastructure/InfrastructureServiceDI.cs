@@ -15,8 +15,7 @@ namespace Scheds.Infrastructure
             services.AddScoped<ICourseScheduleRepository, CourseScheduleRepository>();
             services.AddScoped<IInstructorRepository, InstructorRepository>();
             services.AddScoped<IScheduleGenerationRepository, ScheduleGenerationRepository>();
-            services.AddScoped<ISeatModerationRepository, SeatModerationRepository>();
-            services.AddScoped<ICartSeatModerationRepository, CartSeatModerationRepository>();
+            services.AddScoped<ISeatAlertRepository, SeatAlertRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
@@ -29,8 +28,9 @@ namespace Scheds.Infrastructure
             services.AddScoped<IParsingService, ParsingService>();
             services.AddScoped<ISelfServiceLiveFetchService, SelfServiceLiveFetchService>();
             services.AddScoped<IEmptyRoomsService, EmptyRoomsService>();
-            services.AddScoped<ISeatModerationService, SeatModerationService>();
+            services.AddScoped<ISeatAlertService, SeatAlertService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddSingleton<IUnsubscribeTokenService, UnsubscribeTokenService>();
 
             // Register background service for automated seat monitoring
             services.AddHostedService<SeatMonitoringBackgroundService>();

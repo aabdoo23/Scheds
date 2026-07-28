@@ -1,4 +1,5 @@
 using Scheds.Domain.Entities;
+using Scheds.Domain.ValueObjects;
 
 namespace Scheds.Application.Interfaces.Services
 {
@@ -6,6 +7,11 @@ namespace Scheds.Application.Interfaces.Services
     {
         public Task<List<CardItem>> FetchCards(string CourseCode);
         public Task<bool> FetchCourseBases(string CourseCode);
-        public Task<List<CardItem>> FetchCardsSeatModeration(List<string> CourseCodes, List<string> sections);
+
+        /// <summary>
+        /// Returns the current card for each requested course-section pair. Pairs are passed
+        /// as pairs rather than two parallel lists so callers cannot misalign them.
+        /// </summary>
+        public Task<List<CardItem>> FetchSeatData(IReadOnlyCollection<CourseSection> requested);
     }
 }

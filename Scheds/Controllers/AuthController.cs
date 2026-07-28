@@ -58,7 +58,13 @@ public class AuthController : ControllerBase
     {
         if (User?.Identity?.IsAuthenticated != true)
             return Unauthorized();
-        return Ok(new { name = User.Identity!.Name });
+
+        // Email is surfaced so the UI can tell a student which address alerts are sent to.
+        return Ok(new
+        {
+            name = User.Identity!.Name,
+            email = User.FindFirst(ClaimTypes.Email)?.Value
+        });
     }
 
     [HttpPost("refresh")]

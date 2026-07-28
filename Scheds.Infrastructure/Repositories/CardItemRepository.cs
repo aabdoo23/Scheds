@@ -19,6 +19,15 @@ namespace Scheds.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<CardItem>> GetSeatDataByCourseCodeAsync(string courseCode)
+        {
+            // No Include: seat monitoring polls this constantly and never reads schedules.
+            return await _context.CardItems
+                .Where(cardItem => cardItem.CourseCode == courseCode)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<List<CardItem>> Search(string query)
         {
             return await _context.CardItems.Include(c => c.CourseSchedules)
